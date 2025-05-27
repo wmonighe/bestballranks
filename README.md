@@ -16,3 +16,18 @@ public spreadsheet and populate the table with the following columns:
 - **Sentiment** (from column H of the `Rankings` sheet)
 
 The spreadsheet ID and sheet names are configured directly in `index.html`.
+
+### Unabated API
+
+Player headshots are loaded from the Unabated API. A `config.js` file is
+included with the repository and already contains the API key needed to connect
+to the service:
+
+```javascript
+// config.js
+const UNABATED_API_KEY = 'fwe8yfew80f9wyhb';
+```
+
+No additional setup is required. Simply open the page and it will fetch
+headshots using this key.
+
