@@ -27,37 +27,28 @@
   <script>
     const sheetId = '1rNouBdE-HbWafu-shO_5JLPSrLhr-xuGpXYfyOI-2oY';
     const rankingsUrl = `https://opensheet.elk.sh/${sheetId}/Rankings`;
-    const sentimentUrl = `https://opensheet.elk.sh/${sheetId}/Sentiment`;
+    // Sentiment is now stored on column H of the Rankings tab so we only need to
+    // fetch that sheet.
 
     async function loadData() {
       try {
-        const [rankingsRes, sentimentRes] = await Promise.all([
-          fetch(rankingsUrl),
-          fetch(sentimentUrl)
-        ]);
+        const rankingsRes = await fetch(rankingsUrl);
         const rankings = await rankingsRes.json();
-        const sentiment = await sentimentRes.json();
-
-        const sentimentMap = {};
-        sentiment.forEach(row => {
-          // Sentiment score is stored in column F on the Sentiment tab.
-          // opensheet.elk.sh uses header names; if not present use 'F'.
-          const player = row.Player || row.player;
-          const score = row.Sentiment || row['Sentiment Score'] || row.F;
-          sentimentMap[player] = score;
-        });
 
         const tbody = document.querySelector('#rankings-table tbody');
         rankings.forEach((row, index) => {
           const player = row.Player || row.player;
           const rank = index + 1; // auto-incremented ranking
+          // Sentiment score is stored in column H of the Rankings tab. Depending
+          // on how opensheet interprets the headers, we try a few possibilities.
+          const sentiment = row.Sentiment || row['Sentiment Score'] || row.H || '';
           const tr = document.createElement('tr');
           tr.innerHTML = `
             <td>${rank}</td>
             <td>${row.Position}</td>
             <td>${row.Team}</td>
             <td>${player}</td>
-            <td>${sentimentMap[player] || ''}</td>
+            <td>${sentiment}</td>
           `;
           tbody.appendChild(tr);
         });
