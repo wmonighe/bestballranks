@@ -13,6 +13,6 @@ public spreadsheet and populate the table with the following columns:
 - **Position**
 - **Team**
 - **Player**
-- **Sentiment** (from the `Sentiment` sheet, column F)
+- **Sentiment** (from column H of the `Rankings` sheet)
 
 The spreadsheet ID and sheet names are configured directly in `index.html`.
