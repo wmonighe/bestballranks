@@ -76,7 +76,10 @@
         rankings.forEach((row, index) => {
           const player = row.Player || row.player;
           const rank = index + 1; // auto-incremented ranking
-          const sentiment = sentimentMap[(player || '').toLowerCase()] || '';
+          const rowSentiment =
+            row.Sentiment || row['Sentiment Score'] || row.H || '';
+          const sentiment =
+            rowSentiment || sentimentMap[(player || '').toLowerCase()] || '';
           const headshot = headshots[(player || '').toLowerCase()];
           const playerHtml = headshot
             ? `<img src="${headshot}" alt="${player}" style="height:24px;width:24px;vertical-align:middle;margin-right:4px;">${player}`
