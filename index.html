@@ -50,9 +50,10 @@
         const tbody = document.querySelector('#rankings-table tbody');
         rankings.forEach((row, index) => {
           const player = row.Player || row.player;
+          const rank = index + 1; // auto-incremented ranking
           const tr = document.createElement('tr');
           tr.innerHTML = `
-            <td>${row.Ranking || row.Rank || index + 1}</td>
+            <td>${rank}</td>
             <td>${row.Position}</td>
             <td>${row.Team}</td>
             <td>${player}</td>
