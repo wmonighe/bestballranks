@@ -33,7 +33,7 @@
 
     const playersUrl =
       typeof UNABATED_API_KEY !== 'undefined'
-        ? `https://partner-api.unabated.com/v2/players?x-api-key=${UNABATED_API_KEY}`
+        ? 'https://partner-api.unabated.com/v2/players'
         : null;
 
     const headshots = {};
@@ -41,7 +41,9 @@
     async function fetchPlayers() {
       if (!playersUrl) return;
       try {
-        const res = await fetch(playersUrl);
+        const res = await fetch(playersUrl, {
+          headers: { 'x-api-key': UNABATED_API_KEY },
+        });
         const players = await res.json();
         players.forEach(p => {
           const name = ((p.preferredName || `${p.firstName} ${p.lastName}`) || '')
