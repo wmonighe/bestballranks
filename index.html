@@ -28,8 +28,8 @@
   <script>
     const sheetId = '1rNouBdE-HbWafu-shO_5JLPSrLhr-xuGpXYfyOI-2oY';
     const rankingsUrl = `https://opensheet.elk.sh/${sheetId}/Rankings`;
-    // Sentiment is now stored on column H of the Rankings tab so we only need to
-    // fetch that sheet.
+    const sentimentUrl = `https://opensheet.elk.sh/${sheetId}/Sentiment`;
+    // Sentiment scores are stored on the Sentiment tab in column F.
 
     const playersUrl =
       typeof UNABATED_API_KEY !== 'undefined'
@@ -58,6 +58,15 @@
       try {
         const rankingsRes = await fetch(rankingsUrl);
         const rankings = await rankingsRes.json();
+        const sentimentRes = await fetch(sentimentUrl);
+        const sentimentRows = await sentimentRes.json();
+
+        const sentimentMap = {};
+        sentimentRows.forEach(r => {
+          const playerName = (r.Player || r.player || '').toLowerCase();
+          const score = r.Sentiment || r['Sentiment Score'] || r.F || '';
+          if (playerName) sentimentMap[playerName] = score;
+        });
 
         await fetchPlayers();
 
@@ -65,9 +74,7 @@
         rankings.forEach((row, index) => {
           const player = row.Player || row.player;
           const rank = index + 1; // auto-incremented ranking
-          // Sentiment score is stored in column H of the Rankings tab. Depending
-          // on how opensheet interprets the headers, we try a few possibilities.
-          const sentiment = row.Sentiment || row['Sentiment Score'] || row.H || '';
+          const sentiment = sentimentMap[(player || '').toLowerCase()] || '';
           const headshot = headshots[(player || '').toLowerCase()];
           const playerHtml = headshot
             ? `<img src="${headshot}" alt="${player}" style="height:24px;width:24px;vertical-align:middle;margin-right:4px;">${player}`
