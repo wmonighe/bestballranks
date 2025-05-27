@@ -31,3 +31,6 @@ const UNABATED_API_KEY = 'fwe8yfew80f9wyhb';
 No additional setup is required. Simply open the page and it will fetch
 headshots using this key.
 
+If a headshot is available from Unabated, the Player column will display the
+image directly in front of the player's name.
+
