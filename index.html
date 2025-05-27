@@ -11,6 +11,7 @@
   </style>
 </head>
 <body>
+  <script src="config.js"></script>
   <h1>Best Ball Rankings</h1>
   <table id="rankings-table">
     <thead>
@@ -30,10 +31,35 @@
     // Sentiment is now stored on column H of the Rankings tab so we only need to
     // fetch that sheet.
 
+    const playersUrl =
+      typeof UNABATED_API_KEY !== 'undefined'
+        ? `https://partner-api.unabated.com/v2/players?x-api-key=${UNABATED_API_KEY}`
+        : null;
+
+    const headshots = {};
+
+    async function fetchPlayers() {
+      if (!playersUrl) return;
+      try {
+        const res = await fetch(playersUrl);
+        const players = await res.json();
+        players.forEach(p => {
+          const name = ((p.preferredName || `${p.firstName} ${p.lastName}`) || '')
+            .trim()
+            .toLowerCase();
+          if (name) headshots[name] = p.headshotUrl;
+        });
+      } catch (err) {
+        console.error('Error loading player data:', err);
+      }
+    }
+
     async function loadData() {
       try {
         const rankingsRes = await fetch(rankingsUrl);
         const rankings = await rankingsRes.json();
+
+        await fetchPlayers();
 
         const tbody = document.querySelector('#rankings-table tbody');
         rankings.forEach((row, index) => {
@@ -42,12 +68,16 @@
           // Sentiment score is stored in column H of the Rankings tab. Depending
           // on how opensheet interprets the headers, we try a few possibilities.
           const sentiment = row.Sentiment || row['Sentiment Score'] || row.H || '';
+          const headshot = headshots[(player || '').toLowerCase()];
+          const playerHtml = headshot
+            ? `<img src="${headshot}" alt="${player}" style="height:24px;width:24px;vertical-align:middle;margin-right:4px;">${player}`
+            : player;
           const tr = document.createElement('tr');
           tr.innerHTML = `
             <td>${rank}</td>
             <td>${row.Position}</td>
             <td>${row.Team}</td>
-            <td>${player}</td>
+            <td>${playerHtml}</td>
             <td>${sentiment}</td>
           `;
           tbody.appendChild(tr);
