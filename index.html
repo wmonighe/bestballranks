@@ -48,11 +48,11 @@
         });
 
         const tbody = document.querySelector('#rankings-table tbody');
-        rankings.forEach(row => {
+        rankings.forEach((row, index) => {
           const player = row.Player || row.player;
           const tr = document.createElement('tr');
           tr.innerHTML = `
-            <td>${row.Ranking || row.Rank}</td>
+            <td>${row.Ranking || row.Rank || index + 1}</td>
             <td>${row.Position}</td>
             <td>${row.Team}</td>
             <td>${player}</td>
