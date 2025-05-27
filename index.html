@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Best Ball Rankings</title>
+  <style>
+    table { border-collapse: collapse; width: 100%; }
+    th, td { border: 1px solid #ddd; padding: 8px; }
+    th { background-color: #f2f2f2; }
+  </style>
+</head>
+<body>
+  <h1>Best Ball Rankings</h1>
+  <table id="rankings-table">
+    <thead>
+      <tr>
+        <th>Ranking</th>
+        <th>Position</th>
+        <th>Team</th>
+        <th>Player</th>
+        <th>Sentiment</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <script>
+    const sheetId = '1rNouBdE-HbWafu-shO_5JLPSrLhr-xuGpXYfyOI-2oY';
+    const rankingsUrl = `https://opensheet.elk.sh/${sheetId}/Rankings`;
+    const sentimentUrl = `https://opensheet.elk.sh/${sheetId}/Sentiment`;
+
+    async function loadData() {
+      try {
+        const [rankingsRes, sentimentRes] = await Promise.all([
+          fetch(rankingsUrl),
+          fetch(sentimentUrl)
+        ]);
+        const rankings = await rankingsRes.json();
+        const sentiment = await sentimentRes.json();
+
+        const sentimentMap = {};
+        sentiment.forEach(row => {
+          // Sentiment score is stored in column F on the Sentiment tab.
+          // opensheet.elk.sh uses header names; if not present use 'F'.
+          const player = row.Player || row.player;
+          const score = row.Sentiment || row['Sentiment Score'] || row.F;
+          sentimentMap[player] = score;
+        });
+
+        const tbody = document.querySelector('#rankings-table tbody');
+        rankings.forEach(row => {
+          const player = row.Player || row.player;
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${row.Ranking || row.Rank}</td>
+            <td>${row.Position}</td>
+            <td>${row.Team}</td>
+            <td>${player}</td>
+            <td>${sentimentMap[player] || ''}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      } catch (err) {
+        console.error('Error loading data:', err);
+      }
+    }
+
+    loadData();
+  </script>
+</body>
+</html>
