@@ -21,8 +21,8 @@ The spreadsheet ID and sheet names are configured directly in `index.html`.
 
 Player headshots are loaded from the Unabated API. A `config.js` file is
 included with the repository and already contains the API key needed to connect
-to the service. The page fetches player data for Major League Baseball (league
-ID `5`) so that headshot URLs can be matched to the rankings:
+to the service. The page fetches player data for the National Football League
+(league ID `1`) so that headshot URLs can be matched to the rankings:
 
 ```javascript
 // config.js
