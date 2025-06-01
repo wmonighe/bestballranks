@@ -30,6 +30,10 @@
     th {
       background-color: #f2f2f2;
     }
+    .rating-header, .rating-cell {
+      background-color: #ffeeba;
+      font-weight: 700;
+    }
     tbody tr:nth-child(even) {
       background-color: #fafafa;
     }
@@ -44,6 +48,7 @@
   <table id="rankings-table">
     <thead>
       <tr>
+        <th class="rating-header">Rating</th>
         <th>wmonighe</th>
         <th>Position</th>
         <th>Team</th>
@@ -148,6 +153,7 @@
             : player;
           const tr = document.createElement('tr');
           tr.innerHTML = `
+            <td class="rating-cell"></td>
             <td>${rank}</td>
             <td>${row.Position}</td>
             <td>${row.Team}</td>
