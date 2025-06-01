@@ -195,14 +195,11 @@
         });
 
 
-        const fpPctColMap = {};
         const wmonigheRankMap = {};
         fpPctRows.forEach(r => {
           const name = canonicalName(r.Player || r.player);
-          const fp = getColumn(r, '', 'fd pct');
-          const wRank = getColumn(r, 'G', 'wmonighe rank');
+          const wRank = r["wmonighe Rank"] || r["Wmonighe Rank"] || "";
           if (name) {
-            fpPctColMap[name] = fp;
             wmonigheRankMap[name] = wRank;
           }
         });
