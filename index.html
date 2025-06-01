@@ -83,6 +83,7 @@
         <th>📊 ADP</th>
         <th>🏆 Fantasy Points</th>
         <th>😊 Sentiment</th>
+        <th>📈 Fantasy Points Sentiment</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -91,6 +92,7 @@
     const sheetId = '1rNouBdE-HbWafu-shO_5JLPSrLhr-xuGpXYfyOI-2oY';
     const rankingsUrl = `https://opensheet.elk.sh/${sheetId}/Rankings`;
     const sentimentUrl = `https://opensheet.elk.sh/${sheetId}/Sentiment`;
+    const fpSentimentUrl = `https://opensheet.elk.sh/${sheetId}/148406078`;
     // Sentiment scores are stored on the Sentiment tab in column F.
 
     const LEAGUE_ID = 1; // NFL
@@ -168,9 +170,10 @@
 
     async function loadData() {
       try {
-        const [rankingsRes, sentimentRes] = await Promise.all([
+        const [rankingsRes, sentimentRes, fpSentimentRes] = await Promise.all([
           fetch(rankingsUrl),
           fetch(sentimentUrl),
+          fetch(fpSentimentUrl),
         ]);
         const rankings = await rankingsRes.json();
         const sentimentRows = await sentimentRes.json();
@@ -183,6 +186,13 @@
         });
 
 
+        const fpSentimentRows = await fpSentimentRes.json();
+        const fpSentimentMap = {};
+        fpSentimentRows.forEach(r => {
+          const name = canonicalName(r.Player || r.player);
+          const value = r.K || r["Fantasy Points Sentiment"] || "";
+          if (name) fpSentimentMap[name] = value;
+        });
 
         await fetchPlayers();
 
@@ -215,6 +225,7 @@
             adpPct,
             fantasyPts,
             fpPct,
+            fpSentiment: fpSentimentMap[canonName] || "",
           };
         });
 
@@ -240,6 +251,7 @@
             <td>${r.adp}${r.adpPct ? ` (${r.adpPct})` : ''}</td>
             <td>${r.fantasyPts}${r.fpPct ? ` (${r.fpPct})` : ''}</td>
             <td class="sentiment-cell" style="--width:${percent}%"><span>${r.sentiment}</span></td>
+            <td>${r.fpSentiment}</td>
           `;
           tbody.appendChild(tr);
         });
