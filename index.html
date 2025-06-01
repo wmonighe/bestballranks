@@ -126,6 +126,17 @@
       return key ? row[key] : '';
     }
 
+    function getFantasyPointsPct(row) {
+      if (row.K || row['Fantasy Points Percentile'] || row['FantasyPts Percentile']) {
+        return row.K || row['Fantasy Points Percentile'] || row['FantasyPts Percentile'];
+      }
+      const key = Object.keys(row).find(k => {
+        const ck = canonicalField(k);
+        return ck.includes('fantasypoint') && ck.includes('percent');
+      });
+      return key ? row[key] : '';
+    }
+
     async function fetchPlayers() {
       if (!playersUrl) return;
       try {
@@ -186,7 +197,7 @@
           const adp = row.J || row.ADP || row['ADP'] || '';
           const adpPct = getColumn(row, 'L', 'adp percentile');
           const fantasyPts = getFantasyPoints(row);
-          const fpPct = getColumn(row, 'K', 'fantasy points percentile');
+          const fpPct = getFantasyPointsPct(row);
 
           const headshot = headshots[canonName];
           const playerHtml = headshot
