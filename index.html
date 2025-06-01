@@ -21,6 +21,8 @@
         <th>Team</th>
         <th>Player</th>
         <th>Sentiment</th>
+        <th>ADP</th>
+        <th>Fantasy Points</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -29,6 +31,8 @@
     const sheetId = '1rNouBdE-HbWafu-shO_5JLPSrLhr-xuGpXYfyOI-2oY';
     const rankingsUrl = `https://opensheet.elk.sh/${sheetId}/Rankings`;
     const sentimentUrl = `https://opensheet.elk.sh/${sheetId}/Sentiment`;
+    const adpUrl = `https://opensheet.elk.sh/${sheetId}/ADP`;
+    const clayUrl = `https://opensheet.elk.sh/${sheetId}/ClayProj`;
     // Sentiment scores are stored on the Sentiment tab in column F.
 
     const LEAGUE_ID = 1; // NFL
@@ -59,16 +63,38 @@
 
     async function loadData() {
       try {
-        const rankingsRes = await fetch(rankingsUrl);
+        const [rankingsRes, sentimentRes, adpRes, clayRes] = await Promise.all([
+          fetch(rankingsUrl),
+          fetch(sentimentUrl),
+          fetch(adpUrl),
+          fetch(clayUrl),
+        ]);
         const rankings = await rankingsRes.json();
-        const sentimentRes = await fetch(sentimentUrl);
         const sentimentRows = await sentimentRes.json();
+        const adpRows = await adpRes.json();
+        const clayRows = await clayRes.json();
 
         const sentimentMap = {};
         sentimentRows.forEach(r => {
           const playerName = (r.Player || r.player || '').toLowerCase();
           const score = r.Sentiment || r['Sentiment Score'] || r.F || '';
           if (playerName) sentimentMap[playerName] = score;
+        });
+
+        const adpMap = {};
+        adpRows.forEach(r => {
+          const name = (r.Player || r.player || '').toLowerCase();
+          const adp = r.ADP || r.D || '';
+          const pct = r['Percentile Rank'] || r.Percentile || r.E || '';
+          if (name) adpMap[name] = { adp, pct };
+        });
+
+        const clayMap = {};
+        clayRows.forEach(r => {
+          const name = (r.Player || r.player || '').toLowerCase();
+          const pts = r['Fantasy Points'] || r.W || '';
+          const pct = r['Percentile Rank'] || r.Percentile || r.X || '';
+          if (name) clayMap[name] = { pts, pct };
         });
 
         await fetchPlayers();
@@ -81,17 +107,25 @@
             row.Sentiment || row['Sentiment Score'] || row.H || '';
           const sentiment =
             rowSentiment || sentimentMap[(player || '').toLowerCase()] || '';
+
+          const adpInfo = adpMap[(player || '').toLowerCase()] || {};
+          const clayInfo = clayMap[(player || '').toLowerCase()] || {};
+
           const headshot = headshots[(player || '').toLowerCase()];
           const playerHtml = headshot
             ? `<img src="${headshot}" alt="${player}" style="height:24px;width:24px;vertical-align:middle;margin-right:4px;">${player}`
             : player;
           const tr = document.createElement('tr');
+          tr.dataset.adpPercentile = adpInfo.pct || '';
+          tr.dataset.clayPercentile = clayInfo.pct || '';
           tr.innerHTML = `
             <td>${rank}</td>
             <td>${row.Position}</td>
             <td>${row.Team}</td>
             <td>${playerHtml}</td>
             <td>${sentiment}</td>
+            <td>${adpInfo.adp || ''}</td>
+            <td>${clayInfo.pts || ''}</td>
           `;
           tbody.appendChild(tr);
         });

@@ -14,6 +14,8 @@ public spreadsheet and populate the table with the following columns:
 - **Team**
 - **Player**
 - **Sentiment** (from column F of the `Sentiment` sheet)
+- **ADP** (column D of the `ADP` sheet)
+- **Fantasy Points** (column W of the `ClayProj` sheet)
 
 The spreadsheet ID and sheet names are configured directly in `index.html`.
 
