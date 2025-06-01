@@ -198,7 +198,7 @@
         const fpSentimentMap = {};
         fpSentimentRows.forEach(r => {
           const name = canonicalName(r.Player || r.player);
-          const value = r.K || r["Fantasy Points Sentiment"] || "";
+          const value = getColumn(r, 'K', 'fantasy points sentiment');
           if (name) fpSentimentMap[name] = value;
         });
 
