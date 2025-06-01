@@ -126,12 +126,15 @@
     }
 
     function getFantasyPointsPct(row) {
-      if (row.K || row['Fantasy Points Percentile'] || row['FantasyPts Percentile']) {
-        return row.K || row['Fantasy Points Percentile'] || row['FantasyPts Percentile'];
-      }
+      const direct = getColumn(row, 'K', 'fantasy points percentile');
+      if (direct) return direct;
+
       const key = Object.keys(row).find(k => {
         const ck = canonicalField(k);
-        return ck.includes('fantasypoint') && ck.includes('percent');
+        return (
+          (ck.includes('fantasypoints') || ck.includes('fantasypts') || ck.includes('fp')) &&
+          (ck.includes('percentile') || ck.includes('percent'))
+        );
       });
       return key ? row[key] : '';
     }
