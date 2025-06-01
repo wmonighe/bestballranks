@@ -18,6 +18,7 @@ public spreadsheet and populate the table with the following columns:
 - **Sentiment** (from column F of the `Sentiment` sheet)
 
 - **FP Pct** (column K from sheet gid `148406078`)
+- **FD Pct** (column O from sheet gid `148406078`)
 The spreadsheet ID and sheet names are configured directly in `index.html`.
 
 ### Unabated API

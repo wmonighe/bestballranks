@@ -84,6 +84,7 @@
         <th>🏆 Fantasy Points</th>
         <th>😊 Sentiment</th>
         <th>📈 FP Pct</th>
+        <th>📉 FD Pct</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -196,10 +197,15 @@
 
 
         const fpPctColMap = {};
+        const fdPctColMap = {};
         fpPctRows.forEach(r => {
           const name = canonicalName(r.Player || r.player);
-          const value = getColumn(r, 'K', 'fp pct');
-          if (name) fpPctColMap[name] = value;
+          const fp = getColumn(r, 'K', 'fp pct');
+          const fd = getColumn(r, 'O', 'fd pct');
+          if (name) {
+            fpPctColMap[name] = fp;
+            fdPctColMap[name] = fd;
+          }
         });
 
         await fetchPlayers();
@@ -234,6 +240,7 @@
             fantasyPts,
             fpPct,
             fpPctCol: fpPctColMap[canonName] || "",
+            fdPctCol: fdPctColMap[canonName] || "",
           };
         });
 
@@ -260,6 +267,7 @@
             <td>${r.fantasyPts}${r.fpPct ? ` (${r.fpPct})` : ''}</td>
             <td class="sentiment-cell" style="--width:${percent}%"><span>${r.sentiment}</span></td>
             <td>${r.fpPctCol}</td>
+            <td>${r.fdPctCol}</td>
           `;
           tbody.appendChild(tr);
         });
