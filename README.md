@@ -15,8 +15,8 @@ public spreadsheet and populate the table with the following columns:
 - **Team**
 - **Player**
 - **Sentiment** (from column F of the `Sentiment` sheet)
-- **ADP** (column J of the `Rankings` sheet, with percentile from column L of the `ADP` sheet appended in parentheses)
-- **Fantasy Points** (column I of the `Rankings` sheet, with percentile from column W of the `CLayProj` sheet appended in parentheses)
+- **ADP** (column J of the `Rankings` sheet, with percentile from column L of that sheet appended in parentheses)
+- **Fantasy Points** (column I of the `Rankings` sheet, with percentile from column K of that sheet appended in parentheses)
 
 The spreadsheet ID and sheet names are configured directly in `index.html`.
 
