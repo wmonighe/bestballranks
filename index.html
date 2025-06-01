@@ -85,6 +85,8 @@
     const sheetId = '1rNouBdE-HbWafu-shO_5JLPSrLhr-xuGpXYfyOI-2oY';
     const rankingsUrl = `https://opensheet.elk.sh/${sheetId}/Rankings`;
     const sentimentUrl = `https://opensheet.elk.sh/${sheetId}/Sentiment`;
+    const adpUrl = `https://opensheet.elk.sh/${sheetId}/ADP`;
+    const clayProjUrl = `https://opensheet.elk.sh/${sheetId}/CLayProj`;
     // Sentiment scores are stored on the Sentiment tab in column F.
 
     const LEAGUE_ID = 1; // NFL
@@ -137,20 +139,53 @@
       }
     }
 
+    function letterIndex(letter) {
+      return letter.toUpperCase().charCodeAt(0) - 65; // A=0
+    }
+
+    function getPercentile(row, letter) {
+      const idx = letterIndex(letter);
+      const keys = Object.keys(row);
+      if (keys[idx]) {
+        const val = row[keys[idx]];
+        if (val !== undefined) return val;
+      }
+      const key = keys.find(k => canonicalField(k).includes('percentile'));
+      return key ? row[key] : '';
+    }
+
     async function loadData() {
       try {
-        const [rankingsRes, sentimentRes] = await Promise.all([
+        const [rankingsRes, sentimentRes, adpRes, clayRes] = await Promise.all([
           fetch(rankingsUrl),
           fetch(sentimentUrl),
+          fetch(adpUrl),
+          fetch(clayProjUrl),
         ]);
         const rankings = await rankingsRes.json();
         const sentimentRows = await sentimentRes.json();
+        const adpRows = await adpRes.json();
+        const clayRows = await clayRes.json();
 
         const sentimentMap = {};
         sentimentRows.forEach(r => {
           const playerName = canonicalName(r.Player || r.player);
           const score = r.Sentiment || r['Sentiment Score'] || r.F || '';
           if (playerName) sentimentMap[playerName] = score;
+        });
+
+        const adpPctMap = {};
+        adpRows.forEach(r => {
+          const name = canonicalName(r.Player || r.player);
+          const pct = getPercentile(r, 'L');
+          if (name) adpPctMap[name] = pct;
+        });
+
+        const fpPctMap = {};
+        clayRows.forEach(r => {
+          const name = canonicalName(r.Player || r.player);
+          const pct = getPercentile(r, 'W');
+          if (name) fpPctMap[name] = pct;
         });
 
         await fetchPlayers();
@@ -166,7 +201,9 @@
             rowSentiment || sentimentMap[canonName] || '';
 
           const adp = row.J || row.ADP || row['ADP'] || '';
+          const adpPct = adpPctMap[canonName] || '';
           const fantasyPts = getFantasyPoints(row);
+          const fpPct = fpPctMap[canonName] || '';
 
           const headshot = headshots[canonName];
           const playerHtml = headshot
@@ -181,7 +218,9 @@
             sentiment,
             sentimentValue: parseFloat(sentiment),
             adp,
+            adpPct,
             fantasyPts,
+            fpPct,
           };
         });
 
@@ -206,8 +245,8 @@
             <td>${r.team}</td>
             <td>${r.playerHtml}</td>
             <td class="sentiment-cell" style="--width:${percent}%"><span>${r.sentiment}</span></td>
-            <td>${r.adp}</td>
-            <td>${r.fantasyPts}</td>
+            <td>${r.adp}${r.adpPct ? ` (${r.adpPct})` : ''}</td>
+            <td>${r.fantasyPts}${r.fpPct ? ` (${r.fpPct})` : ''}</td>
           `;
           tbody.appendChild(tr);
         });
