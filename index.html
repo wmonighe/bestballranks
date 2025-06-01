@@ -198,7 +198,7 @@
         const fpPctColMap = {};
         fpPctRows.forEach(r => {
           const name = canonicalName(r.Player || r.player);
-          const fp = getColumn(r, 'K', 'fp pct');
+          const fp = getColumn(r, '', 'fd pct');
           if (name) {
             fpPctColMap[name] = fp;
           }
