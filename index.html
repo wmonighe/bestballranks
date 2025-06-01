@@ -73,18 +73,7 @@
   <script src="config.js"></script>
   <h1>Best Ball Rankings</h1>
   <table id="rankings-table">
-    <thead>
-      <tr>
-        <th class="rating-column">⭐ Rating</th>
-        <th>👤 Player</th>
-        <th>🏈 Team</th>
-        <th>📋 Position</th>
-        <th>📊 ADP</th>
-        <th>🏅 wmonighe Rank</th>
-        <th>🏆 Fantasy Points</th>
-        <th>😊 Sentiment</th>
-      </tr>
-    </thead>
+    <thead></thead>
     <tbody></tbody>
   </table>
   <script>
@@ -100,6 +89,43 @@
         : null;
 
     const headshots = {};
+
+    const columns = [
+      {
+        header: '⭐ Rating',
+        thClass: 'rating-column',
+        cell: () => '<td class="rating-cell"></td>',
+      },
+      {
+        header: '👤 Player',
+        cell: r => `<td>${r.playerHtml}</td>`,
+      },
+      {
+        header: '🏈 Team',
+        cell: r => `<td>${r.team}</td>`,
+      },
+      {
+        header: '📋 Position',
+        cell: r => `<td>${r.position}</td>`,
+      },
+      {
+        header: '🏅 wmonighe Rank',
+        cell: r => `<td>${r.wmonigheRank}</td>`,
+      },
+      {
+        header: '📊 ADP',
+        cell: r => `<td>${r.adp}${r.adpPct ? ' (' + r.adpPct + ')' : ''}</td>`,
+      },
+      {
+        header: '🏆 Fantasy Points',
+        cell: r => `<td>${r.fantasyPts}${r.fpPct ? ' (' + r.fpPct + ')' : ''}</td>`,
+      },
+      {
+        header: '😊 Sentiment',
+        cell: r =>
+          `<td class="sentiment-cell" style="--width:${r.sentimentPercent}%"><span>${r.sentiment}</span></td>`,
+      },
+    ];
 
     function canonicalName(name) {
       return (name || '')
@@ -190,6 +216,10 @@
         await fetchPlayers();
 
         const tbody = document.querySelector('#rankings-table tbody');
+        const thead = document.querySelector('#rankings-table thead');
+        tbody.innerHTML = '';
+        thead.innerHTML = '';
+
         const rowsData = rankings.map(row => {
           const player = row.Player || row.player;
           const canonName = canonicalName(player);
@@ -246,20 +276,25 @@
         const range = maxSentiment - minSentiment || 1;
 
         rowsData.forEach(r => {
-          const percent = !isNaN(r.sentimentValue)
+          r.sentimentPercent = !isNaN(r.sentimentValue)
             ? ((r.sentimentValue - minSentiment) / range) * 100
             : 0;
+        });
+
+        const headerRow = document.createElement('tr');
+        columns.forEach(col => {
+          const th = document.createElement('th');
+          if (col.thClass) th.className = col.thClass;
+          th.innerHTML = col.header;
+          headerRow.appendChild(th);
+        });
+        thead.appendChild(headerRow);
+
+        rowsData.forEach(r => {
           const tr = document.createElement('tr');
-          tr.innerHTML = `
-            <td class="rating-cell"></td>
-            <td>${r.playerHtml}</td>
-            <td>${r.team}</td>
-            <td>${r.position}</td>
-            <td>${r.adp}${r.adpPct ? ` (${r.adpPct})` : ''}</td>
-            <td>${r.wmonigheRank}</td>
-            <td>${r.fantasyPts}${r.fpPct ? ` (${r.fpPct})` : ''}</td>
-            <td class="sentiment-cell" style="--width:${percent}%"><span>${r.sentiment}</span></td>
-          `;
+          columns.forEach(col => {
+            tr.insertAdjacentHTML('beforeend', col.cell(r));
+          });
           tbody.appendChild(tr);
         });
       } catch (err) {
