@@ -234,9 +234,22 @@
             adp,
             adpPct,
             fantasyPts,
-            fpPct,
-            fpPctCol: fpPctColMap[canonName] || "",
-          };
+          fpPct,
+          fpPctCol: fpPctColMap[canonName] || "",
+        };
+      });
+
+        const numericFps = rowsData
+          .map(r => parseFloat(r.fantasyPts))
+          .filter(v => !isNaN(v))
+          .sort((a, b) => a - b);
+
+        rowsData.forEach(r => {
+          const val = parseFloat(r.fantasyPts);
+          if (!isNaN(val) && numericFps.length) {
+            const rank = numericFps.filter(v => v <= val).length;
+            r.fpPctCol = ((rank / numericFps.length) * 100).toFixed(1);
+          }
         });
 
         const numericSentiments = rowsData
