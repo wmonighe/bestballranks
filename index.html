@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Best Ball Rankings</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-  <!-- Load the Inter font from Google Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet" />
   <style>
     body {
       font-family: 'Inter', sans-serif;
@@ -93,13 +92,14 @@
     const rankingsUrl = `https://opensheet.elk.sh/${sheetId}/Rankings`;
     const sentimentUrl = `https://opensheet.elk.sh/${sheetId}/Sentiment`;
     const fpPctUrl = `https://opensheet.elk.sh/${sheetId}/148406078`;
-    // Sentiment scores are stored on the Sentiment tab in column F.
 
-    const LEAGUE_ID = 1; // NFL
+    const LEAGUE_ID = 1;
     const playersUrl =
       typeof UNABATED_API_KEY !== 'undefined'
         ? `https://partner-api.unabated.com/v2/players?leagues=${LEAGUE_ID}`
         : null;
+
+    const headshots = {};
 
     function canonicalName(name) {
       return (name || '')
@@ -109,8 +109,6 @@
         .replace(/[^a-z0-9]+/g, ' ')
         .trim();
     }
-
-    const headshots = {};
 
     function canonicalField(name) {
       return (name || '').toString().toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -127,17 +125,12 @@
       return key ? row[key] : '';
     }
 
-    function getFantasyPointsPct(row) {
-      const direct = getColumn(row, 'K', 'fantasy points percentile');
-      if (direct) return direct;
-
-      const key = Object.keys(row).find(k => {
-        const ck = canonicalField(k);
-        return (
-          (ck.includes('fantasypoints') || ck.includes('fantasypts') || ck.includes('fp')) &&
-          (ck.includes('percentile') || ck.includes('percent'))
-        );
-      });
+    function getColumn(row, letter, labelPart) {
+      if (row[letter]) return row[letter];
+      const target = canonicalField(labelPart);
+      const key = Object.keys(row).find(k =>
+        canonicalField(k).includes(target)
+      );
       return key ? row[key] : '';
     }
 
@@ -157,15 +150,6 @@
       } catch (err) {
         console.error('Error loading player data:', err);
       }
-    }
-
-    function getColumn(row, letter, labelPart) {
-      if (row[letter]) return row[letter];
-      const target = canonicalField(labelPart);
-      const key = Object.keys(row).find(k =>
-        canonicalField(k).includes(target)
-      );
-      return key ? row[key] : '';
     }
 
     async function loadData() {
@@ -194,7 +178,6 @@
           if (playerName) sentimentMap[playerName] = score;
         });
 
-
         const wmonigheRankMap = {};
         fpPctRows.forEach(r => {
           const name = canonicalName(r.Player || r.player);
@@ -214,7 +197,6 @@
             row.Sentiment || row['Sentiment Score'] || row.H || '';
           const sentiment =
             rowSentiment || sentimentMap[canonName] || '';
-
           const adp = row.J || row.ADP || row['ADP'] || '';
           const adpPct = getColumn(row, 'L', 'adp percentile');
           const fantasyPts = getFantasyPoints(row);
@@ -234,23 +216,26 @@
             adpPct,
             wmonigheRank: wmonigheRankMap[canonName] || '',
             fantasyPts,
-          fpPctCol: fpPctColMap[canonName] || "",
-        };
-      });
+          };
+        });
 
+        // Add fantasy points percentiles
         const numericFps = rowsData
           .map(r => parseFloat(r.fantasyPts))
           .filter(v => !isNaN(v))
           .sort((a, b) => a - b);
 
         rowsData.forEach(r => {
-            const val = parseFloat(r.fantasyPts);
-            if (!isNaN(val) && numericFps.length) {
-              const rank = numericFps.filter(v => v <= val).length;
-              r.fpPctCol = (rank / numericFps.length).toFixed(2);
-            }
+          const val = parseFloat(r.fantasyPts);
+          if (!isNaN(val) && numericFps.length) {
+            const rank = numericFps.filter(v => v <= val).length;
+            r.fpPct = (rank / numericFps.length).toFixed(2);
+          } else {
+            r.fpPct = '';
+          }
         });
 
+        // Sentiment rendering
         const numericSentiments = rowsData
           .map(r => r.sentimentValue)
           .filter(v => !isNaN(v));
@@ -272,7 +257,7 @@
             <td>${r.position}</td>
             <td>${r.adp}${r.adpPct ? ` (${r.adpPct})` : ''}</td>
             <td>${r.wmonigheRank}</td>
-            <td>${r.fantasyPts}${r.fpPctCol ? ` (${r.fpPctCol})` : ''}</td>
+            <td>${r.fantasyPts}${r.fpPct ? ` (${r.fpPct})` : ''}</td>
             <td class="sentiment-cell" style="--width:${percent}%"><span>${r.sentiment}</span></td>
           `;
           tbody.appendChild(tr);
