@@ -10,13 +10,12 @@ Open `index.html` in a modern web browser. The page will fetch data from the
 public spreadsheet and populate the table with the following columns:
 
 - **Rating** (blank column)
-- **wmonighe**
-- **Position**
-- **Team**
 - **Player**
-- **Sentiment** (from column F of the `Sentiment` sheet)
+- **Team**
+- **Position**
 - **ADP** (column J of the `Rankings` sheet, with percentile from column L of that sheet appended in parentheses)
 - **Fantasy Points** (column I of the `Rankings` sheet, with percentile from column K of that sheet appended in parentheses)
+- **Sentiment** (from column F of the `Sentiment` sheet)
 
 The spreadsheet ID and sheet names are configured directly in `index.html`.
 
