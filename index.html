@@ -81,6 +81,7 @@
         <th>🏈 Team</th>
         <th>📋 Position</th>
         <th>📊 ADP</th>
+        <th>🏅 wmonighe Rank</th>
         <th>🏆 Fantasy Points</th>
         <th>😊 Sentiment</th>
       </tr>
@@ -195,11 +196,14 @@
 
 
         const fpPctColMap = {};
+        const wmonigheRankMap = {};
         fpPctRows.forEach(r => {
           const name = canonicalName(r.Player || r.player);
           const fp = getColumn(r, '', 'fd pct');
+          const wRank = getColumn(r, 'G', 'wmonighe rank');
           if (name) {
             fpPctColMap[name] = fp;
+            wmonigheRankMap[name] = wRank;
           }
         });
 
@@ -231,6 +235,7 @@
             sentimentValue: parseFloat(sentiment),
             adp,
             adpPct,
+            wmonigheRank: wmonigheRankMap[canonName] || '',
             fantasyPts,
           fpPctCol: fpPctColMap[canonName] || "",
         };
@@ -269,6 +274,7 @@
             <td>${r.team}</td>
             <td>${r.position}</td>
             <td>${r.adp}${r.adpPct ? ` (${r.adpPct})` : ''}</td>
+            <td>${r.wmonigheRank}</td>
             <td>${r.fantasyPts}${r.fpPctCol ? ` (${r.fpPctCol})` : ''}</td>
             <td class="sentiment-cell" style="--width:${percent}%"><span>${r.sentiment}</span></td>
           `;
