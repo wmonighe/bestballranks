@@ -83,7 +83,6 @@
         <th>📊 ADP</th>
         <th>🏆 Fantasy Points</th>
         <th>😊 Sentiment</th>
-        <th>📈 FP Pct</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -272,7 +271,6 @@
             <td>${r.adp}${r.adpPct ? ` (${r.adpPct})` : ''}</td>
             <td>${r.fantasyPts}${r.fpPctCol ? ` (${r.fpPctCol})` : ''}</td>
             <td class="sentiment-cell" style="--width:${percent}%"><span>${r.sentiment}</span></td>
-            <td>${r.fpPctCol}</td>
           `;
           tbody.appendChild(tr);
         });
