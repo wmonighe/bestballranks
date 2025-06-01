@@ -218,7 +218,6 @@
           const adp = row.J || row.ADP || row['ADP'] || '';
           const adpPct = getColumn(row, 'L', 'adp percentile');
           const fantasyPts = getFantasyPoints(row);
-          const fpPct = getFantasyPointsPct(row);
 
           const headshot = headshots[canonName];
           const playerHtml = headshot
@@ -234,7 +233,6 @@
             adp,
             adpPct,
             fantasyPts,
-          fpPct,
           fpPctCol: fpPctColMap[canonName] || "",
         };
       });
@@ -245,11 +243,11 @@
           .sort((a, b) => a - b);
 
         rowsData.forEach(r => {
-          const val = parseFloat(r.fantasyPts);
-          if (!isNaN(val) && numericFps.length) {
-            const rank = numericFps.filter(v => v <= val).length;
-            r.fpPctCol = ((rank / numericFps.length) * 100).toFixed(1);
-          }
+            const val = parseFloat(r.fantasyPts);
+            if (!isNaN(val) && numericFps.length) {
+              const rank = numericFps.filter(v => v <= val).length;
+              r.fpPctCol = (rank / numericFps.length).toFixed(2);
+            }
         });
 
         const numericSentiments = rowsData
@@ -272,7 +270,7 @@
             <td>${r.team}</td>
             <td>${r.position}</td>
             <td>${r.adp}${r.adpPct ? ` (${r.adpPct})` : ''}</td>
-            <td>${r.fantasyPts}${r.fpPct ? ` (${r.fpPct})` : ''}</td>
+            <td>${r.fantasyPts}${r.fpPctCol ? ` (${r.fpPctCol})` : ''}</td>
             <td class="sentiment-cell" style="--width:${percent}%"><span>${r.sentiment}</span></td>
             <td>${r.fpPctCol}</td>
           `;
