@@ -78,6 +78,21 @@
 
     const headshots = {};
 
+    function canonicalField(name) {
+      return (name || '').toString().toLowerCase().replace(/[^a-z0-9]/g, '');
+    }
+
+    function getFantasyPoints(row) {
+      if (row.I || row['Fantasy Points'] || row['FantasyPts']) {
+        return row.I || row['Fantasy Points'] || row['FantasyPts'];
+      }
+      const key = Object.keys(row).find(k => {
+        const ck = canonicalField(k);
+        return ck.includes('fantasypoints') || ck.includes('fantasypts');
+      });
+      return key ? row[key] : '';
+    }
+
     async function fetchPlayers() {
       if (!playersUrl) return;
       try {
@@ -125,8 +140,7 @@
             rowSentiment || sentimentMap[canonName] || '';
 
           const adp = row.J || row.ADP || row['ADP'] || '';
-          const fantasyPts =
-            row.I || row['Fantasy Points'] || row['FantasyPts'] || '';
+          const fantasyPts = getFantasyPoints(row);
 
           const headshot = headshots[canonName];
           const playerHtml = headshot
