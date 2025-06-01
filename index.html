@@ -91,7 +91,7 @@
     const sheetId = '1rNouBdE-HbWafu-shO_5JLPSrLhr-xuGpXYfyOI-2oY';
     const rankingsUrl = `https://opensheet.elk.sh/${sheetId}/Rankings`;
     const sentimentUrl = `https://opensheet.elk.sh/${sheetId}/Sentiment`;
-    const fpPctUrl = `https://opensheet.elk.sh/${sheetId}/148406078`;
+    const wmonigheUrl = `https://opensheet.elk.sh/${sheetId}/148406078`;
 
     const LEAGUE_ID = 1;
     const playersUrl =
@@ -161,11 +161,11 @@
         const rankings = await rankingsRes.json();
         const sentimentRows = await sentimentRes.json();
 
-        let fpPctRows = [];
+        let wmonigheRows = [];
         try {
-          const res = await fetch(fpPctUrl);
+          const res = await fetch(wmonigheUrl);
           if (res.ok) {
-            fpPctRows = await res.json();
+            wmonigheRows = await res.json();
           }
         } catch (err) {
           console.warn('Error loading fantasy points sentiment:', err);
@@ -179,7 +179,7 @@
         });
 
         const wmonigheRankMap = {};
-        fpPctRows.forEach(r => {
+        wmonigheRows.forEach(r => {
           const name = canonicalName(r.Player || r.player);
           const wRank = r["wmonighe Rank"] || r["Wmonighe Rank"] || "";
           if (name) {
@@ -219,21 +219,6 @@
           };
         });
 
-        // Add fantasy points percentiles
-        const numericFps = rowsData
-          .map(r => parseFloat(r.fantasyPts))
-          .filter(v => !isNaN(v))
-          .sort((a, b) => a - b);
-
-        rowsData.forEach(r => {
-          const val = parseFloat(r.fantasyPts);
-          if (!isNaN(val) && numericFps.length) {
-            const rank = numericFps.filter(v => v <= val).length;
-            r.fpPct = (rank / numericFps.length).toFixed(2);
-          } else {
-            r.fpPct = '';
-          }
-        });
 
         // Sentiment rendering
         const numericSentiments = rowsData
@@ -257,7 +242,7 @@
             <td>${r.position}</td>
             <td>${r.adp}${r.adpPct ? ` (${r.adpPct})` : ''}</td>
             <td>${r.wmonigheRank}</td>
-            <td>${r.fantasyPts}${r.fpPct ? ` (${r.fpPct})` : ''}</td>
+            <td>${r.fantasyPts}</td>
             <td class="sentiment-cell" style="--width:${percent}%"><span>${r.sentiment}</span></td>
           `;
           tbody.appendChild(tr);
