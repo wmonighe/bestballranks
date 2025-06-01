@@ -77,13 +77,12 @@
     <thead>
       <tr>
         <th class="rating-column">⭐ Rating</th>
-        <th>🔢 Ranking</th>
-        <th>📋 Position</th>
-        <th>🏈 Team</th>
         <th>👤 Player</th>
-        <th>😊 Sentiment</th>
+        <th>🏈 Team</th>
+        <th>📋 Position</th>
         <th>📊 ADP</th>
         <th>🏆 Fantasy Points</th>
+        <th>😊 Sentiment</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -174,10 +173,9 @@
         await fetchPlayers();
 
         const tbody = document.querySelector('#rankings-table tbody');
-        const rowsData = rankings.map((row, index) => {
+        const rowsData = rankings.map(row => {
           const player = row.Player || row.player;
           const canonName = canonicalName(player);
-          const rank = index + 1; // auto-incremented ranking
           const rowSentiment =
             row.Sentiment || row['Sentiment Score'] || row.H || '';
           const sentiment =
@@ -194,7 +192,6 @@
             : player;
 
           return {
-            rank,
             position: row.Position,
             team: row.Team,
             playerHtml,
@@ -223,13 +220,12 @@
           const tr = document.createElement('tr');
           tr.innerHTML = `
             <td class="rating-cell"></td>
-            <td>${r.rank}</td>
-            <td>${r.position}</td>
-            <td>${r.team}</td>
             <td>${r.playerHtml}</td>
-            <td class="sentiment-cell" style="--width:${percent}%"><span>${r.sentiment}</span></td>
+            <td>${r.team}</td>
+            <td>${r.position}</td>
             <td>${r.adp}${r.adpPct ? ` (${r.adpPct})` : ''}</td>
             <td>${r.fantasyPts}${r.fpPct ? ` (${r.fpPct})` : ''}</td>
+            <td class="sentiment-cell" style="--width:${percent}%"><span>${r.sentiment}</span></td>
           `;
           tbody.appendChild(tr);
         });
