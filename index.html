@@ -54,6 +54,13 @@
       position: relative;
       z-index: 1;
     }
+    .rating-column {
+      background-color: #ffecc0;
+    }
+    .rating-cell {
+      background-color: #fff9e6;
+      font-weight: 700;
+    }
   </style>
 </head>
 <body>
@@ -62,6 +69,7 @@
   <table id="rankings-table">
     <thead>
       <tr>
+        <th class="rating-column">Rating</th>
         <th>wmonighe</th>
         <th>Position</th>
         <th>Team</th>
@@ -192,6 +200,7 @@
             : 0;
           const tr = document.createElement('tr');
           tr.innerHTML = `
+            <td class="rating-cell"></td>
             <td>${r.rank}</td>
             <td>${r.position}</td>
             <td>${r.team}</td>
