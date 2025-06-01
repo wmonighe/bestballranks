@@ -36,6 +36,24 @@
     tbody tr:hover {
       background-color: #f5f5f5;
     }
+    .sentiment-cell {
+      position: relative;
+    }
+    .sentiment-cell::before {
+      content: '';
+      position: absolute;
+      top: 4px;
+      bottom: 4px;
+      left: 0;
+      width: var(--width, 0%);
+      background-color: #d0eaff;
+      border-radius: 4px;
+      z-index: 0;
+    }
+    .sentiment-cell span {
+      position: relative;
+      z-index: 1;
+    }
   </style>
 </head>
 <body>
@@ -130,7 +148,7 @@
         await fetchPlayers();
 
         const tbody = document.querySelector('#rankings-table tbody');
-        rankings.forEach((row, index) => {
+        const rowsData = rankings.map((row, index) => {
           const player = row.Player || row.player;
           const canonName = canonicalName(player);
           const rank = index + 1; // auto-incremented ranking
@@ -146,15 +164,41 @@
           const playerHtml = headshot
             ? `<img src="${headshot}" alt="${player}" style="height:24px;width:24px;vertical-align:middle;margin-right:4px;">${player}`
             : player;
+
+          return {
+            rank,
+            position: row.Position,
+            team: row.Team,
+            playerHtml,
+            sentiment,
+            sentimentValue: parseFloat(sentiment),
+            adp,
+            fantasyPts,
+          };
+        });
+
+        const numericSentiments = rowsData
+          .map(r => r.sentimentValue)
+          .filter(v => !isNaN(v));
+        const minSentiment =
+          numericSentiments.length > 0 ? Math.min(...numericSentiments) : 0;
+        const maxSentiment =
+          numericSentiments.length > 0 ? Math.max(...numericSentiments) : 0;
+        const range = maxSentiment - minSentiment || 1;
+
+        rowsData.forEach(r => {
+          const percent = !isNaN(r.sentimentValue)
+            ? ((r.sentimentValue - minSentiment) / range) * 100
+            : 0;
           const tr = document.createElement('tr');
           tr.innerHTML = `
-            <td>${rank}</td>
-            <td>${row.Position}</td>
-            <td>${row.Team}</td>
-            <td>${playerHtml}</td>
-            <td>${sentiment}</td>
-            <td>${adp}</td>
-            <td>${fantasyPts}</td>
+            <td>${r.rank}</td>
+            <td>${r.position}</td>
+            <td>${r.team}</td>
+            <td>${r.playerHtml}</td>
+            <td class="sentiment-cell" style="--width:${percent}%"><span>${r.sentiment}</span></td>
+            <td>${r.adp}</td>
+            <td>${r.fantasyPts}</td>
           `;
           tbody.appendChild(tr);
         });
