@@ -41,6 +41,15 @@
         ? `https://partner-api.unabated.com/v2/players?leagues=${LEAGUE_ID}`
         : null;
 
+    function canonicalName(name) {
+      return (name || '')
+        .toString()
+        .toLowerCase()
+        .replace(/[.'’]/g, '')
+        .replace(/[^a-z0-9]+/g, ' ')
+        .trim();
+    }
+
     const headshots = {};
 
     async function fetchPlayers() {
@@ -51,9 +60,9 @@
         });
         const players = await res.json();
         players.forEach(p => {
-          const name = ((p.preferredName || `${p.firstName} ${p.lastName}`) || '')
-            .trim()
-            .toLowerCase();
+          const name = canonicalName(
+            p.preferredName || `${p.firstName} ${p.lastName}` || ''
+          );
           if (name) headshots[name] = p.headshotUrl;
         });
       } catch (err) {
@@ -76,24 +85,24 @@
 
         const sentimentMap = {};
         sentimentRows.forEach(r => {
-          const playerName = (r.Player || r.player || '').toLowerCase();
+          const playerName = canonicalName(r.Player || r.player);
           const score = r.Sentiment || r['Sentiment Score'] || r.F || '';
           if (playerName) sentimentMap[playerName] = score;
         });
 
         const adpMap = {};
         adpRows.forEach(r => {
-          const name = (r.Player || r.player || '').toLowerCase();
-          const adp = r.ADP || r.D || '';
-          const pct = r['Percentile Rank'] || r.Percentile || r.E || '';
+          const name = canonicalName(r.Player || r.player);
+          const adp = r.D || r.ADP || '';
+          const pct = r.E || r['Percentile Rank'] || r.Percentile || '';
           if (name) adpMap[name] = { adp, pct };
         });
 
         const clayMap = {};
         clayRows.forEach(r => {
-          const name = (r.Player || r.player || '').toLowerCase();
-          const pts = r['Fantasy Points'] || r.W || '';
-          const pct = r['Percentile Rank'] || r.Percentile || r.X || '';
+          const name = canonicalName(r.Player || r.player);
+          const pts = r.W || r['Fantasy Points'] || '';
+          const pct = r.X || r['Percentile Rank'] || r.Percentile || '';
           if (name) clayMap[name] = { pts, pct };
         });
 
@@ -102,16 +111,17 @@
         const tbody = document.querySelector('#rankings-table tbody');
         rankings.forEach((row, index) => {
           const player = row.Player || row.player;
+          const canonName = canonicalName(player);
           const rank = index + 1; // auto-incremented ranking
           const rowSentiment =
             row.Sentiment || row['Sentiment Score'] || row.H || '';
           const sentiment =
-            rowSentiment || sentimentMap[(player || '').toLowerCase()] || '';
+            rowSentiment || sentimentMap[canonName] || '';
 
-          const adpInfo = adpMap[(player || '').toLowerCase()] || {};
-          const clayInfo = clayMap[(player || '').toLowerCase()] || {};
+          const adpInfo = adpMap[canonName] || {};
+          const clayInfo = clayMap[canonName] || {};
 
-          const headshot = headshots[(player || '').toLowerCase()];
+          const headshot = headshots[canonName];
           const playerHtml = headshot
             ? `<img src="${headshot}" alt="${player}" style="height:24px;width:24px;vertical-align:middle;margin-right:4px;">${player}`
             : player;
