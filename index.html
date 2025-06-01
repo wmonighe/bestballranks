@@ -170,13 +170,22 @@
 
     async function loadData() {
       try {
-        const [rankingsRes, sentimentRes, fpSentimentRes] = await Promise.all([
+        const [rankingsRes, sentimentRes] = await Promise.all([
           fetch(rankingsUrl),
           fetch(sentimentUrl),
-          fetch(fpSentimentUrl),
         ]);
         const rankings = await rankingsRes.json();
         const sentimentRows = await sentimentRes.json();
+
+        let fpSentimentRows = [];
+        try {
+          const res = await fetch(fpSentimentUrl);
+          if (res.ok) {
+            fpSentimentRows = await res.json();
+          }
+        } catch (err) {
+          console.warn('Error loading fantasy points sentiment:', err);
+        }
 
         const sentimentMap = {};
         sentimentRows.forEach(r => {
@@ -186,7 +195,6 @@
         });
 
 
-        const fpSentimentRows = await fpSentimentRes.json();
         const fpSentimentMap = {};
         fpSentimentRows.forEach(r => {
           const name = canonicalName(r.Player || r.player);
