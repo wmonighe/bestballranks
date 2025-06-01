@@ -17,7 +17,7 @@ public spreadsheet and populate the table with the following columns:
 - **Fantasy Points** (column I of the `Rankings` sheet, with percentile from column K of that sheet appended in parentheses)
 - **Sentiment** (from column F of the `Sentiment` sheet)
 
-- **Fantasy Points Sentiment** (column K from sheet gid `148406078`)
+- **FP Pct** (column K from sheet gid `148406078`)
 The spreadsheet ID and sheet names are configured directly in `index.html`.
 
 ### Unabated API

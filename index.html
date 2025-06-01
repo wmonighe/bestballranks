@@ -83,7 +83,7 @@
         <th>📊 ADP</th>
         <th>🏆 Fantasy Points</th>
         <th>😊 Sentiment</th>
-        <th>📈 Fantasy Points Sentiment</th>
+        <th>📈 FP Pct</th>
       </tr>
     </thead>
     <tbody></tbody>
@@ -92,7 +92,7 @@
     const sheetId = '1rNouBdE-HbWafu-shO_5JLPSrLhr-xuGpXYfyOI-2oY';
     const rankingsUrl = `https://opensheet.elk.sh/${sheetId}/Rankings`;
     const sentimentUrl = `https://opensheet.elk.sh/${sheetId}/Sentiment`;
-    const fpSentimentUrl = `https://opensheet.elk.sh/${sheetId}/148406078`;
+    const fpPctUrl = `https://opensheet.elk.sh/${sheetId}/148406078`;
     // Sentiment scores are stored on the Sentiment tab in column F.
 
     const LEAGUE_ID = 1; // NFL
@@ -177,11 +177,11 @@
         const rankings = await rankingsRes.json();
         const sentimentRows = await sentimentRes.json();
 
-        let fpSentimentRows = [];
+        let fpPctRows = [];
         try {
-          const res = await fetch(fpSentimentUrl);
+          const res = await fetch(fpPctUrl);
           if (res.ok) {
-            fpSentimentRows = await res.json();
+            fpPctRows = await res.json();
           }
         } catch (err) {
           console.warn('Error loading fantasy points sentiment:', err);
@@ -195,11 +195,11 @@
         });
 
 
-        const fpSentimentMap = {};
-        fpSentimentRows.forEach(r => {
+        const fpPctColMap = {};
+        fpPctRows.forEach(r => {
           const name = canonicalName(r.Player || r.player);
-          const value = getColumn(r, 'K', 'fantasy points sentiment');
-          if (name) fpSentimentMap[name] = value;
+          const value = getColumn(r, 'K', 'fp pct');
+          if (name) fpPctColMap[name] = value;
         });
 
         await fetchPlayers();
@@ -233,7 +233,7 @@
             adpPct,
             fantasyPts,
             fpPct,
-            fpSentiment: fpSentimentMap[canonName] || "",
+            fpPctCol: fpPctColMap[canonName] || "",
           };
         });
 
@@ -259,7 +259,7 @@
             <td>${r.adp}${r.adpPct ? ` (${r.adpPct})` : ''}</td>
             <td>${r.fantasyPts}${r.fpPct ? ` (${r.fpPct})` : ''}</td>
             <td class="sentiment-cell" style="--width:${percent}%"><span>${r.sentiment}</span></td>
-            <td>${r.fpSentiment}</td>
+            <td>${r.fpPctCol}</td>
           `;
           tbody.appendChild(tr);
         });
