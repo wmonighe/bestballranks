@@ -80,7 +80,6 @@
     const sheetId = '1rNouBdE-HbWafu-shO_5JLPSrLhr-xuGpXYfyOI-2oY';
     const rankingsUrl = `https://opensheet.elk.sh/${sheetId}/Rankings`;
     const sentimentUrl = `https://opensheet.elk.sh/${sheetId}/Sentiment`;
-    const fpPctUrl = `https://opensheet.elk.sh/${sheetId}/148406078`;
 
     const LEAGUE_ID = 1;
     const playersUrl =
@@ -187,30 +186,11 @@
         const rankings = await rankingsRes.json();
         const sentimentRows = await sentimentRes.json();
 
-        let fpPctRows = [];
-        try {
-          const res = await fetch(fpPctUrl);
-          if (res.ok) {
-            fpPctRows = await res.json();
-          }
-        } catch (err) {
-          console.warn('Error loading fantasy points sentiment:', err);
-        }
-
         const sentimentMap = {};
         sentimentRows.forEach(r => {
           const playerName = canonicalName(r.Player || r.player);
           const score = r.Sentiment || r['Sentiment Score'] || r.F || '';
           if (playerName) sentimentMap[playerName] = score;
-        });
-
-        const wmonigheRankMap = {};
-        fpPctRows.forEach(r => {
-          const name = canonicalName(r.Player || r.player);
-          const wRank = r["wmonighe Rank"] || r["Wmonighe Rank"] || "";
-          if (name) {
-            wmonigheRankMap[name] = wRank;
-          }
         });
 
         await fetchPlayers();
@@ -230,6 +210,7 @@
           const adp = row.J || row.ADP || row['ADP'] || '';
           const adpPct = getColumn(row, 'L', 'adp percentile');
           const fantasyPts = getFantasyPoints(row);
+          const wmonigheRank = getColumn(row, 'G', 'wmonighe rank');
 
           const headshot = headshots[canonName];
           const playerHtml = headshot
@@ -244,7 +225,7 @@
             sentimentValue: parseFloat(sentiment),
             adp,
             adpPct,
-            wmonigheRank: wmonigheRankMap[canonName] || '',
+            wmonigheRank,
             fantasyPts,
           };
         });
