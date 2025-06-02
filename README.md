@@ -16,7 +16,8 @@ public spreadsheet and populate the table with the following columns:
 - **ADP** (column J of the `Rankings` sheet, with percentile from column L of that sheet appended in parentheses)
 - **wmonighe Rank** (column G of the `Rankings` sheet)
 - **Fantasy Points** (column I of the `Rankings` sheet, with the computed fantasy point percentile appended in parentheses as a decimal between 0 and 1)
-- **Sentiment** (from column F of the `Sentiment` sheet)
+- **Sentiment** (from column F of the `Sentiment` sheet, with the computed
+  sentiment percentile appended in parentheses as a decimal between 0 and 1)
 
 The spreadsheet ID and sheet names are configured directly in `index.html`.
 

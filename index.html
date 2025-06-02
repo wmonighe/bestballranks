@@ -123,7 +123,7 @@
       {
         header: '😊 Sentiment',
         cell: r =>
-          `<td class="sentiment-cell" style="--width:${r.sentimentPercent}%"><span>${r.sentiment}</span></td>`,
+          `<td class="sentiment-cell" style="--width:${r.sentimentPercent}%"><span>${r.sentiment}${r.sentimentPct ? ' (' + r.sentimentPct + ')' : ''}</span></td>`,
       },
     ];
 
@@ -272,9 +272,14 @@
         const range = maxSentiment - minSentiment || 1;
 
         rowsData.forEach(r => {
-          r.sentimentPercent = !isNaN(r.sentimentValue)
-            ? ((r.sentimentValue - minSentiment) / range) * 100
-            : 0;
+          if (!isNaN(r.sentimentValue)) {
+            const pctRaw = (r.sentimentValue - minSentiment) / range;
+            r.sentimentPercent = pctRaw * 100;
+            r.sentimentPct = pctRaw.toFixed(2);
+          } else {
+            r.sentimentPercent = 0;
+            r.sentimentPct = '';
+          }
         });
 
         const headerRow = document.createElement('tr');
