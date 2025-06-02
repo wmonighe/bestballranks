@@ -93,6 +93,7 @@
         header: '⭐ Rating',
         thClass: 'rating-column',
         cell: r => `<td class="rating-cell">${r.rating || ''}</td>`,
+        sortKey: 'rating',
       },
       {
         header: '👤 Player',
@@ -110,19 +111,23 @@
         header: '🏅 wmonighe Rank',
         cell: r =>
           `<td>${r.wmonigheRank}${r.wmonighePct ? ' (' + r.wmonighePct + ')' : ''}</td>`,
+        sortKey: 'wmonigheRank',
       },
       {
         header: '📊 ADP',
         cell: r => `<td>${r.adp}${r.adpPct ? ' (' + r.adpPct + ')' : ''}</td>`,
+        sortKey: 'adp',
       },
       {
         header: '🏆 Fantasy Points',
         cell: r => `<td>${r.fantasyPts}${r.fpPct ? ' (' + r.fpPct + ')' : ''}</td>`,
+        sortKey: 'fantasyPts',
       },
       {
         header: '😊 Sentiment',
         cell: r =>
           `<td class="sentiment-cell" style="--width:${r.sentimentPercent}%"><span>${r.sentiment}${r.sentimentPct ? ' (' + r.sentimentPct + ')' : ''}</span></td>`,
+        sortKey: 'sentimentValue',
       },
     ];
 
@@ -175,6 +180,39 @@
       } catch (err) {
         console.error('Error loading player data:', err);
       }
+    }
+
+    let allRows = [];
+    let sortState = { key: null, asc: true };
+
+    function renderRows(rows) {
+      const tbody = document.querySelector('#rankings-table tbody');
+      tbody.innerHTML = '';
+      rows.forEach(r => {
+        const tr = document.createElement('tr');
+        columns.forEach(col => {
+          tr.insertAdjacentHTML('beforeend', col.cell(r));
+        });
+        tbody.appendChild(tr);
+      });
+    }
+
+    function sortAndRender(key) {
+      if (!key) {
+        renderRows(allRows);
+        return;
+      }
+      const asc = sortState.key === key ? !sortState.asc : true;
+      sortState = { key, asc };
+      const sorted = [...allRows].sort((a, b) => {
+        const va = parseFloat(a[key]);
+        const vb = parseFloat(b[key]);
+        if (isNaN(va) && isNaN(vb)) return 0;
+        if (isNaN(va)) return 1;
+        if (isNaN(vb)) return -1;
+        return asc ? va - vb : vb - va;
+      });
+      renderRows(sorted);
     }
 
     async function loadData() {
@@ -297,22 +335,22 @@
           }
         });
 
+        allRows = rowsData;
+
         const headerRow = document.createElement('tr');
         columns.forEach(col => {
           const th = document.createElement('th');
           if (col.thClass) th.className = col.thClass;
           th.innerHTML = col.header;
+          if (col.sortKey) {
+            th.style.cursor = 'pointer';
+            th.addEventListener('click', () => sortAndRender(col.sortKey));
+          }
           headerRow.appendChild(th);
         });
         thead.appendChild(headerRow);
 
-        rowsData.forEach(r => {
-          const tr = document.createElement('tr');
-          columns.forEach(col => {
-            tr.insertAdjacentHTML('beforeend', col.cell(r));
-          });
-          tbody.appendChild(tr);
-        });
+        renderRows(allRows);
       } catch (err) {
         console.error('Error loading data:', err);
       }
