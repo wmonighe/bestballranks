@@ -99,35 +99,50 @@
       top: 1rem;
       right: 1rem;
     }
+    #weight-controls {
+      margin: 1rem auto;
+      text-align: center;
+      max-width: 600px;
+    }
+    #weight-controls > div {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    #weight-controls label {
+      min-width: 130px;
+      text-align: right;
+    }
+    #weight-controls input[type="range"] {
+      flex: 1;
+    }
   </style>
 </head>
 <body>
   <script src="config.js"></script>
   <button id="download-btn">Download</button>
   <h1 id="page-title">Best Ball Rankings Builder</h1>
-  <div id="weight-controls" style="margin:1rem 0;text-align:center;">
+  <div id="weight-controls">
     <div>
-      <label>wmonighe Rank
-        <input type="range" id="weight-wmonighe" min="0" max="100" value="25" />
-      </label>
+      <label for="weight-wmonighe">wmonighe Rank</label>
+      <input type="range" id="weight-wmonighe" min="0" max="100" value="25" />
       <span id="weight-wmonighe-val">25%</span>
     </div>
     <div>
-      <label>ADP
-        <input type="range" id="weight-adp" min="0" max="100" value="25" />
-      </label>
+      <label for="weight-adp">ADP</label>
+      <input type="range" id="weight-adp" min="0" max="100" value="25" />
       <span id="weight-adp-val">25%</span>
     </div>
     <div>
-      <label>Fantasy Points
-        <input type="range" id="weight-fp" min="0" max="100" value="25" />
-      </label>
+      <label for="weight-fp">Fantasy Points</label>
+      <input type="range" id="weight-fp" min="0" max="100" value="25" />
       <span id="weight-fp-val">25%</span>
     </div>
     <div>
-      <label>Sentiment
-        <input type="range" id="weight-sentiment" min="0" max="100" value="25" />
-      </label>
+      <label for="weight-sentiment">Sentiment</label>
+      <input type="range" id="weight-sentiment" min="0" max="100" value="25" />
       <span id="weight-sentiment-val">25%</span>
     </div>
     <button id="update-weights" style="margin-top:0.5rem;">Update</button>
