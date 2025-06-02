@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Best Ball Rankings</title>
+  <title>Best Ball Rankings Optimizer</title>
   <link rel="icon" type="image/svg+xml" href="favicon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -81,11 +81,20 @@
     .sortable.sorted-desc::after {
       content: '\2193';
     }
+    #page-title {
+      text-align: center;
+      font-size: 2.5rem;
+      margin: 1rem 0 2rem;
+      background: linear-gradient(90deg, #ff8a00, #e52e71);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
   </style>
 </head>
 <body>
   <script src="config.js"></script>
-  <h1>Best Ball Rankings</h1>
+  <h1 id="page-title">Best Ball Rankings Optimizer</h1>
   <table id="rankings-table">
     <thead></thead>
     <tbody></tbody>
