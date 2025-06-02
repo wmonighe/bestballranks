@@ -414,7 +414,7 @@
             sentimentValue: parseFloat(sentiment),
             adp,
             adpPct,
-            postDraftId: row.P || row['Post Draft ID'] || '',
+            postDraftId: getColumn(row, 'P', 'post draft id'),
             wmonigheRank,
             fantasyPts,
           };
