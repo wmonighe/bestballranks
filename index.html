@@ -500,7 +500,7 @@
     }
 
     document.getElementById('download-btn').addEventListener('click', () => {
-      const header = 'PostDraftID,Name\n';
+      const header = 'id,Name\n';
       const rows = displayRows
         .map(r => `${r.postDraftId || ''},${r.player || ''}`)
         .join('\n');
