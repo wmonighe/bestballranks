@@ -109,7 +109,8 @@
       },
       {
         header: '🏅 wmonighe Rank',
-        cell: r => `<td>${r.wmonigheRank}</td>`,
+        cell: r =>
+          `<td>${r.wmonigheRank}${r.wmonighePct ? ' (' + r.wmonighePct + ')' : ''}</td>`,
       },
       {
         header: '📊 ADP',
@@ -243,6 +244,20 @@
             r.fpPct = (rank / numericFps.length).toFixed(2);
           } else {
             r.fpPct = '';
+          }
+        });
+
+        // Add wmonighe rank percentiles (1 -> 1, 300 or below -> 0)
+        rowsData.forEach(r => {
+          const rankVal = parseFloat(r.wmonigheRank);
+          if (!isNaN(rankVal)) {
+            let pct = (300 - rankVal) / 299;
+            if (rankVal >= 300) pct = 0;
+            if (pct > 1) pct = 1;
+            if (pct < 0) pct = 0;
+            r.wmonighePct = pct.toFixed(2);
+          } else {
+            r.wmonighePct = '';
           }
         });
 
