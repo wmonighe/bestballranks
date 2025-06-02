@@ -298,6 +298,7 @@
 
     let allRows = [];
     let sortState = { key: null, asc: true };
+    let displayRows = [];
 
     function computeRatings() {
       const weights = {
@@ -331,6 +332,7 @@
       });
 
     function renderRows(rows) {
+      displayRows = rows;
       const tbody = document.querySelector('#rankings-table tbody');
       tbody.innerHTML = '';
       rows.forEach(r => {
@@ -344,6 +346,7 @@
 
     function sortAndRender(key) {
       if (!key) {
+        displayRows = allRows;
         renderRows(allRows);
         return;
       }
@@ -357,6 +360,7 @@
         if (isNaN(vb)) return -1;
         return asc ? va - vb : vb - va;
       });
+      displayRows = sorted;
       renderRows(sorted);
 
       const headers = document.querySelectorAll('#rankings-table th.sortable');
@@ -488,7 +492,8 @@
         });
         thead.appendChild(headerRow);
 
-        renderRows(allRows);
+        sortState = { key: 'rating', asc: true };
+        sortAndRender('rating');
       } catch (err) {
         console.error('Error loading data:', err);
       }
@@ -496,7 +501,7 @@
 
     document.getElementById('download-btn').addEventListener('click', () => {
       const header = 'PostDraftID,Name\n';
-      const rows = allRows
+      const rows = displayRows
         .map(r => `${r.postDraftId || ''},${r.player || ''}`)
         .join('\n');
       const csv = header + rows;
