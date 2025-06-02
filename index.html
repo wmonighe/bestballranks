@@ -66,6 +66,21 @@
       background-color: #fff9e6;
       font-weight: 700;
     }
+    .sortable {
+      cursor: pointer;
+      position: relative;
+    }
+    .sortable::after {
+      content: '\2195';
+      font-size: 0.8em;
+      margin-left: 4px;
+    }
+    .sortable.sorted-asc::after {
+      content: '\2191';
+    }
+    .sortable.sorted-desc::after {
+      content: '\2193';
+    }
   </style>
 </head>
 <body>
@@ -213,6 +228,11 @@
         return asc ? va - vb : vb - va;
       });
       renderRows(sorted);
+
+      const headers = document.querySelectorAll('#rankings-table th.sortable');
+      headers.forEach(h => h.classList.remove('sorted-asc', 'sorted-desc'));
+      const active = document.querySelector(`#rankings-table th[data-key="${key}"]`);
+      if (active) active.classList.add(asc ? 'sorted-asc' : 'sorted-desc');
     }
 
     async function loadData() {
@@ -343,7 +363,8 @@
           if (col.thClass) th.className = col.thClass;
           th.innerHTML = col.header;
           if (col.sortKey) {
-            th.style.cursor = 'pointer';
+            th.dataset.key = col.sortKey;
+            th.classList.add('sortable');
             th.addEventListener('click', () => sortAndRender(col.sortKey));
           }
           headerRow.appendChild(th);
