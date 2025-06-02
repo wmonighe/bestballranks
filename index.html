@@ -100,6 +100,33 @@
   <script src="config.js"></script>
   <h1 id="page-title">Best Ball Rankings Builder</h1>
   <p class="info-note">Values in parentheses indicate percentile rank.</p>
+  <div id="weight-controls" style="margin:1rem 0;text-align:center;">
+    <div>
+      <label>wmonighe Rank
+        <input type="range" id="weight-wmonighe" min="0" max="100" value="25" />
+      </label>
+      <span id="weight-wmonighe-val">25%</span>
+    </div>
+    <div>
+      <label>ADP
+        <input type="range" id="weight-adp" min="0" max="100" value="25" />
+      </label>
+      <span id="weight-adp-val">25%</span>
+    </div>
+    <div>
+      <label>Fantasy Points
+        <input type="range" id="weight-fp" min="0" max="100" value="25" />
+      </label>
+      <span id="weight-fp-val">25%</span>
+    </div>
+    <div>
+      <label>Sentiment
+        <input type="range" id="weight-sentiment" min="0" max="100" value="25" />
+      </label>
+      <span id="weight-sentiment-val">25%</span>
+    </div>
+    <button id="update-weights" style="margin-top:0.5rem;">Update</button>
+  </div>
   <table id="rankings-table">
     <thead></thead>
     <tbody></tbody>
@@ -116,6 +143,25 @@
         : null;
 
     const headshots = {};
+
+    const weightInputs = {
+      wmonighe: document.getElementById('weight-wmonighe'),
+      adp: document.getElementById('weight-adp'),
+      fp: document.getElementById('weight-fp'),
+      sentiment: document.getElementById('weight-sentiment'),
+    };
+
+    function updateWeightDisplay(key) {
+      const el = document.getElementById(`weight-${key}-val`);
+      if (el && weightInputs[key]) {
+        el.textContent = `${weightInputs[key].value}%`;
+      }
+    }
+
+    Object.keys(weightInputs).forEach(k => {
+      weightInputs[k].addEventListener('input', () => updateWeightDisplay(k));
+      updateWeightDisplay(k);
+    });
 
     const columns = [
       {
@@ -213,6 +259,37 @@
 
     let allRows = [];
     let sortState = { key: null, asc: true };
+
+    function computeRatings() {
+      const weights = {
+        wmonighe: parseFloat(weightInputs.wmonighe.value) / 100,
+        adp: parseFloat(weightInputs.adp.value) / 100,
+        fp: parseFloat(weightInputs.fp.value) / 100,
+        sentiment: parseFloat(weightInputs.sentiment.value) / 100,
+      };
+      allRows.forEach(r => {
+        const items = [
+          { v: parseFloat(r.wmonighePct), w: weights.wmonighe },
+          { v: parseFloat(r.adpPct), w: weights.adp },
+          { v: parseFloat(r.fpPct), w: weights.fp },
+          { v: parseFloat(r.sentimentPct), w: weights.sentiment },
+        ].filter(i => !isNaN(i.v) && i.w > 0);
+        const totalWeight = items.reduce((a, b) => a + b.w, 0);
+        if (items.length && totalWeight > 0) {
+          const sum = items.reduce((s, i) => s + i.v * i.w, 0);
+          r.rating = (sum / totalWeight).toFixed(2);
+        } else {
+          r.rating = '';
+        }
+      });
+    }
+
+    document
+      .getElementById('update-weights')
+      .addEventListener('click', () => {
+        computeRatings();
+        sortAndRender(sortState.key);
+      });
 
     function renderRows(rows) {
       const tbody = document.querySelector('#rankings-table tbody');
@@ -353,23 +430,8 @@
           }
         });
 
-        // Calculate overall rating as the average of all available percentiles
-        rowsData.forEach(r => {
-          const vals = [
-            parseFloat(r.wmonighePct),
-            parseFloat(r.adpPct),
-            parseFloat(r.fpPct),
-            parseFloat(r.sentimentPct),
-          ].filter(v => !isNaN(v));
-          if (vals.length) {
-            const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
-            r.rating = avg.toFixed(2);
-          } else {
-            r.rating = '';
-          }
-        });
-
         allRows = rowsData;
+        computeRatings();
 
         const headerRow = document.createElement('tr');
         columns.forEach(col => {
