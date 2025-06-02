@@ -94,10 +94,16 @@
       margin-top: -0.5rem;
       margin-bottom: 1rem;
     }
+    #download-btn {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+    }
   </style>
 </head>
 <body>
   <script src="config.js"></script>
+  <button id="download-btn">Download</button>
   <h1 id="page-title">Best Ball Rankings Builder</h1>
   <div id="weight-controls" style="margin:1rem 0;text-align:center;">
     <div>
@@ -400,6 +406,7 @@
             : player;
 
           return {
+            player,
             position: row.Position,
             team: row.Team,
             playerHtml,
@@ -486,6 +493,23 @@
         console.error('Error loading data:', err);
       }
     }
+
+    document.getElementById('download-btn').addEventListener('click', () => {
+      const header = 'PostDraftID,Name\n';
+      const rows = allRows
+        .map(r => `${r.postDraftId || ''},${r.player || ''}`)
+        .join('\n');
+      const csv = header + rows;
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'Underdog Post-Draft Best Ball Rankings.csv';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
 
     loadData();
   </script>
