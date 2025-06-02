@@ -160,19 +160,34 @@
 
     const prevWeights = {};
 
-    function handleWeightInput(key) {
-      const newVal = parseInt(weightInputs[key].value, 10) || 0;
-      const total = Object.keys(weightInputs).reduce((sum, k) => {
-        const val = k === key ? newVal : parseInt(weightInputs[k].value, 10) || 0;
-        return sum + val;
-      }, 0);
+    let validateTimeout;
+
+    function scheduleValidation() {
+      clearTimeout(validateTimeout);
+      validateTimeout = setTimeout(validateWeights, 1000);
+    }
+
+    function validateWeights() {
+      const total = Object.keys(weightInputs).reduce(
+        (sum, k) => sum + (parseInt(weightInputs[k].value, 10) || 0),
+        0
+      );
       if (total > 100) {
         alert('Total percentage cannot exceed 100%.');
-        weightInputs[key].value = prevWeights[key];
+        Object.keys(weightInputs).forEach(k => {
+          weightInputs[k].value = prevWeights[k];
+          updateWeightDisplay(k);
+        });
       } else {
-        prevWeights[key] = newVal;
+        Object.keys(weightInputs).forEach(k => {
+          prevWeights[k] = parseInt(weightInputs[k].value, 10) || 0;
+        });
       }
+    }
+
+    function handleWeightInput(key) {
       updateWeightDisplay(key);
+      scheduleValidation();
     }
 
     Object.keys(weightInputs).forEach(k => {
