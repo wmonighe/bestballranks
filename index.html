@@ -93,7 +93,7 @@
       {
         header: '⭐ Rating',
         thClass: 'rating-column',
-        cell: () => '<td class="rating-cell"></td>',
+        cell: r => `<td class="rating-cell">${r.rating || ''}</td>`,
       },
       {
         header: '👤 Player',
@@ -279,6 +279,22 @@
           } else {
             r.sentimentPercent = 0;
             r.sentimentPct = '';
+          }
+        });
+
+        // Calculate overall rating as the average of all available percentiles
+        rowsData.forEach(r => {
+          const vals = [
+            parseFloat(r.wmonighePct),
+            parseFloat(r.adpPct),
+            parseFloat(r.fpPct),
+            parseFloat(r.sentimentPct),
+          ].filter(v => !isNaN(v));
+          if (vals.length) {
+            const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
+            r.rating = avg.toFixed(2);
+          } else {
+            r.rating = '';
           }
         });
 
