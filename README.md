@@ -19,6 +19,8 @@ public spreadsheet and populate the table with the following columns:
 - **Sentiment** (from column F of the `Sentiment` sheet, with the computed
   sentiment percentile appended in parentheses as a decimal between 0 and 1)
 
+Note: values shown in parentheses represent the percentile rank for that metric.
+
 The spreadsheet ID and sheet names are configured directly in `index.html`.
 
 ### Unabated API
