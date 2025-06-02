@@ -7,9 +7,12 @@ the browser and displayed in a table.
 ## Usage
 
 Open `index.html` in a modern web browser. The page will fetch data from the
-public spreadsheet and populate the table with the following columns:
+public spreadsheet and populate the table with the following columns. Above the
+table are slider controls that let you adjust the weighting of each metric when
+calculating the **Rating** value. Move the sliders and click **Update** to
+recompute ratings.
 
-- **Rating** (average of wmonighe, ADP, fantasy points, and sentiment percentiles)
+- **Rating** (weighted combination of wmonighe, ADP, fantasy points and sentiment percentiles)
 - **Player**
 - **Team**
 - **Position**
