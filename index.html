@@ -81,11 +81,85 @@
     .sortable.sorted-desc::after {
       content: '\2193';
     }
+    #top-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      background: #fff;
+      padding: 1rem;
+      border-bottom: 1px solid #ddd;
+    }
     #page-title {
-      text-align: center;
-      font-size: 2.5rem;
-      margin: 1rem 0 2rem;
+      margin: 0;
+      padding-top: 0.5rem;
+      font-size: 2rem;
+      font-weight: 700;
+      text-align: left;
       color: #000;
+    }
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    #weight-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      max-width: 400px;
+    }
+    #weight-controls > div {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    #weight-controls label {
+      min-width: 110px;
+      text-align: right;
+    }
+    #weight-controls input[type="range"] {
+      flex: 1;
+      -webkit-appearance: none;
+      height: 8px;
+      border-radius: 4px;
+      background: #e0e0e0;
+      outline: none;
+    }
+    #weight-controls input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #1e90ff;
+      cursor: pointer;
+      margin-top: -8px;
+    }
+    #weight-controls input[type="range"]::-moz-range-thumb {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #1e90ff;
+      cursor: pointer;
+    }
+    .btn {
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .btn-primary {
+      background: #1e90ff;
+      color: #fff;
+      border: none;
+    }
+    .btn-outline {
+      background: #fff;
+      color: #1e90ff;
+      border: 2px solid #1e90ff;
     }
     .info-note {
       text-align: center;
@@ -94,59 +168,55 @@
       margin-top: -0.5rem;
       margin-bottom: 1rem;
     }
-    #download-btn {
-      position: absolute;
-      top: 1rem;
-      right: 1rem;
-    }
-    #weight-controls {
-      margin: 1rem auto;
-      text-align: center;
-      max-width: 600px;
-    }
-    #weight-controls > div {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      margin-bottom: 0.5rem;
-    }
-    #weight-controls label {
-      min-width: 130px;
-      text-align: right;
-    }
-    #weight-controls input[type="range"] {
-      flex: 1;
+    @media (max-width: 600px) {
+      #top-controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      #download-btn {
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
   <script src="config.js"></script>
-  <button id="download-btn">Download</button>
-  <h1 id="page-title">Best Ball Rankings Builder</h1>
-  <div id="weight-controls">
-    <div>
-      <label for="weight-wmonighe">wmonighe Rank</label>
-      <input type="range" id="weight-wmonighe" min="0" max="100" value="25" />
-      <span id="weight-wmonighe-val">25%</span>
+  <header id="top-controls">
+    <h1 id="page-title">Best Ball Rankings Builder</h1>
+    <div class="controls">
+      <div id="weight-controls">
+        <div>
+          <label for="weight-wmonighe">wmonighe Rank</label>
+          <input type="range" id="weight-wmonighe" min="0" max="100" value="25" />
+          <span id="weight-wmonighe-val">25%</span>
+        </div>
+        <div>
+          <label for="weight-adp">ADP</label>
+          <input type="range" id="weight-adp" min="0" max="100" value="25" />
+          <span id="weight-adp-val">25%</span>
+        </div>
+        <div>
+          <label for="weight-fp">Fantasy Points</label>
+          <input type="range" id="weight-fp" min="0" max="100" value="25" />
+          <span id="weight-fp-val">25%</span>
+        </div>
+        <div>
+          <label for="weight-sentiment">Sentiment</label>
+          <input type="range" id="weight-sentiment" min="0" max="100" value="25" />
+          <span id="weight-sentiment-val">25%</span>
+        </div>
+      </div>
+      <div class="button-row">
+        <button id="update-weights" class="btn btn-outline">Update</button>
+        <button id="reset-weights" class="btn btn-outline">Reset</button>
+        <button id="download-btn" class="btn btn-primary">⬇ Download</button>
+      </div>
     </div>
-    <div>
-      <label for="weight-adp">ADP</label>
-      <input type="range" id="weight-adp" min="0" max="100" value="25" />
-      <span id="weight-adp-val">25%</span>
-    </div>
-    <div>
-      <label for="weight-fp">Fantasy Points</label>
-      <input type="range" id="weight-fp" min="0" max="100" value="25" />
-      <span id="weight-fp-val">25%</span>
-    </div>
-    <div>
-      <label for="weight-sentiment">Sentiment</label>
-      <input type="range" id="weight-sentiment" min="0" max="100" value="25" />
-      <span id="weight-sentiment-val">25%</span>
-    </div>
-    <button id="update-weights" style="margin-top:0.5rem;">Update</button>
-  </div>
+  </header>
   <p class="info-note">Values in parentheses indicate percentile rank.</p>
   <table id="rankings-table">
     <thead></thead>
@@ -529,6 +599,16 @@
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+    });
+
+    document.getElementById('reset-weights').addEventListener('click', () => {
+      Object.keys(weightInputs).forEach(k => {
+        weightInputs[k].value = 25;
+        updateWeightDisplay(k);
+        prevWeights[k] = 25;
+      });
+      computeRatings();
+      sortAndRender(sortState.key);
     });
 
     loadData();
