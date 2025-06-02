@@ -9,7 +9,7 @@ the browser and displayed in a table.
 Open `index.html` in a modern web browser. The page will fetch data from the
 public spreadsheet and populate the table with the following columns:
 
-- **Rating** (blank column)
+- **Rating** (average of wmonighe, ADP, fantasy points, and sentiment percentiles)
 - **Player**
 - **Team**
 - **Position**
