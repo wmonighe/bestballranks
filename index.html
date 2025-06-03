@@ -369,7 +369,7 @@
       },
       {
         header: '🏈 Team',
-        cell: r => `<td>${r.team}</td>`,
+        cell: r => `<td>${r.teamHtml}</td>`,
       },
       {
         header: '📋 Position',
@@ -654,10 +654,18 @@
             ? `<img src="${headshot}" alt="${player}" style="height:24px;width:24px;vertical-align:middle;margin-right:4px;">${player}`
             : player;
 
+          const teamLogo = row.Team
+            ? `https://www.fantasynerds.com/images/nfl/team_logos/${row.Team}.png`
+            : '';
+          const teamHtml = row.Team
+            ? `<img src="${teamLogo}" alt="${row.Team} Logo" style="height:24px;width:24px;">`
+            : '';
+
           return {
             player,
             position: row.Position,
             team: row.Team,
+            teamHtml,
             playerHtml,
             sentiment,
             sentimentValue: parseFloat(sentiment),
