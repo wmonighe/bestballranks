@@ -175,6 +175,11 @@
       border-radius: 4px;
       cursor: pointer;
     }
+    .upload-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
     #active-set-display {
       font-weight: 700;
       margin-bottom: 0.5rem;
@@ -243,14 +248,16 @@
   <script src="config.js"></script>
   <header id="top-controls">
     <h1 id="page-title">Best Ball Rankings Builder</h1>
-    <div id="active-set-display">Active set: <span id="rankings-source-name">wmonighe</span></div>
     <div class="controls">
       <div id="weight-controls">
         <div>
-          <label for="weight-wmonighe" id="rank-label">wmonighe Rank</label>
-          <button id="open-upload" class="upload-button" title="Upload Custom Rankings">🗁⬆ Upload CSV</button>
+          <label for="weight-wmonighe" id="rank-label">Rankings</label>
           <input type="range" id="weight-wmonighe" min="0" max="100" value="25" />
           <span id="weight-wmonighe-val">25%</span>
+          <div class="upload-container">
+            <div id="active-set-display">Active Set: <span id="rankings-source-name">wmonighe</span></div>
+            <button id="open-upload" class="upload-button" title="Upload Custom Rankings">Upload my own</button>
+          </div>
         </div>
         <div>
           <label for="weight-adp">ADP</label>
@@ -485,7 +492,7 @@
       const disp = document.getElementById('rankings-source-name');
       if (disp) disp.textContent = name;
       const label = document.getElementById('rank-label');
-      if (label) label.textContent = `${name} Rank`;
+      if (label) label.textContent = 'Rankings';
     }
 
     function recomputeWmonighePct() {
