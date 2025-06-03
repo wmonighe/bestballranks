@@ -178,6 +178,21 @@
       align-items: center;
       gap: 0.5rem;
     }
+    .actions-container {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .button-row {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .rankings-dropdown-row {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
     .dropdown {
       position: relative;
     }
@@ -286,14 +301,6 @@
             <label for="weight-wmonighe" id="rank-label">Rankings</label>
             <input type="range" id="weight-wmonighe" min="0" max="100" value="25" />
             <span id="weight-wmonighe-val">25%</span>
-            <div class="dropdown" id="rankings-dropdown">
-              <button id="rankings-dropdown-btn" class="dropdown-btn">
-                Active Set: <span id="rankings-source-name">wmonighe</span>
-              </button>
-              <div id="rankings-menu" class="dropdown-menu">
-                <div id="upload-option" class="upload-option">Upload my own</div>
-              </div>
-            </div>
           </div>
         </div>
         <div>
@@ -312,10 +319,22 @@
           <span id="weight-sentiment-val">5%</span>
         </div>
       </div>
-      <div class="button-row">
-        <button id="update-weights" class="btn btn-outline">Update</button>
-        <button id="reset-weights" class="btn btn-outline">Reset</button>
-        <button id="download-btn" class="btn btn-primary">⬇ Download</button>
+      <div class="actions-container">
+        <div class="rankings-dropdown-row">
+          <div class="dropdown" id="rankings-dropdown">
+            <button id="rankings-dropdown-btn" class="dropdown-btn">
+              Active Set: <span id="rankings-source-name">wmonighe</span>
+            </button>
+            <div id="rankings-menu" class="dropdown-menu">
+              <div id="upload-option" class="upload-option">Upload my own</div>
+            </div>
+          </div>
+        </div>
+        <div class="button-row">
+          <button id="update-weights" class="btn btn-outline">Update</button>
+          <button id="reset-weights" class="btn btn-outline">Reset</button>
+          <button id="download-btn" class="btn btn-primary">⬇ Download</button>
+        </div>
       </div>
     </div>
   </header>
