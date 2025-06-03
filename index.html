@@ -93,10 +93,16 @@
     #page-title {
       margin: 0;
       padding-top: 0.5rem;
-      font-size: 2rem;
+      font-size: 3rem;
       font-weight: 700;
       text-align: left;
-      color: #000;
+      color: #1468b3; /* Fallback color */
+      background: linear-gradient(90deg, #1468b3, #007f6c);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      text-fill-color: transparent;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
     }
     .controls {
       display: flex;
