@@ -196,8 +196,8 @@
         </div>
         <div>
           <label for="weight-adp">ADP</label>
-          <input type="range" id="weight-adp" min="0" max="100" value="25" />
-          <span id="weight-adp-val">25%</span>
+          <input type="range" id="weight-adp" min="0" max="100" value="45" />
+          <span id="weight-adp-val">45%</span>
         </div>
         <div>
           <label for="weight-fp">Fantasy Points</label>
@@ -206,8 +206,8 @@
         </div>
         <div>
           <label for="weight-sentiment">Sentiment</label>
-          <input type="range" id="weight-sentiment" min="0" max="100" value="25" />
-          <span id="weight-sentiment-val">25%</span>
+          <input type="range" id="weight-sentiment" min="0" max="100" value="5" />
+          <span id="weight-sentiment-val">5%</span>
         </div>
       </div>
       <div class="button-row">
@@ -413,7 +413,8 @@
       .getElementById('update-weights')
       .addEventListener('click', () => {
         computeRatings();
-        sortAndRender(sortState.key);
+        sortState = { key: 'rating', asc: true };
+        sortAndRender('rating');
       });
 
     function renderRows(rows) {
@@ -602,10 +603,13 @@
     });
 
     document.getElementById('reset-weights').addEventListener('click', () => {
+      weightInputs.wmonighe.value = 25;
+      weightInputs.adp.value = 45;
+      weightInputs.fp.value = 25;
+      weightInputs.sentiment.value = 5;
       Object.keys(weightInputs).forEach(k => {
-        weightInputs[k].value = 25;
         updateWeightDisplay(k);
-        prevWeights[k] = 25;
+        prevWeights[k] = parseInt(weightInputs[k].value, 10) || 0;
       });
       computeRatings();
       sortAndRender(sortState.key);
