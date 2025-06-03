@@ -661,8 +661,10 @@
             ? `<img src="${headshot}" alt="${player}" style="height:24px;width:24px;vertical-align:middle;margin-right:4px;">${player}`
             : player;
 
+          const teamMap = { JAX: 'JAC' };
+          const teamCode = teamMap[row.Team] || row.Team;
           const teamLogo = row.Team
-            ? `https://www.fantasynerds.com/images/nfl/team_logos/${row.Team}.png`
+            ? `https://www.fantasynerds.com/images/nfl/team_logos/${teamCode}.png`
             : '';
           const teamHtml = row.Team
             ? `<img src="${teamLogo}" alt="${row.Team} Logo" style="height:24px;width:24px;">`
