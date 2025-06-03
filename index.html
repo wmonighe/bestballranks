@@ -167,18 +167,19 @@
       color: #1e90ff;
       border: 2px solid #1e90ff;
     }
-    .upload-button {
-      border: 2px dashed #1e90ff;
-      background: #fff;
-      color: #1e90ff;
-      padding: 0 0.5rem;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    .upload-container {
+    .rankings-control {
       display: flex;
       flex-direction: column;
+      align-items: flex-start;
+      gap: 0.25rem;
+    }
+    .rankings-control .rankings-row {
+      display: flex;
       align-items: center;
+      gap: 0.5rem;
+    }
+    .upload-button {
+      padding: 0.25rem 0.75rem;
     }
     #active-set-display {
       font-weight: 700;
@@ -250,14 +251,14 @@
     <h1 id="page-title">Best Ball Rankings Builder</h1>
     <div class="controls">
       <div id="weight-controls">
-        <div>
-          <label for="weight-wmonighe" id="rank-label">Rankings</label>
-          <input type="range" id="weight-wmonighe" min="0" max="100" value="25" />
-          <span id="weight-wmonighe-val">25%</span>
-          <div class="upload-container">
-            <div id="active-set-display">Active Set: <span id="rankings-source-name">wmonighe</span></div>
-            <button id="open-upload" class="upload-button" title="Upload Custom Rankings">Upload my own</button>
+        <div class="rankings-control">
+          <div class="rankings-row">
+            <label for="weight-wmonighe" id="rank-label">Rankings</label>
+            <input type="range" id="weight-wmonighe" min="0" max="100" value="25" />
+            <span id="weight-wmonighe-val">25%</span>
           </div>
+          <div id="active-set-display">Active Set: <span id="rankings-source-name">wmonighe</span></div>
+          <button id="open-upload" class="btn btn-outline upload-button" title="Upload a CSV file to use your own rankings instead of the default set.">Upload Rankings</button>
         </div>
         <div>
           <label for="weight-adp">ADP</label>
@@ -524,7 +525,7 @@
       recomputeWmonighePct();
       computeRatings();
       sortAndRender(sortState.key);
-      updateRankingsSource('Custom');
+      updateRankingsSource('Custom (uploaded)');
     }
 
     function parseCSV(text) {
