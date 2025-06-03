@@ -376,7 +376,7 @@
       },
       {
         header: '🏈 Team',
-        cell: r => `<td>${r.teamHtml}</td>`,
+        cell: r => `<td style="text-align:center;">${r.teamHtml}</td>`,
       },
       {
         header: '📋 Position',
@@ -667,7 +667,7 @@
             ? `https://www.fantasynerds.com/images/nfl/team_logos/${teamCode}.png`
             : '';
           const teamHtml = row.Team
-            ? `<img src="${teamLogo}" alt="${row.Team} Logo" style="height:24px;width:24px;">`
+            ? `<img src="${teamLogo}" alt="${row.Team} Logo" style="display:block;margin:0 auto;height:32px;width:32px;">`
             : '';
 
           return {
