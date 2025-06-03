@@ -167,6 +167,56 @@
       color: #1e90ff;
       border: 2px solid #1e90ff;
     }
+    .upload-button {
+      border: 2px dashed #1e90ff;
+      background: #fff;
+      color: #1e90ff;
+      padding: 0 0.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    #active-set-display {
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background: #fff;
+      padding: 1rem;
+      border-radius: 8px;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+    }
+    .drop-zone {
+      border: 2px dashed #1e90ff;
+      padding: 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-bottom: 1rem;
+    }
+    .drop-zone input {
+      display: none;
+    }
+    .upload-error {
+      color: red;
+      margin-bottom: 0.5rem;
+    }
+    .upload-success {
+      color: green;
+      margin-bottom: 0.5rem;
+    }
     .info-note {
       text-align: center;
       font-size: 0.9rem;
@@ -193,10 +243,12 @@
   <script src="config.js"></script>
   <header id="top-controls">
     <h1 id="page-title">Best Ball Rankings Builder</h1>
+    <div id="active-set-display">Active set: <span id="rankings-source-name">wmonighe</span></div>
     <div class="controls">
       <div id="weight-controls">
         <div>
-          <label for="weight-wmonighe">wmonighe Rank</label>
+          <label for="weight-wmonighe" id="rank-label">wmonighe Rank</label>
+          <button id="open-upload" class="upload-button" title="Upload Custom Rankings">🗁⬆ Upload CSV</button>
           <input type="range" id="weight-wmonighe" min="0" max="100" value="25" />
           <span id="weight-wmonighe-val">25%</span>
         </div>
@@ -228,6 +280,17 @@
     <thead></thead>
     <tbody></tbody>
   </table>
+  <div id="upload-modal" class="modal">
+    <div class="modal-content">
+      <h3>Upload Custom Rankings</h3>
+      <div id="drop-zone" class="drop-zone">
+        Drag and drop your CSV file or click to upload
+        <input type="file" id="upload-input" accept=".csv" />
+      </div>
+      <div id="upload-feedback"></div>
+      <button id="close-upload" class="btn btn-outline">Close</button>
+    </div>
+  </div>
   <script>
     const sheetId = '1rNouBdE-HbWafu-shO_5JLPSrLhr-xuGpXYfyOI-2oY';
     const rankingsUrl = `https://opensheet.elk.sh/${sheetId}/Rankings`;
@@ -313,7 +376,7 @@
         cell: r => `<td>${r.position}</td>`,
       },
       {
-        header: '🏅 wmonighe Rank',
+        header: '🏅 <span id="rankings-source">wmonighe</span> Rankings',
         cell: r =>
           `<td>${r.wmonigheRank}${r.wmonighePct ? ' (' + r.wmonighePct + ')' : ''}</td>`,
         sortKey: 'wmonigheRank',
@@ -390,6 +453,7 @@
     let allRows = [];
     let sortState = { key: null, asc: true };
     let displayRows = [];
+    let customRanks = null;
 
     function computeRatings() {
       const weights = {
@@ -413,6 +477,95 @@
           r.rating = '';
         }
       });
+    }
+
+    function updateRankingsSource(name) {
+      const span = document.getElementById('rankings-source');
+      if (span) span.textContent = name;
+      const disp = document.getElementById('rankings-source-name');
+      if (disp) disp.textContent = name;
+      const label = document.getElementById('rank-label');
+      if (label) label.textContent = `${name} Rank`;
+    }
+
+    function recomputeWmonighePct() {
+      allRows.forEach(r => {
+        const rankVal = parseFloat(r.wmonigheRank);
+        if (!isNaN(rankVal)) {
+          let pct = (300 - rankVal) / 299;
+          if (rankVal >= 300) pct = 0;
+          if (pct > 1) pct = 1;
+          if (pct < 0) pct = 0;
+          r.wmonighePct = pct.toFixed(2);
+        } else {
+          r.wmonighePct = '';
+        }
+      });
+    }
+
+    function applyCustomRanks() {
+      if (!customRanks) return;
+      allRows.forEach(r => {
+        const canon = canonicalName(r.player);
+        if (customRanks.hasOwnProperty(canon)) {
+          r.wmonigheRank = customRanks[canon];
+        } else {
+          r.wmonigheRank = '';
+          r.fantasyPts = 'N/A';
+        }
+      });
+      recomputeWmonighePct();
+      computeRatings();
+      sortAndRender(sortState.key);
+      updateRankingsSource('Custom');
+    }
+
+    function parseCSV(text) {
+      const lines = text.trim().split(/\r?\n/);
+      if (!lines.length) throw new Error('Empty file');
+      const headers = lines[0].split(',').map(h => h.trim());
+      let playerIdx = -1;
+      let rankIdx = -1;
+      headers.forEach((h, i) => {
+        const c = canonicalField(h);
+        if (c === 'player' || c === 'name') playerIdx = i;
+        if (c === 'rank' || c === 'ranking' || c === 'rating') rankIdx = i;
+      });
+      if (playerIdx === -1 || rankIdx === -1) {
+        throw new Error('Player or Rank column not found.');
+      }
+      const map = {};
+      for (let i = 1; i < lines.length; i++) {
+        const parts = lines[i].split(',');
+        const player = (parts[playerIdx] || '').trim();
+        const rank = (parts[rankIdx] || '').trim();
+        if (player) {
+          map[canonicalName(player)] = rank;
+        }
+      }
+      return map;
+    }
+
+    function handleFiles(files) {
+      if (!files.length) return;
+      const file = files[0];
+      const reader = new FileReader();
+      document.getElementById('upload-feedback').textContent = 'Loading...';
+      reader.onload = e => {
+        try {
+          customRanks = parseCSV(e.target.result);
+          document.getElementById('upload-feedback').textContent = '✅ Custom rankings imported successfully';
+          document.getElementById('upload-feedback').className = 'upload-success';
+          applyCustomRanks();
+          setTimeout(() => {
+            document.getElementById('upload-modal').style.display = 'none';
+          }, 800);
+        } catch (err) {
+          document.getElementById('upload-feedback').textContent = 'Error: ' + err.message;
+          document.getElementById('upload-feedback').className = 'upload-error';
+        }
+      };
+      reader.readAsText(file);
     }
 
     document
@@ -584,6 +737,8 @@
         });
         thead.appendChild(headerRow);
 
+        updateRankingsSource('wmonighe');
+
         sortState = { key: 'rating', asc: true };
         sortAndRender('rating');
       } catch (err) {
@@ -620,6 +775,28 @@
       computeRatings();
       sortAndRender(sortState.key);
     });
+
+    document.getElementById('open-upload').addEventListener('click', () => {
+      document.getElementById('upload-feedback').textContent = '';
+      document.getElementById('upload-feedback').className = '';
+      document.getElementById('upload-modal').style.display = 'flex';
+    });
+
+    document.getElementById('close-upload').addEventListener('click', () => {
+      document.getElementById('upload-modal').style.display = 'none';
+    });
+
+    const dropZone = document.getElementById('drop-zone');
+    const uploadInput = document.getElementById('upload-input');
+    dropZone.addEventListener('click', () => uploadInput.click());
+    dropZone.addEventListener('dragover', e => {
+      e.preventDefault();
+    });
+    dropZone.addEventListener('drop', e => {
+      e.preventDefault();
+      handleFiles(e.dataTransfer.files);
+    });
+    uploadInput.addEventListener('change', e => handleFiles(e.target.files));
 
     loadData();
   </script>
