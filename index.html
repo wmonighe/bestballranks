@@ -53,6 +53,14 @@
       position: relative;
       z-index: 1;
     }
+    .headshot {
+      width: 30px;
+      height: 30px;
+      object-fit: cover;
+      border-radius: 50%;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
       .rating-column,
       .rating-cell {
         position: relative;
@@ -359,13 +367,12 @@
     const rankingsUrl = `https://opensheet.elk.sh/${sheetId}/Rankings`;
     const sentimentUrl = `https://opensheet.elk.sh/${sheetId}/Sentiment`;
 
-    const LEAGUE_ID = 1;
-    const playersUrl =
-      typeof UNABATED_API_KEY !== 'undefined'
-        ? `https://partner-api.unabated.com/v2/players?leagues=${LEAGUE_ID}`
-        : null;
+    const HEADSHOTS_MANIFEST_URL =
+      'https://api.sportradar.us/nfl-images-t3/getty/headshots/players/manifest.xml?api_key=IpzKJTsjR52ZlApIRNRIP7agFKwZRoP214HdrdLu';
 
     const headshots = {};
+    const DEFAULT_HEADSHOT =
+      'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==';
 
     const weightInputs = {
       wmonighe: document.getElementById('weight-wmonighe'),
@@ -495,21 +502,25 @@
       return key ? row[key] : '';
     }
 
-    async function fetchPlayers() {
-      if (!playersUrl) return;
+    async function fetchHeadshots() {
       try {
-        const res = await fetch(playersUrl, {
-          headers: { 'x-api-key': UNABATED_API_KEY },
-        });
-        const players = await res.json();
+        const res = await fetch(HEADSHOTS_MANIFEST_URL);
+        const text = await res.text();
+        const xml = new DOMParser().parseFromString(text, 'application/xml');
+        const players = xml.querySelectorAll('player');
         players.forEach(p => {
-          const name = canonicalName(
-            p.preferredName || `${p.firstName} ${p.lastName}` || ''
+          const ref = p.querySelector('ref');
+          if (!ref) return;
+          const name = canonicalName(ref.getAttribute('name') || ref.textContent);
+          const linkNode = Array.from(p.querySelectorAll('links link')).find(l =>
+            l.textContent.includes('h250')
           );
-          if (name) headshots[name] = p.headshotUrl;
+          if (name && linkNode) {
+            headshots[name] = linkNode.textContent;
+          }
         });
       } catch (err) {
-        console.error('Error loading player data:', err);
+        console.error('Error loading headshot data:', err);
       }
     }
 
@@ -693,7 +704,7 @@
           if (playerName) sentimentMap[playerName] = score;
         });
 
-        await fetchPlayers();
+        await fetchHeadshots();
 
         const tbody = document.querySelector('#rankings-table tbody');
         const thead = document.querySelector('#rankings-table thead');
@@ -713,8 +724,9 @@
           const wmonigheRank = getColumn(row, 'G', 'wmonighe rank');
 
           const headshot = headshots[canonName];
-          const playerHtml = headshot
-            ? `<img src="${headshot}" alt="${player}" style="height:24px;width:24px;vertical-align:middle;margin-right:4px;">${player}`
+          const imgSrc = headshot || DEFAULT_HEADSHOT;
+          const playerHtml = imgSrc
+            ? `<img src="${imgSrc}" class="headshot" onerror="this.remove()" /> ${player}`
             : player;
 
           const teamMap = { JAX: 'JAC' };

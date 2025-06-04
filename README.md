@@ -26,22 +26,19 @@ Note: values shown in parentheses represent the percentile rank for that metric.
 
 The spreadsheet ID and sheet names are configured directly in `index.html`.
 
-### Unabated API
+### Player Headshots
 
-Player headshots are loaded from the Unabated API. A `config.js` file is
-included with the repository and already contains the API key needed to connect
-to the service. The page fetches player data for the National Football League
-(league ID `1`) so that headshot URLs can be matched to the rankings:
+Headshots are loaded from Sportradar's Getty Images API. The page downloads the
+player manifest XML once on load and stores a mapping from player name to image
+URL in memory. When building the table, each player's name is preceded by their
+headshot image if available. A small default image is used if the manifest does
+not contain a match.
 
-```javascript
-// config.js
-const UNABATED_API_KEY = 'fwe8yfew80f9wyhb';
+The manifest is fetched from the following endpoint:
+
+```
+https://api.sportradar.us/nfl-images-t3/getty/headshots/players/manifest.xml?api_key=IpzKJTsjR52ZlApIRNRIP7agFKwZRoP214HdrdLu
 ```
 
-No additional setup is required. Simply open the page and it will fetch
-headshots using this key. If you wish to pull a different sport, edit
-`LEAGUE_ID` in `index.html`.
-
-If a headshot is available from Unabated, the Player column will display the
-image directly in front of the player's name.
+No additional setup is required.
 
