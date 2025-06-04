@@ -14,7 +14,6 @@ recompute ratings.
 
 - **Rating** (weighted combination of wmonighe, ADP, fantasy points and sentiment percentiles)
 - **Player**
-- **Team**
 - **Position**
 - **ADP** (column J of the `Rankings` sheet, with percentile from column L of that sheet appended in parentheses)
 - **wmonighe Rank** (column G of the `Rankings` sheet)
@@ -26,19 +25,8 @@ Note: values shown in parentheses represent the percentile rank for that metric.
 
 The spreadsheet ID and sheet names are configured directly in `index.html`.
 
-### Player Headshots
+### Team Logos
 
-Headshots are loaded from Sportradar's Getty Images API. The page downloads the
-player manifest XML once on load and stores a mapping from player name to image
-URL in memory. When building the table, each player's name is preceded by their
-headshot image if available. A small default image is used if the manifest does
-not contain a match.
-
-The manifest is fetched from the following endpoint:
-
-```
-https://api.sportradar.us/nfl-images-t3/getty/headshots/players/manifest.xml?api_key=e2f66p2fmb5ndn539cf6f2yc
-```
-
-No additional setup is required.
+Each player's row displays the logo of their NFL team to the left of their name.
+Logos are loaded directly from FantasyNerds and no additional setup is required.
 
