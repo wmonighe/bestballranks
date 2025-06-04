@@ -111,6 +111,15 @@
       text-fill-color: transparent;
       text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
     }
+    #title-container {
+      display: flex;
+      align-items: baseline;
+      gap: 0.5rem;
+    }
+    #help-link {
+      font-size: 1rem;
+      font-weight: normal;
+    }
     .controls {
       display: flex;
       align-items: center;
@@ -332,7 +341,10 @@
 <body>
   <script src="config.js"></script>
   <header id="top-controls">
-    <h1 id="page-title">Best Ball Rankings Builder</h1>
+    <div id="title-container">
+      <h1 id="page-title">Best Ball Rankings Builder</h1>
+      <a id="help-link" href="https://www.loom.com/share/d9b149a66e12497d9f842192d831c0cb?sid=3b5641ff-9830-43f0-83c1-f73f8c8bc6de" target="_blank">What's this?</a>
+    </div>
     <div class="controls">
       <div id="weight-controls">
         <div class="rankings-control">
