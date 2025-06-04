@@ -601,22 +601,21 @@
       if (!lines.length) throw new Error('Empty file');
       const headers = lines[0].split(',').map(h => h.trim());
       let playerIdx = -1;
-      let rankIdx = -1;
       headers.forEach((h, i) => {
         const c = canonicalField(h);
         if (c === 'player' || c === 'name') playerIdx = i;
-        if (c === 'rank' || c === 'ranking' || c === 'rating') rankIdx = i;
       });
-      if (playerIdx === -1 || rankIdx === -1) {
-        throw new Error('Player or Rank column not found.');
+      if (playerIdx === -1) {
+        throw new Error('Player column not found.');
       }
       const map = {};
+      let rankCounter = 1;
       for (let i = 1; i < lines.length; i++) {
         const parts = lines[i].split(',');
         const player = (parts[playerIdx] || '').trim();
-        const rank = (parts[rankIdx] || '').trim();
         if (player) {
-          map[canonicalName(player)] = rank;
+          map[canonicalName(player)] = rankCounter.toString();
+          rankCounter++;
         }
       }
       return map;
