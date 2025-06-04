@@ -635,7 +635,7 @@
       });
       recomputeWmonighePct();
       computeRatings();
-      sortAndRender(sortState.key);
+      sortAndRender(sortState.key, true);
       updateRankingsSource('Custom (uploaded)');
     }
 
@@ -736,13 +736,18 @@
       if (msg) msg.style.display = 'block';
     }
 
-    function sortAndRender(key) {
+    function sortAndRender(key, preserve) {
       if (!key) {
         displayRows = allRows;
         renderRows(allRows);
         return;
       }
-      const asc = sortState.key === key ? !sortState.asc : true;
+      let asc;
+      if (preserve && sortState.key === key) {
+        asc = sortState.asc;
+      } else {
+        asc = sortState.key === key ? !sortState.asc : true;
+      }
       sortState = { key, asc };
       const sorted = [...allRows].sort((a, b) => {
         const va = parseFloat(a[key]);
@@ -926,7 +931,7 @@
         prevWeights[k] = parseInt(weightInputs[k].value, 10) || 0;
       });
       computeRatings();
-      sortAndRender(sortState.key);
+      sortAndRender(sortState.key, true);
     });
 
     document.getElementById('close-upload').addEventListener('click', () => {
