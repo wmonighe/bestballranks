@@ -117,8 +117,18 @@
       gap: 0.5rem;
     }
     #help-link {
+      width: 24px;
+      height: 24px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #1e90ff;
+      border-radius: 50%;
+      color: #1e90ff;
+      text-decoration: none;
       font-size: 1rem;
-      font-weight: normal;
+      font-weight: bold;
+      line-height: 1;
     }
     .controls {
       display: flex;
@@ -266,6 +276,9 @@
       width: 90%;
       text-align: center;
     }
+    #video-modal .modal-content {
+      max-width: 800px;
+    }
     .drop-zone {
       border: 2px dashed #1e90ff;
       padding: 1rem;
@@ -343,7 +356,12 @@
   <header id="top-controls">
     <div id="title-container">
       <h1 id="page-title">Best Ball Rankings Builder</h1>
-      <a id="help-link" href="https://www.loom.com/share/d9b149a66e12497d9f842192d831c0cb?sid=3b5641ff-9830-43f0-83c1-f73f8c8bc6de" target="_blank">What's this?</a>
+      <a
+        id="help-link"
+        href="#"
+        title="What's This?"
+        data-video="https://www.loom.com/embed/d9b149a66e12497d9f842192d831c0cb?sid=3b5641ff-9830-43f0-83c1-f73f8c8bc6de"
+      >?</a>
     </div>
     <div class="controls">
       <div id="weight-controls">
@@ -404,6 +422,19 @@
       </div>
       <div id="upload-feedback"></div>
       <button id="close-upload" class="btn btn-outline">Close</button>
+    </div>
+  </div>
+  <div id="video-modal" class="modal">
+    <div class="modal-content">
+      <iframe
+        id="video-frame"
+        width="100%"
+        height="450"
+        src=""
+        frameborder="0"
+        allowfullscreen
+      ></iframe>
+      <button id="close-video" class="btn btn-outline">Close</button>
     </div>
   </div>
   <script>
@@ -942,6 +973,24 @@
       handleFiles(e.dataTransfer.files);
     });
     uploadInput.addEventListener('change', e => handleFiles(e.target.files));
+
+    document.getElementById('help-link').addEventListener('click', e => {
+      e.preventDefault();
+      const modal = document.getElementById('video-modal');
+      const frame = document.getElementById('video-frame');
+      if (modal && frame) {
+        frame.src = e.currentTarget.dataset.video;
+        modal.style.display = 'flex';
+      }
+    });
+    document.getElementById('close-video').addEventListener('click', () => {
+      const modal = document.getElementById('video-modal');
+      const frame = document.getElementById('video-frame');
+      if (modal && frame) {
+        frame.src = '';
+        modal.style.display = 'none';
+      }
+    });
 
     showSkeleton();
     loadData();
