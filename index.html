@@ -268,6 +268,38 @@
       color: green;
       margin-bottom: 0.5rem;
     }
+    .loading-msg {
+      text-align: center;
+      margin-bottom: 1rem;
+      opacity: 0;
+      animation: fadeIn 0.5s forwards;
+      display: none;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .skeleton-row .skeleton-block {
+      height: 1em;
+      background: #e0e0e0;
+      border-radius: 4px;
+      position: relative;
+      overflow: hidden;
+    }
+    .skeleton-row .skeleton-block::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, rgba(224,224,224,0) 0%, rgba(255,255,255,0.6) 50%, rgba(224,224,224,0) 100%);
+      animation: shimmer 1.5s infinite;
+    }
+    @keyframes shimmer {
+      from { left: -100%; }
+      to { left: 100%; }
+    }
     .info-note {
       text-align: center;
       font-size: 0.9rem;
@@ -339,6 +371,7 @@
     </div>
   </header>
   <p class="info-note">Values in parentheses indicate percentile rank.</p>
+  <div id="loading-message" class="loading-msg">Loading player rankings…</div>
   <table id="rankings-table">
     <thead></thead>
     <tbody></tbody>
@@ -652,6 +685,35 @@
       });
     }
 
+    function showSkeleton() {
+      const tbody = document.querySelector('#rankings-table tbody');
+      const thead = document.querySelector('#rankings-table thead');
+      thead.innerHTML = '';
+      const headerRow = document.createElement('tr');
+      columns.forEach(col => {
+        const th = document.createElement('th');
+        if (col.thClass) th.className = col.thClass;
+        th.innerHTML = col.header;
+        headerRow.appendChild(th);
+      });
+      thead.appendChild(headerRow);
+      tbody.innerHTML = '';
+      for (let i = 0; i < 10; i++) {
+        const tr = document.createElement('tr');
+        tr.className = 'skeleton-row';
+        columns.forEach(() => {
+          const td = document.createElement('td');
+          const div = document.createElement('div');
+          div.className = 'skeleton-block';
+          td.appendChild(div);
+          tr.appendChild(td);
+        });
+        tbody.appendChild(tr);
+      }
+      const msg = document.getElementById('loading-message');
+      if (msg) msg.style.display = 'block';
+    }
+
     function sortAndRender(key) {
       if (!key) {
         displayRows = allRows;
@@ -814,8 +876,12 @@
 
         sortState = { key: 'rating', asc: true };
         sortAndRender('rating');
+        const loadingMsg = document.getElementById('loading-message');
+        if (loadingMsg) loadingMsg.style.display = 'none';
       } catch (err) {
         console.error('Error loading data:', err);
+        const loadingMsg = document.getElementById('loading-message');
+        if (loadingMsg) loadingMsg.style.display = 'none';
       }
     }
 
@@ -894,6 +960,7 @@
     });
     uploadInput.addEventListener('change', e => handleFiles(e.target.files));
 
+    showSkeleton();
     loadData();
   </script>
 </body>
