@@ -37,7 +37,7 @@ not contain a match.
 The manifest is fetched from the following endpoint:
 
 ```
-https://api.sportradar.us/nfl-images-t3/getty/headshots/players/manifest.xml?api_key=IpzKJTsjR52ZlApIRNRIP7agFKwZRoP214HdrdLu
+https://api.sportradar.us/nfl-images-t3/getty/headshots/players/manifest.xml?api_key=e2f66p2fmb5ndn539cf6f2yc
 ```
 
 No additional setup is required.
