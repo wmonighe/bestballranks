@@ -323,7 +323,7 @@
         <div class="rankings-dropdown-row">
           <div class="dropdown" id="rankings-dropdown">
             <button id="rankings-dropdown-btn" class="dropdown-btn">
-              Active Set: <span id="rankings-source-name">wmonighe</span>
+              Active Ranking Set: <span id="rankings-source-name">wmonighe</span>
             </button>
             <div id="rankings-menu" class="dropdown-menu">
               <div id="upload-option" class="upload-option">Upload my own</div>
@@ -871,6 +871,16 @@
         dropdownMenu.style.display = 'none';
       }
     });
+
+    function adjustDropdownWidth() {
+      const btn = document.getElementById('rankings-dropdown-btn');
+      const row = document.querySelector('.button-row');
+      if (btn && row) {
+        btn.style.width = row.offsetWidth + 'px';
+      }
+    }
+    window.addEventListener('load', adjustDropdownWidth);
+    window.addEventListener('resize', adjustDropdownWidth);
 
     const dropZone = document.getElementById('drop-zone');
     const uploadInput = document.getElementById('upload-input');
