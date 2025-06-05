@@ -498,6 +498,10 @@
 
     const columns = [
       {
+        header: '#',
+        cell: (r, i) => `<td>${i + 1}</td>`,
+      },
+      {
         header: '⭐ Rating',
         thClass: 'rating-column',
         cell: r => `<td class="rating-cell">${r.rating || ''}</td>`,
@@ -708,10 +712,10 @@
       displayRows = rows;
       const tbody = document.querySelector('#rankings-table tbody');
       tbody.innerHTML = '';
-      rows.forEach(r => {
+      rows.forEach((r, i) => {
         const tr = document.createElement('tr');
         columns.forEach(col => {
-          tr.insertAdjacentHTML('beforeend', col.cell(r));
+          tr.insertAdjacentHTML('beforeend', col.cell(r, i));
         });
         tbody.appendChild(tr);
       });
