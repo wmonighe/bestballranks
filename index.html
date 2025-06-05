@@ -137,6 +137,11 @@
       flex-wrap: wrap;
       justify-content: center;
     }
+    #last-update {
+      margin-left: auto;
+      font-size: 0.9rem;
+      color: #555;
+    }
     #weight-controls {
       display: flex;
       flex-direction: column;
@@ -406,6 +411,7 @@
         </div>
       </div>
     </div>
+    <div id="last-update"></div>
   </header>
   <p class="info-note">Values in parentheses indicate percentile rank.</p>
   <div id="loading-message" class="loading-msg">Loading player rankings…</div>
@@ -786,6 +792,12 @@
           fetch(rankingsUrl),
           fetch(sentimentUrl),
         ]);
+        const lastModified = rankingsRes.headers.get('Last-Modified');
+        if (lastModified) {
+          const dt = new Date(lastModified);
+          const el = document.getElementById('last-update');
+          if (el) el.textContent = 'Last Update: ' + dt.toLocaleString();
+        }
         const rankings = await rankingsRes.json();
         const sentimentRows = await sentimentRes.json();
 
