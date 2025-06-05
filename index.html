@@ -519,7 +519,13 @@
       },
       {
         header: '📊 ADP',
-        cell: r => `<td>${r.adp}${r.adpPct ? ' (' + r.adpPct + ')' : ''}</td>`,
+        cell: r => {
+          let text = `${r.adp}${r.adpPct ? ' (' + r.adpPct + ')' : ''}`;
+          if (text === '#N/A (#N/A)' || text === '- (#VALUE!)') {
+            text = 'Undrafted';
+          }
+          return `<td>${text}</td>`;
+        },
         sortKey: 'adp',
       },
       {
