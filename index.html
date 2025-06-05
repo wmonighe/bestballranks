@@ -521,7 +521,11 @@
         header: '📊 ADP',
         cell: r => {
           let text = `${r.adp}${r.adpPct ? ' (' + r.adpPct + ')' : ''}`;
-          if (text === '#N/A (#N/A)' || text === '- (#VALUE!)') {
+          if (
+            r.adp === 'Undrafted' ||
+            text === '#N/A (#N/A)' ||
+            text === '- (#VALUE!)'
+          ) {
             text = 'Undrafted';
           }
           return `<td>${text}</td>`;
@@ -800,8 +804,19 @@
             row.Sentiment || row['Sentiment Score'] || row.H || '';
           const sentiment =
             rowSentiment || sentimentMap[canonName] || '';
-          const adp = row.J || row.ADP || row['ADP'] || '';
-          const adpPct = getColumn(row, 'L', 'adp percentile');
+          let adp = row.J || row.ADP || row['ADP'] || '';
+          let adpPct = getColumn(row, 'L', 'adp percentile');
+          const isUndrafted =
+            adp.toString().toLowerCase() === 'undrafted' ||
+            adp === '#N/A' ||
+            adp === '-' ||
+            adpPct === '#N/A' ||
+            adpPct === '#VALUE!' ||
+            adpPct === '';
+          if (isUndrafted) {
+            adp = 'Undrafted';
+            adpPct = '0.00';
+          }
           const fantasyPts = getFantasyPoints(row);
           const wmonigheRank = getColumn(row, 'G', 'wmonighe rank');
 
