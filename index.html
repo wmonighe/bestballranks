@@ -369,24 +369,29 @@
         <div class="rankings-control">
           <div class="rankings-row">
             <label for="weight-wmonighe" id="rank-label">Rankings</label>
-            <input type="range" id="weight-wmonighe" min="0" max="100" value="25" />
-            <span id="weight-wmonighe-val">25%</span>
+            <input type="range" id="weight-wmonighe" min="0" max="100" value="20" />
+            <span id="weight-wmonighe-val">20%</span>
           </div>
         </div>
         <div>
           <label for="weight-adp">ADP</label>
-          <input type="range" id="weight-adp" min="0" max="100" value="45" />
-          <span id="weight-adp-val">45%</span>
+          <input type="range" id="weight-adp" min="0" max="100" value="20" />
+          <span id="weight-adp-val">20%</span>
         </div>
         <div>
           <label for="weight-fp">Fantasy Points</label>
-          <input type="range" id="weight-fp" min="0" max="100" value="25" />
-          <span id="weight-fp-val">25%</span>
+          <input type="range" id="weight-fp" min="0" max="100" value="20" />
+          <span id="weight-fp-val">20%</span>
         </div>
         <div>
           <label for="weight-sentiment">Sentiment</label>
-          <input type="range" id="weight-sentiment" min="0" max="100" value="5" />
-          <span id="weight-sentiment-val">5%</span>
+          <input type="range" id="weight-sentiment" min="0" max="100" value="20" />
+          <span id="weight-sentiment-val">20%</span>
+        </div>
+        <div>
+          <label for="weight-vorp">VORP Score</label>
+          <input type="range" id="weight-vorp" min="0" max="100" value="20" />
+          <span id="weight-vorp-val">20%</span>
         </div>
       </div>
       <div class="actions-container">
@@ -450,6 +455,7 @@
       adp: document.getElementById('weight-adp'),
       fp: document.getElementById('weight-fp'),
       sentiment: document.getElementById('weight-sentiment'),
+      vorp: document.getElementById('weight-vorp'),
     };
 
     function updateWeightDisplay(key) {
@@ -597,6 +603,7 @@
         adp: parseFloat(weightInputs.adp.value) / 100,
         fp: parseFloat(weightInputs.fp.value) / 100,
         sentiment: parseFloat(weightInputs.sentiment.value) / 100,
+        vorp: parseFloat(weightInputs.vorp.value) / 100,
       };
       allRows.forEach(r => {
         const items = [
@@ -604,6 +611,7 @@
           { v: parseFloat(r.adpPct), w: weights.adp },
           { v: parseFloat(r.fpPct), w: weights.fp },
           { v: parseFloat(r.sentimentPct), w: weights.sentiment },
+          { v: parseFloat(r.vorpPct), w: weights.vorp },
         ].filter(i => !isNaN(i.v) && i.w > 0);
         const totalWeight = items.reduce((a, b) => a + b.w, 0);
         if (items.length && totalWeight > 0) {
@@ -952,10 +960,11 @@
     });
 
     document.getElementById('reset-weights').addEventListener('click', () => {
-      weightInputs.wmonighe.value = 25;
-      weightInputs.adp.value = 45;
-      weightInputs.fp.value = 25;
-      weightInputs.sentiment.value = 5;
+      weightInputs.wmonighe.value = 20;
+      weightInputs.adp.value = 20;
+      weightInputs.fp.value = 20;
+      weightInputs.sentiment.value = 20;
+      weightInputs.vorp.value = 20;
       Object.keys(weightInputs).forEach(k => {
         updateWeightDisplay(k);
         prevWeights[k] = parseInt(weightInputs[k].value, 10) || 0;
