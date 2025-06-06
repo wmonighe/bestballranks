@@ -891,6 +891,16 @@
           }
         });
 
+        // Round VORP score percentile
+        rowsData.forEach(r => {
+          const val = parseFloat(r.vorpPct);
+          if (!isNaN(val)) {
+            r.vorpPct = val.toFixed(2);
+          } else {
+            r.vorpPct = '';
+          }
+        });
+
         // Sentiment rendering
         const numericSentiments = rowsData
           .map(r => r.sentimentValue)
