@@ -13,8 +13,7 @@ calculating the **Rating** value. Move the sliders and click **Update** to
 recompute ratings.
 
 - **Rating** (weighted combination of wmonighe, ADP, fantasy points and sentiment percentiles)
-- **Player**
-- **Position**
+- **Player (Position)**
 - **ADP** (column J of the `Rankings` sheet, with percentile from column L of that sheet appended in parentheses)
 - **wmonighe Rank** (column G of the `Rankings` sheet)
 - **Fantasy Points** (column I of the `Rankings` sheet, with the computed fantasy point percentile appended in parentheses as a decimal between 0 and 1)

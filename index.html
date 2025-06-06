@@ -513,10 +513,6 @@
         cell: r => `<td>${r.playerHtml}</td>`,
       },
       {
-        header: '📋 Position',
-        cell: r => `<td>${r.position}</td>`,
-      },
-      {
         header: '🏅 <span id="rankings-source">wmonighe</span> Rankings',
         cell: r =>
           `<td>${r.wmonigheRank}${r.wmonighePct ? ' (' + r.wmonighePct + ')' : ''}</td>`,
@@ -836,8 +832,8 @@
             ? `https://www.fantasynerds.com/images/nfl/team_logos/${teamCode}.png`
             : '';
           const playerHtml = teamLogo
-            ? `<img src="${teamLogo}" class="team-logo" onerror="this.style.display='none'" /> ${player}`
-            : player;
+            ? `<img src="${teamLogo}" class="team-logo" onerror="this.style.display='none'" /> ${player} (${row.Position})`
+            : `${player} (${row.Position})`;
 
           return {
             player,
