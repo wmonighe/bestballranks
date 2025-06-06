@@ -546,7 +546,8 @@
       },
       {
         header: '📈 VORP Score',
-        cell: r => `<td>${r.vorp}</td>`,
+        cell: r =>
+          `<td>${r.vorp}${r.vorpPct ? ' (' + r.vorpPct + ')' : ''}</td>`,
         sortKey: 'vorp',
       },
     ];
@@ -847,6 +848,7 @@
             postDraftId: getColumn(row, 'P', 'post draft id'),
             wmonigheRank,
             vorp: getColumn(row, 'Q', 'vorp score'),
+            vorpPct: getColumn(row, 'R', 'vorp percentile'),
             fantasyPts,
           };
         });
