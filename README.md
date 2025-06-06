@@ -12,7 +12,7 @@ table are slider controls that let you adjust the weighting of each metric when
 calculating the **Rating** value. Move the sliders and click **Update** to
 recompute ratings.
 
-- **Rating** (weighted combination of wmonighe, ADP, fantasy points and sentiment percentiles)
+- **Rating** (weighted combination of wmonighe, ADP, fantasy points, sentiment and VORP percentiles)
 - **Player (Position)**
 - **ADP** (column J of the `Rankings` sheet, with percentile from column L of that sheet appended in parentheses)
 - **wmonighe Rank** (column G of the `Rankings` sheet)
