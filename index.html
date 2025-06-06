@@ -548,6 +548,11 @@
           `<td class="sentiment-cell" style="--width:${r.sentimentPercent}%"><span>${r.sentiment}${r.sentimentPct ? ' (' + r.sentimentPct + ')' : ''}</span></td>`,
         sortKey: 'sentimentValue',
       },
+      {
+        header: '📈 VORP Score',
+        cell: r => `<td>${r.vorp}</td>`,
+        sortKey: 'vorp',
+      },
     ];
 
     function canonicalName(name) {
@@ -845,6 +850,7 @@
             adpPct,
             postDraftId: getColumn(row, 'P', 'post draft id'),
             wmonigheRank,
+            vorp: getColumn(row, 'Q', 'vorp score'),
             fantasyPts,
           };
         });

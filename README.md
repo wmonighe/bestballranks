@@ -20,6 +20,7 @@ recompute ratings.
 - **Fantasy Points** (column I of the `Rankings` sheet, with the computed fantasy point percentile appended in parentheses as a decimal between 0 and 1)
 - **Sentiment** (from column F of the `Sentiment` sheet, with the computed
   sentiment percentile appended in parentheses as a decimal between 0 and 1)
+- **VORP Score** (column Q of the `Rankings` sheet)
 
 Note: values shown in parentheses represent the percentile rank for that metric.
 
