@@ -264,6 +264,19 @@
               (a, b) =>
                 parseInt(a["Pick Number"], 10) - parseInt(b["Pick Number"], 10)
             );
+
+            const firstPick = team.picks[0];
+            let dateEntered = "";
+            if (firstPick && firstPick["Picked At"]) {
+              const d = new Date(firstPick["Picked At"]);
+              if (!isNaN(d)) {
+                const mm = String(d.getMonth() + 1).padStart(2, "0");
+                const dd = String(d.getDate()).padStart(2, "0");
+                dateEntered = `${mm}/${dd}`;
+              }
+            }
+            team.dateEntered = dateEntered;
+
             team.totalRating = team.picks.reduce((sum, p) => {
               const canon = canonicalName(`${p["First Name"]} ${p["Last Name"]}`);
               const rating = parseFloat(ratingMap[canon]);
@@ -278,7 +291,8 @@
             card.className = "team-card";
             const header = document.createElement("h2");
             const feeDisp = parseFloat(team.entryFee).toString();
-            header.textContent = `${team.tournamentTitle} - $${feeDisp} - Total Rating: ${team.totalRating.toFixed(2)}`;
+            const datePart = team.dateEntered ? ` - Date Entered: ${team.dateEntered}` : "";
+            header.textContent = `${team.tournamentTitle} - $${feeDisp}${datePart} - Total Rating: ${team.totalRating.toFixed(2)}`;
             card.appendChild(header);
             const table = document.createElement("table");
             const thead = document.createElement("thead");
