@@ -14,12 +14,17 @@
       margin-top: 1rem;
       font-weight: bold;
     }
+  .team-card{border:1px solid #ddd;padding:1rem;margin-top:1rem;border-radius:4px;}
+  .team-card h2{margin-top:0;}
+  .team-card table{width:100%;border-collapse:collapse;margin-top:0.5rem;}
+  .team-card th,.team-card td{border:1px solid #ccc;padding:4px;text-align:left;font-size:0.9rem;}
   </style>
 </head>
 <body>
   <h1>Upload CSV</h1>
   <input type="file" id="file-input" accept=".csv">
   <div id="message"></div>
+  <div id="teams"></div>
 
   <script>
     const requiredHeaders = [
@@ -52,23 +57,64 @@
       "Weekly Winner Size"
     ];
 
-    document.getElementById('file-input').addEventListener('change', function(e) {
+    document.getElementById("file-input").addEventListener("change", function(e) {
       const file = e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
       reader.onload = function(event) {
         try {
           const text = event.target.result.trim();
-          const firstLine = text.split(/\r?\n/)[0];
-          const headers = firstLine.split(',').map(h => h.trim());
+          const lines = text.split(/\r?\n/).filter(l => l.trim() !== "");
+          const headers = lines[0].split(',').map(h => h.trim());
           const allPresent = requiredHeaders.every(h => headers.includes(h));
-          document.getElementById('message').textContent = allPresent ? 'Upload Successful.' : 'Upload Failed.';
+          const msgEl = document.getElementById("message");
+          const teamsEl = document.getElementById("teams");
+          teamsEl.innerHTML = "";
+          if (!allPresent) {
+            msgEl.textContent = "Upload Failed.";
+            return;
+          }
+          msgEl.textContent = "Upload Successful.";
+          const rows = lines.slice(1).map(line => {
+            const values = line.split(',').map(v => v.trim());
+            const obj = {};
+            headers.forEach((h, i) => obj[h] = values[i]);
+            return obj;
+          });
+          const teams = {};
+          rows.forEach(r => {
+            const key = r["Draft Entry"];
+            if (!teams[key]) {
+              teams[key] = { tournamentTitle: r["Tournament Title"], entryFee: r["Tournament Entry Fee"], picks: [] };
+            }
+            teams[key].picks.push(r);
+          });
+          Object.values(teams).forEach(team => {
+            const card = document.createElement("div");
+            card.className = "team-card";
+            const header = document.createElement("h2");
+            header.textContent = `${team.tournamentTitle} - $${team.entryFee}`;
+            card.appendChild(header);
+            const table = document.createElement("table");
+            const thead = document.createElement("thead");
+            thead.innerHTML = "<tr><th>Pick Number</th><th>First Name</th><th>Last Name</th><th>Team</th><th>Position</th></tr>";
+            table.appendChild(thead);
+            const tbody = document.createElement("tbody");
+            team.picks.forEach(p => {
+              const tr = document.createElement("tr");
+              tr.innerHTML = `<td>${p["Pick Number"]}</td><td>${p["First Name"]}</td><td>${p["Last Name"]}</td><td>${p["Team"]}</td><td>${p["Position"]}</td>`;
+              tbody.appendChild(tr);
+            });
+            table.appendChild(tbody);
+            card.appendChild(table);
+            teamsEl.appendChild(card);
+          });
         } catch (err) {
-          document.getElementById('message').textContent = 'Upload Failed.';
+          document.getElementById("message").textContent = "Upload Failed.";
         }
       };
       reader.onerror = function() {
-        document.getElementById('message').textContent = 'Upload Failed.';
+        document.getElementById("message").textContent = "Upload Failed.";
       };
       reader.readAsText(file);
     });
