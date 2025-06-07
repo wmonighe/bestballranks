@@ -249,16 +249,36 @@
           rows.forEach(r => {
             const key = r["Draft Entry"];
             if (!teams[key]) {
-              teams[key] = { tournamentTitle: r["Tournament Title"], entryFee: r["Tournament Entry Fee"], picks: [] };
+              teams[key] = {
+                tournamentTitle: r["Tournament Title"],
+                entryFee: r["Tournament Entry Fee"],
+                picks: []
+              };
             }
             teams[key].picks.push(r);
           });
-          Object.values(teams).forEach(team => {
-            team.picks.sort((a,b) => parseInt(a["Pick Number"],10) - parseInt(b["Pick Number"],10));
+
+          const teamArr = Object.values(teams);
+          teamArr.forEach(team => {
+            team.picks.sort(
+              (a, b) =>
+                parseInt(a["Pick Number"], 10) - parseInt(b["Pick Number"], 10)
+            );
+            team.totalRating = team.picks.reduce((sum, p) => {
+              const canon = canonicalName(`${p["First Name"]} ${p["Last Name"]}`);
+              const rating = parseFloat(ratingMap[canon]);
+              return sum + (isNaN(rating) ? 0 : rating);
+            }, 0);
+          });
+
+          teamArr.sort((a, b) => b.totalRating - a.totalRating);
+
+          teamArr.forEach(team => {
             const card = document.createElement("div");
             card.className = "team-card";
             const header = document.createElement("h2");
-            header.textContent = `${team.tournamentTitle} - $${team.entryFee}`;
+            const feeDisp = parseFloat(team.entryFee).toString();
+            header.textContent = `${team.tournamentTitle} - $${feeDisp} - Total Rating: ${team.totalRating.toFixed(2)}`;
             card.appendChild(header);
             const table = document.createElement("table");
             const thead = document.createElement("thead");
