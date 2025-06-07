@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Upload CSV</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+    }
+    #message {
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>Upload CSV</h1>
+  <input type="file" id="file-input" accept=".csv">
+  <div id="message"></div>
+
+  <script>
+    const requiredHeaders = [
+      "Picked At",
+      "Pick Number",
+      "Appearance",
+      "First Name",
+      "Last Name",
+      "Team",
+      "Position",
+      "Draft",
+      "Draft Entry",
+      "Draft Entry Fee",
+      "Draft Size",
+      "Draft Total Prizes",
+      "Tournament Title",
+      "Tournament",
+      "Tournament Entry Fee",
+      "Tournament Total Prizes",
+      "Tournament Size",
+      "Draft Pool Title",
+      "Draft Pool",
+      "Draft Pool Entry Fee",
+      "Draft Pool Total Prizes",
+      "Draft Pool Size",
+      "Weekly Winner Title",
+      "Weekly Winner",
+      "Weekly Winner Entry Fee",
+      "Weekly Winner Total Prizes",
+      "Weekly Winner Size"
+    ];
+
+    document.getElementById('file-input').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        try {
+          const text = event.target.result.trim();
+          const firstLine = text.split(/\r?\n/)[0];
+          const headers = firstLine.split(',').map(h => h.trim());
+          const allPresent = requiredHeaders.every(h => headers.includes(h));
+          document.getElementById('message').textContent = allPresent ? 'Upload Successful.' : 'Upload Failed.';
+        } catch (err) {
+          document.getElementById('message').textContent = 'Upload Failed.';
+        }
+      };
+      reader.onerror = function() {
+        document.getElementById('message').textContent = 'Upload Failed.';
+      };
+      reader.readAsText(file);
+    });
+  </script>
+</body>
+</html>
