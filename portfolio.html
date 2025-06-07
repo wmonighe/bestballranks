@@ -14,7 +14,8 @@
       margin-top: 1rem;
       font-weight: bold;
     }
-  .team-card{border:1px solid #ddd;padding:1rem;margin-top:1rem;border-radius:4px;}
+  #teams{display:flex;flex-wrap:wrap;gap:1rem;}
+  .team-card{border:1px solid #ddd;padding:1rem;margin-top:1rem;border-radius:4px;flex:1 0 calc(33.333% - 1rem);box-sizing:border-box;}
   .team-card h2{margin-top:0;}
   .team-card table{width:100%;border-collapse:collapse;margin-top:0.5rem;}
   .team-card th,.team-card td{border:1px solid #ccc;padding:4px;text-align:left;font-size:0.9rem;}
@@ -90,6 +91,7 @@
             teams[key].picks.push(r);
           });
           Object.values(teams).forEach(team => {
+            team.picks.sort((a,b) => parseInt(a["Pick Number"],10) - parseInt(b["Pick Number"],10));
             const card = document.createElement("div");
             card.className = "team-card";
             const header = document.createElement("h2");
