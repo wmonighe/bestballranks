@@ -908,17 +908,24 @@
           };
         });
 
-        // Add fantasy points percentiles
-        const numericFps = rowsData
-          .map(r => parseFloat(r.fantasyPts))
-          .filter(v => !isNaN(v))
-          .sort((a, b) => a - b);
+        // Add fantasy points percentiles by position
+        const fpsByPos = {};
+        rowsData.forEach(r => {
+          const val = parseFloat(r.fantasyPts);
+          if (!isNaN(val)) {
+            const pos = r.position || 'NA';
+            if (!fpsByPos[pos]) fpsByPos[pos] = [];
+            fpsByPos[pos].push(val);
+          }
+        });
+        Object.keys(fpsByPos).forEach(pos => fpsByPos[pos].sort((a, b) => a - b));
 
         rowsData.forEach(r => {
           const val = parseFloat(r.fantasyPts);
-          if (!isNaN(val) && numericFps.length) {
-            const rank = numericFps.filter(v => v <= val).length;
-            r.fpPct = (rank / numericFps.length).toFixed(2);
+          const arr = fpsByPos[r.position || 'NA'];
+          if (!isNaN(val) && arr && arr.length) {
+            const rank = arr.filter(v => v <= val).length;
+            r.fpPct = (rank / arr.length).toFixed(2);
           } else {
             r.fpPct = '';
           }
