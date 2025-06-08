@@ -123,7 +123,11 @@
           let dateEntered='';
           if(firstPick&&firstPick['Picked At']){const d=new Date(firstPick['Picked At']);if(!isNaN(d)){const mm=String(d.getMonth()+1).padStart(2,'0');const dd=String(d.getDate()).padStart(2,'0');dateEntered=`${mm}/${dd}`;}}
           team.dateEntered=dateEntered;
+          const rosterSize=team.picks.length;
           team.totalRating=team.picks.reduce((sum,p)=>{const canon=canonicalName(`${p['First Name']} ${p['Last Name']}`);const rating=parseFloat(ratingMap[canon]);return sum+(isNaN(rating)?0:rating);},0);
+          if(rosterSize===20){
+            team.totalRating=team.totalRating*(18/20);
+          }
         });
         allTeams.push(...teamArr);
         statusEl.textContent='\u2713 Upload Successful';
