@@ -588,7 +588,10 @@
       },
       {
         header: '🏆 Fantasy Points',
-        cell: r => `<td>${r.fantasyPts}${r.fpPct ? ' (' + r.fpPct + ')' : ''}</td>`,
+        cell: r => {
+          const pctText = r.fpPctDisplay || r.fpPct;
+          return `<td>${r.fantasyPts}${pctText ? ' (' + pctText + ')' : ''}</td>`;
+        },
         sortKey: 'fantasyPts',
       },
       {
@@ -656,7 +659,7 @@
         const items = [
           { v: parseFloat(r.wmonighePct), w: weights.wmonighe },
           { v: parseFloat(r.adpPct), w: weights.adp },
-          { v: parseFloat(r.fpPct), w: weights.fp },
+          { v: parseFloat(r.fpPctValue !== undefined ? r.fpPctValue : r.fpPct), w: weights.fp },
           { v: parseFloat(r.sentimentPct), w: weights.sentiment },
           { v: parseFloat(r.vorpPct), w: weights.vorp },
         ].filter(i => !isNaN(i.v) && i.w > 0);
@@ -914,20 +917,42 @@
           const val = parseFloat(r.fantasyPts);
           if (!isNaN(val)) {
             const pos = r.position || 'NA';
-            if (!fpsByPos[pos]) fpsByPos[pos] = [];
-            fpsByPos[pos].push(val);
+            let include = true;
+            if (pos === 'QB') include = val > 50;
+            if (include) {
+              if (!fpsByPos[pos]) fpsByPos[pos] = [];
+              fpsByPos[pos].push(val);
+            }
           }
         });
         Object.keys(fpsByPos).forEach(pos => fpsByPos[pos].sort((a, b) => a - b));
 
         rowsData.forEach(r => {
           const val = parseFloat(r.fantasyPts);
-          const arr = fpsByPos[r.position || 'NA'];
-          if (!isNaN(val) && arr && arr.length) {
-            const rank = arr.filter(v => v <= val).length;
-            r.fpPct = (rank / arr.length).toFixed(2);
+          const pos = r.position || 'NA';
+          const arr = fpsByPos[pos];
+          if (pos === 'QB') {
+            if (!isNaN(val) && val > 50 && arr && arr.length) {
+              const rank = arr.filter(v => v <= val).length;
+              r.fpPct = (rank / arr.length).toFixed(2);
+              r.fpPctValue = r.fpPct;
+            } else if (!isNaN(val)) {
+              r.fpPct = '0.00';
+              r.fpPctValue = '0.00';
+              r.fpPctDisplay = 'Unranked';
+            } else {
+              r.fpPct = '';
+              r.fpPctValue = '';
+            }
           } else {
-            r.fpPct = '';
+            if (!isNaN(val) && arr && arr.length) {
+              const rank = arr.filter(v => v <= val).length;
+              r.fpPct = (rank / arr.length).toFixed(2);
+              r.fpPctValue = r.fpPct;
+            } else {
+              r.fpPct = '';
+              r.fpPctValue = '';
+            }
           }
         });
 
