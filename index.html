@@ -339,6 +339,15 @@
       color: green;
       margin-bottom: 0.5rem;
     }
+    .unmatched-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .unmatched-item input {
+      flex: 1;
+    }
     .loading-msg {
       text-align: center;
       margin-bottom: 1rem;
@@ -477,6 +486,13 @@
       <button id="close-upload" class="btn btn-outline">Close</button>
     </div>
   </div>
+  <div id="unmatched-modal" class="modal">
+    <div class="modal-content">
+      <h3>Match Unrecognized Players</h3>
+      <div id="unmatched-list"></div>
+      <button id="close-unmatched" class="btn btn-outline">Close</button>
+    </div>
+  </div>
   <div id="video-modal" class="modal">
     <div class="modal-content">
       <iframe
@@ -490,6 +506,7 @@
       <button id="close-video" class="btn btn-outline">Close</button>
     </div>
   </div>
+  <datalist id="players-datalist"></datalist>
   <script>
     const sheetId = '1rNouBdE-HbWafu-shO_5JLPSrLhr-xuGpXYfyOI-2oY';
     const rankingsUrl = `https://opensheet.elk.sh/${sheetId}/Rankings`;
@@ -646,6 +663,7 @@
     let sortState = { key: null, asc: true };
     let displayRows = [];
     let customRanks = null;
+    let customNames = {};
 
     function computeRatings() {
       const weights = {
@@ -697,6 +715,17 @@
       });
     }
 
+    function updatePlayerOptions() {
+      const dl = document.getElementById('players-datalist');
+      if (!dl) return;
+      dl.innerHTML = '';
+      allRows.forEach(r => {
+        const opt = document.createElement('option');
+        opt.value = r.player;
+        dl.appendChild(opt);
+      });
+    }
+
     function applyCustomRanks() {
       if (!customRanks) return;
       allRows.forEach(r => {
@@ -714,6 +743,47 @@
       updateRankingsSource('Custom (uploaded)');
     }
 
+    function findUnmatchedPlayers() {
+      const set = new Set(allRows.map(r => canonicalName(r.player)));
+      return Object.keys(customRanks || {}).filter(c => !set.has(c)).map(c => ({
+        canon: c,
+        name: customNames[c] || c,
+      }));
+    }
+
+    function updateUnmatchedModal() {
+      const listEl = document.getElementById('unmatched-list');
+      if (!listEl) return;
+      listEl.innerHTML = '';
+      const unmatched = findUnmatchedPlayers();
+      if (!unmatched.length) {
+        document.getElementById('unmatched-modal').style.display = 'none';
+        return;
+      }
+      unmatched.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'unmatched-item';
+        div.innerHTML = `
+          <span>${item.name}</span>
+          <input type="text" list="players-datalist" />
+          <button class="map-btn">Map</button>`;
+        const btn = div.querySelector('button');
+        const input = div.querySelector('input');
+        btn.addEventListener('click', () => {
+          const val = input.value.trim();
+          if (!val) return;
+          const canonSel = canonicalName(val);
+          customRanks[canonSel] = customRanks[item.canon];
+          delete customRanks[item.canon];
+          delete customNames[item.canon];
+          applyCustomRanks();
+          updateUnmatchedModal();
+        });
+        listEl.appendChild(div);
+      });
+      document.getElementById('unmatched-modal').style.display = 'flex';
+    }
+
     function parseCSV(text) {
       const lines = text.trim().split(/\r?\n/);
       if (!lines.length) throw new Error('Empty file');
@@ -726,17 +796,20 @@
       if (playerIdx === -1) {
         throw new Error('Player column not found.');
       }
-      const map = {};
+      const ranks = {};
+      const originals = {};
       let rankCounter = 1;
       for (let i = 1; i < lines.length; i++) {
         const parts = lines[i].split(',');
         const player = (parts[playerIdx] || '').trim();
         if (player) {
-          map[canonicalName(player)] = rankCounter.toString();
+          const canon = canonicalName(player);
+          ranks[canon] = rankCounter.toString();
+          if (!originals[canon]) originals[canon] = player;
           rankCounter++;
         }
       }
-      return map;
+      return { ranks, originals };
     }
 
     function handleFiles(files) {
@@ -746,12 +819,15 @@
       document.getElementById('upload-feedback').textContent = 'Loading...';
       reader.onload = e => {
         try {
-          customRanks = parseCSV(e.target.result);
+          const parsed = parseCSV(e.target.result);
+          customRanks = parsed.ranks;
+          customNames = parsed.originals;
           document.getElementById('upload-feedback').textContent = '✅ Custom rankings imported successfully';
           document.getElementById('upload-feedback').className = 'upload-success';
           applyCustomRanks();
           setTimeout(() => {
             document.getElementById('upload-modal').style.display = 'none';
+            updateUnmatchedModal();
           }, 800);
         } catch (err) {
           document.getElementById('upload-feedback').textContent = 'Error: ' + err.message;
@@ -1003,6 +1079,7 @@
 
         allRows = rowsData;
         computeRatings();
+        updatePlayerOptions();
 
         const headerRow = document.createElement('tr');
         columns.forEach(col => {
@@ -1064,6 +1141,10 @@
 
     document.getElementById('close-upload').addEventListener('click', () => {
       document.getElementById('upload-modal').style.display = 'none';
+    });
+
+    document.getElementById('close-unmatched').addEventListener('click', () => {
+      document.getElementById('unmatched-modal').style.display = 'none';
     });
 
     const dropdownBtn = document.getElementById('rankings-dropdown-btn');
