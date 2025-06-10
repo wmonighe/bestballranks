@@ -814,10 +814,15 @@
           customRanks = parsed.ranks;
           customNames = parsed.originals;
           const unmatchedCount = findUnmatchedPlayers().length;
-          document.getElementById('upload-feedback').innerHTML =
-            '✅ Custom rankings imported successfully<br>' +
-            `${unmatchedCount} players were not found. Click OK to Resolve`;
+          const feedback =
+            '✅ Custom rankings imported successfully' +
+            (unmatchedCount
+              ? `<br>${unmatchedCount} players were not found. Click Next to Resolve`
+              : '');
+          document.getElementById('upload-feedback').innerHTML = feedback;
           document.getElementById('upload-feedback').className = 'upload-success';
+          document.getElementById('close-upload').textContent =
+            unmatchedCount ? 'Next' : 'Close';
           applyCustomRanks();
         } catch (err) {
           document.getElementById('upload-feedback').textContent = 'Error: ' + err.message;
@@ -1164,6 +1169,7 @@
       dropdownMenu.style.display = 'none';
       document.getElementById('upload-feedback').textContent = '';
       document.getElementById('upload-feedback').className = '';
+      document.getElementById('close-upload').textContent = 'Close';
       document.getElementById('upload-modal').style.display = 'flex';
     });
     document.addEventListener('click', e => {
