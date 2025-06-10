@@ -14,6 +14,7 @@
     .team-card{border:1px solid #ddd;padding:1rem;margin-top:1rem;border-radius:4px;flex:1 0 calc(33.333% - 1rem);box-sizing:border-box;}
     .team-card h2{margin-top:0;}
     .team-card table{width:100%;border-collapse:collapse;margin-top:0.5rem;}
+    .team-card.roster-18 table,.team-card.roster-20 table{overflow:hidden;}
     .team-card th,.team-card td{border:1px solid #ccc;padding:4px;text-align:left;font-size:0.9rem;}
     .modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);align-items:center;justify-content:center;}
     .modal.show{display:flex;}
@@ -124,6 +125,7 @@
           if(firstPick&&firstPick['Picked At']){const d=new Date(firstPick['Picked At']);if(!isNaN(d)){const mm=String(d.getMonth()+1).padStart(2,'0');const dd=String(d.getDate()).padStart(2,'0');dateEntered=`${mm}/${dd}`;}}
           team.dateEntered=dateEntered;
           const rosterSize=team.picks.length;
+          team.rosterSize=rosterSize;
           team.totalRating=team.picks.reduce((sum,p)=>{const canon=canonicalName(`${p['First Name']} ${p['Last Name']}`);const rating=parseFloat(ratingMap[canon]);return sum+(isNaN(rating)?0:rating);},0);
           if(rosterSize===20){
             team.totalRating=team.totalRating*(18/20);
@@ -144,7 +146,7 @@
       teams.sort((a,b)=>b.totalRating-a.totalRating);
       teams.forEach(team=>{
         const card=document.createElement('div');
-        card.className='team-card';
+        card.className=`team-card roster-${team.rosterSize}`;
         const header=document.createElement('h2');
         const feeDisp=parseFloat(team.entryFee).toString();
         const datePart=team.dateEntered?` - Date Entered: ${team.dateEntered}`:'';
@@ -165,6 +167,16 @@
         table.appendChild(tbody);
         card.appendChild(table);
         teamsEl.appendChild(card);
+      });
+      requestAnimationFrame(standardizeTableHeights);
+    }
+
+    function standardizeTableHeights(){
+      ['18','20'].forEach(size=>{
+        const tables=document.querySelectorAll(`.team-card.roster-${size} table`);
+        let max=0;
+        tables.forEach(t=>{if(t.offsetHeight>max)max=t.offsetHeight;});
+        tables.forEach(t=>{if(max)t.style.height=max+'px';});
       });
     }
 
