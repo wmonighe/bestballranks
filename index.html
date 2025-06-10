@@ -490,7 +490,10 @@
     <div class="modal-content">
       <h3>Match Unrecognized Players</h3>
       <div id="unmatched-list"></div>
-      <button id="close-unmatched" class="btn btn-outline">Close</button>
+      <div class="button-row">
+        <button id="map-all" class="btn">Map All</button>
+        <button id="close-unmatched" class="btn btn-outline">Close</button>
+      </div>
     </div>
   </div>
   <div id="video-modal" class="modal">
@@ -763,22 +766,10 @@
       unmatched.forEach(item => {
         const div = document.createElement('div');
         div.className = 'unmatched-item';
+        div.dataset.canon = item.canon;
         div.innerHTML = `
           <span>${item.name}</span>
-          <input type="text" list="players-datalist" />
-          <button class="map-btn">Map</button>`;
-        const btn = div.querySelector('button');
-        const input = div.querySelector('input');
-        btn.addEventListener('click', () => {
-          const val = input.value.trim();
-          if (!val) return;
-          const canonSel = canonicalName(val);
-          customRanks[canonSel] = customRanks[item.canon];
-          delete customRanks[item.canon];
-          delete customNames[item.canon];
-          applyCustomRanks();
-          updateUnmatchedModal();
-        });
+          <input type="text" list="players-datalist" />`;
         listEl.appendChild(div);
       });
       document.getElementById('unmatched-modal').style.display = 'flex';
@@ -822,13 +813,12 @@
           const parsed = parseCSV(e.target.result);
           customRanks = parsed.ranks;
           customNames = parsed.originals;
-          document.getElementById('upload-feedback').textContent = '✅ Custom rankings imported successfully';
+          const unmatchedCount = findUnmatchedPlayers().length;
+          document.getElementById('upload-feedback').innerHTML =
+            '✅ Custom rankings imported successfully<br>' +
+            `${unmatchedCount} players were not found. Click OK to Resolve`;
           document.getElementById('upload-feedback').className = 'upload-success';
           applyCustomRanks();
-          setTimeout(() => {
-            document.getElementById('upload-modal').style.display = 'none';
-            updateUnmatchedModal();
-          }, 800);
         } catch (err) {
           document.getElementById('upload-feedback').textContent = 'Error: ' + err.message;
           document.getElementById('upload-feedback').className = 'upload-error';
@@ -1141,6 +1131,22 @@
 
     document.getElementById('close-upload').addEventListener('click', () => {
       document.getElementById('upload-modal').style.display = 'none';
+      updateUnmatchedModal();
+    });
+
+    document.getElementById('map-all').addEventListener('click', () => {
+      document.querySelectorAll('#unmatched-list .unmatched-item').forEach(div => {
+        const input = div.querySelector('input');
+        const val = input.value.trim();
+        if (!val) return;
+        const origCanon = div.dataset.canon;
+        const canonSel = canonicalName(val);
+        customRanks[canonSel] = customRanks[origCanon];
+        delete customRanks[origCanon];
+        delete customNames[origCanon];
+      });
+      applyCustomRanks();
+      updateUnmatchedModal();
     });
 
     document.getElementById('close-unmatched').addEventListener('click', () => {
