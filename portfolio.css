@@ -1,0 +1,104 @@
+:root {
+  --font-main: 'Inter', sans-serif;
+  --color-primary: #0fa3b1;
+  --color-accent: #ffbe0b;
+  --color-bg: #f5f5f5;
+  --color-card: #ffffff;
+  --color-text: #222;
+  --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
+  --shadow-lg: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+body {
+  font-family: var(--font-main);
+  background: var(--color-bg);
+  margin: 0;
+  color: var(--color-text);
+}
+
+#portfolio-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1rem;
+}
+
+#upload-area {
+  border: 2px dashed var(--color-primary);
+  padding: 2rem;
+  border-radius: 8px;
+  text-align: center;
+  background: var(--color-card);
+  transition: box-shadow .2s, background .2s;
+}
+#upload-area.dragover {
+  background: rgba(15,163,177,0.05);
+  box-shadow: var(--shadow-sm);
+}
+#upload-area input { display:none; }
+
+#team-grid {
+  display: grid;
+  gap: 1.5rem;
+  margin-top: 2rem;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 640px) {
+  #team-grid { grid-template-columns: repeat(auto-fit,minmax(300px,1fr)); }
+}
+
+.team-card {
+  background: var(--color-card);
+  border-radius: 8px;
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  transition: box-shadow .2s, transform .2s;
+  display: flex;
+  flex-direction: column;
+}
+.team-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+.team-card header {
+  padding: 1rem;
+  border-bottom: 1px solid #e5e5e5;
+}
+.contest-name {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--color-primary);
+}
+.meta {
+  margin: 0.25rem 0 0;
+  font-size: 0.85rem;
+  color: #555;
+}
+.rating-badge {
+  background: var(--color-accent);
+  color: #000;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  display: inline-block;
+  margin-top: 0.25rem;
+}
+
+.roster {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+.roster th,
+.roster td {
+  border: 1px solid #ddd;
+  padding: 0.5rem;
+  text-align: left;
+}
+.roster th {
+  background: #f0f0f0;
+}
+.roster tbody tr:nth-child(even) {
+  background: rgba(0,0,0,0.03);
+}
+
