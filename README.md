@@ -30,16 +30,3 @@ The spreadsheet ID and sheet names are configured directly in `index.html`.
 Each player's row displays the logo of their NFL team to the left of their name.
 Logos are loaded directly from FantasyNerds and no additional setup is required.
 
-## Running the Server
-
-A small Express server is included to parse uploaded CSV files for the
-exposure rater tool. Install dependencies with `npm install` and start
-the server:
-
-```bash
-npm start
-```
-
-The server listens on port `3000` by default and exposes a `POST`
-endpoint at `/api/exposure-rate`.
-
