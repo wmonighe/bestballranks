@@ -91,16 +91,17 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
 #teams{
   display:grid;
   grid-template-columns:repeat(3,minmax(340px,1fr));
-  gap:32px;
+  gap:40px;
   margin:56px auto;
-  padding:0 24px;
+  padding:0 32px;
   max-width:1200px;
+  align-items:start;
 }
 
 /* Draft card styling */
 .draft-card{
   background:var(--bb-surface);
-  border-left:5px solid var(--bb-blue-500);
+  border:2px solid var(--bb-blue-500);
   border-radius:var(--radius);
   box-shadow:var(--bb-shadow);
   padding:20px 18px;
@@ -110,6 +111,7 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
   font-size:18px;
   color:var(--bb-blue-600);
   font-weight:700;
+  min-height:48px;
 }
 .rating-pill{
   display:inline-block;
