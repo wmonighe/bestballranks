@@ -60,6 +60,28 @@ label.upload-btn{
 }
 label.upload-btn:hover{background:var(--bb-blue-600);}
 
+/* File upload rows */
+.upload-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  margin-bottom:12px;
+}
+label.browse-btn{
+  background:var(--bb-blue-500);
+  color:#fff;
+  display:inline-block;
+  padding:6px 12px;
+  border-radius:var(--radius);
+  font-weight:600;
+  cursor:pointer;
+  transition:var(--transition);
+}
+label.browse-btn:hover{background:var(--bb-blue-600);}
+.status{font-weight:600;}
+.status.success{color:green;}
+.status.error{color:red;}
+
 /* Create a responsive masonry-like grid for each draft card */
 #portfolio-wrapper{
   display:grid;
