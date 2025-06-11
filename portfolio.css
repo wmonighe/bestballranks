@@ -84,11 +84,17 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
 
 /* Create a responsive masonry-like grid for each draft card */
 #portfolio-wrapper{
+  display:block;
+}
+
+/* Display three lineup cards per row */
+#teams{
   display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(340px,1fr));
+  grid-template-columns:repeat(3,minmax(340px,1fr));
   gap:32px;
-  margin:56px 0;
+  margin:56px auto;
   padding:0 24px;
+  max-width:1200px;
 }
 
 /* Draft card styling */
