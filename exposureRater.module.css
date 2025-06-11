@@ -1,0 +1,133 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700&display=swap');
+
+:root {
+  --brand-primary: #0060ff;
+  --brand-primary-dk:#004bd1;
+  --neutral-900: #0c1e25;
+  --neutral-700: #34454d;
+  --neutral-200: #e5e8ec;
+  --neutral-050: #f9fafb;
+  --success-600: #2e974b;
+  --danger-600: #c0303b;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1.25rem;
+  --space-5: 2rem;
+}
+
+.page {
+  padding-inline: var(--space-5);
+}
+.page-title {
+  margin-block: var(--space-5) var(--space-4);
+  color: var(--neutral-900);
+}
+
+.uploader {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-3);
+  border: 2px dashed var(--neutral-200);
+  padding: var(--space-5);
+  border-radius: 8px;
+  background: var(--neutral-050);
+  transition: border .2s;
+}
+.uploader.drag {
+  border-color: var(--brand-primary);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: .55rem 1.1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: .95rem;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+.btn svg {
+  width: 1em;
+  height: 1em;
+  margin-right: .4em;
+}
+
+.btn-primary {
+  background: var(--brand-primary);
+  color: #fff;
+  border: 1px solid transparent;
+}
+.btn-primary:hover {
+  background: var(--brand-primary-dk);
+}
+
+.btn-secondary {
+  background: #fff;
+  color: var(--brand-primary);
+  border: 1px solid var(--brand-primary);
+}
+.btn-secondary:hover {
+  background: rgba(0, 96, 255, .08);
+}
+
+.teams-grid {
+  margin-top: var(--space-5);
+  display: grid;
+  gap: var(--space-5);
+  grid-template-columns: repeat(auto-fit, minmax(24rem, 1fr));
+}
+
+.team-card {
+  background: #fff;
+  border: 1px solid var(--neutral-200);
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.05);
+  display: flex;
+  flex-direction: column;
+}
+.team-card h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: var(--space-3);
+}
+.team-card table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .85rem;
+}
+.team-card th,
+.team-card td {
+  padding: .35rem .5rem;
+  text-align: left;
+  border: 1px solid var(--neutral-200);
+}
+.team-card tbody tr:nth-child(odd) {
+  background: var(--neutral-050);
+}
+
+.badge-rating {
+  display: inline-block;
+  min-width: 2rem;
+  text-align: center;
+  border-radius: 999px;
+  padding: .15rem .5rem;
+  color: #fff;
+  font-weight: 600;
+}
+
+.r10,
+.r9 { background: #2e974b; }
+.r8,
+.r7 { background: #55b04f; }
+.r6,
+.r5 { background: #ffd54f; color: #000; }
+.r4,
+.r3 { background: #f29339; }
+.r2,
+.r1,
+.r0 { background: #c0303b; }
