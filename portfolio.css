@@ -105,6 +105,8 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
   border-radius:var(--radius);
   box-shadow:var(--bb-shadow);
   padding:20px 18px;
+
+  overflow-x:auto;
 }
 .draft-card h2{
   margin:0 0 12px;
@@ -128,6 +130,11 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
   width:100%;
   border-collapse:collapse;
   font-size:14px;
+  table-layout:fixed;
+}
+.player-table th,
+.player-table td{
+  word-break:break-word;
 }
 .player-table thead th{
   background:var(--bb-blue-500);
