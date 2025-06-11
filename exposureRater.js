@@ -44,7 +44,18 @@ function buildTable(rows){
 }
 
 function showError(msg){
-  // TODO insert alert component
+  const alert = document.createElement('div');
+  alert.textContent = msg;
+  alert.style.position = 'fixed';
+  alert.style.top = '1rem';
+  alert.style.right = '1rem';
+  alert.style.background = '#c0303b';
+  alert.style.color = '#fff';
+  alert.style.padding = '0.5rem 1rem';
+  alert.style.borderRadius = '4px';
+  alert.style.zIndex = 1000;
+  document.body.appendChild(alert);
+  setTimeout(() => alert.remove(), 3000);
 }
 
 export { renderTeams };
