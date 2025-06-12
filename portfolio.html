@@ -71,6 +71,21 @@
     }
 
     const ratingMap={};
+
+    const positiveEmojis=['😃','🚀','💰','💵','🙌'];
+    const neutralEmojis=['😐','🤔','🧐','🤷','😑'];
+    const negativeEmojis=['😞','👎','☠️','🔥','🆘'];
+
+    function pickEmoji(arr){return arr[Math.floor(Math.random()*arr.length)];}
+
+    function colorForPct(pct){
+      const hue=pct>=66?120:pct>=34?60:0;
+      const light=90-(Math.min(pct,100)/100)*50;
+      const bg=`hsl(${hue},70%,${light}%)`;
+      const text=light<60?'#fff':'#000';
+      return {bg,text};
+    }
+
     const ratingsPromise=loadRatings();
 
     async function loadRatings(){
@@ -146,10 +161,13 @@
         const ratingEl=document.createElement('span');
         ratingEl.className='rating-pill';
         const pct=Math.max(0,Math.min(100,((team.totalRating-7.5)/(11-7.5))*100));
-        let emoji='😐';
-        if(pct>=66) emoji='😃';
-        else if(pct<33) emoji='😞';
+        let emoji=pickEmoji(neutralEmojis);
+        if(pct>=66) emoji=pickEmoji(positiveEmojis);
+        else if(pct<34) emoji=pickEmoji(negativeEmojis);
+        const colors=colorForPct(pct);
         ratingEl.textContent=`${pct.toFixed(0)}% ${emoji}`;
+        ratingEl.style.backgroundColor=colors.bg;
+        ratingEl.style.color=colors.text;
         header.appendChild(ratingEl);
         card.appendChild(header);
         const table=document.createElement('table');
