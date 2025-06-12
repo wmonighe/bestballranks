@@ -1102,6 +1102,8 @@
     const rateBtn = document.getElementById('rateMyTeamBtn');
     if (rateBtn) {
       rateBtn.classList.add('animate-pulse');
+      // Stop pulsing after 3 seconds
+      setTimeout(() => rateBtn.classList.remove('animate-pulse'), 3000);
       rateBtn.addEventListener('click', () => {
         window.location.href = 'portfolio.html';
       });
