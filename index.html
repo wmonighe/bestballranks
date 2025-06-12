@@ -369,7 +369,7 @@
           <span id="weight-sentiment-val">5%</span>
         </div>
         <div>
-          <label for="weight-vorp">VORP Score</label>
+          <label for="weight-vorp">Futures Props</label>
           <input type="range" id="weight-vorp" min="0" max="100" value="15" />
           <span id="weight-vorp-val">15%</span>
         </div>
@@ -549,7 +549,7 @@
         sortKey: 'sentimentValue',
       },
       {
-        header: '📈 VORP Score',
+        header: '🎲 Futures Props',
         cell: r =>
           `<td>${r.vorp}${r.vorpPct ? ' (' + r.vorpPct + ')' : ''}</td>`,
         sortKey: 'vorp',
