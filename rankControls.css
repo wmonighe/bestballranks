@@ -24,6 +24,7 @@
 }
 
 .btn svg.icon{width:1em;height:1em;margin-right:.4em;}
+.btn img.icon{width:1em;height:1em;margin-right:.4em;}
 
 .btn-primary{background:#0060ff;color:#fff;}
 .btn-secondary{background:#f8f9fa;border-color:#0060ff;color:#0060ff;}
