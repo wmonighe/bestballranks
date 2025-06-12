@@ -359,7 +359,8 @@
           <header class="rank-set">
             <label for="rankSet" class="rank-label">Active Ranking Set</label>
             <select id="rankSet" name="rankSet" class="rank-select">
-              <option selected>wmonighe</option>
+              <option value="wmonighe" selected>wmonighe</option>
+              <option value="upload">Upload Rankings</option>
             </select>
           </header>
 
@@ -375,7 +376,6 @@
             <button type="button" class="btn btn-primary" id="rateMyTeamBtn" aria-label="Rate my fantasy team">Rate My Team</button>
             <button type="button" class="btn btn-secondary" id="updateBtn">Update</button>
             <button type="button" class="btn btn-ghost" id="resetBtn">Reset</button>
-            <button type="button" class="btn btn-ghost" id="uploadOpenBtn">Upload Rankings</button>
           </div>
         </aside>
     </div>
@@ -642,7 +642,10 @@
       computeRatings();
       sortAndRender(sortState.key, true);
       updateRankingsSource('Custom (uploaded)');
+      currentRankSet = 'custom';
       refreshRankSetOptions(true);
+      const sel = document.getElementById('rankSet');
+      if (sel) sel.value = 'custom';
     }
 
     function restoreOriginalRanks() {
@@ -656,6 +659,7 @@
       updateRankingsSource('wmonighe');
       const sel = document.getElementById('rankSet');
       if (sel) sel.value = 'wmonighe';
+      currentRankSet = 'wmonighe';
     }
 
     function refreshRankSetOptions(hasCustom) {
@@ -667,14 +671,26 @@
       baseOpt.value = 'wmonighe';
       baseOpt.textContent = 'wmonighe';
       select.appendChild(baseOpt);
+      const uploadOpt = document.createElement('option');
+      uploadOpt.value = 'upload';
+      uploadOpt.textContent = 'Upload Rankings';
+      select.appendChild(uploadOpt);
       if (hasCustom) {
         const customOpt = document.createElement('option');
         customOpt.value = 'custom';
         customOpt.textContent = 'Custom (uploaded)';
         select.appendChild(customOpt);
-        select.value = current === 'custom' ? 'custom' : 'wmonighe';
+        if (['wmonighe', 'upload', 'custom'].includes(current)) {
+          select.value = current;
+        } else {
+          select.value = 'wmonighe';
+        }
       } else {
-        select.value = 'wmonighe';
+        if (current === 'upload') {
+          select.value = 'upload';
+        } else {
+          select.value = 'wmonighe';
+        }
       }
     }
 
@@ -1069,9 +1085,6 @@
       sortAndRender(sortState.key, true);
     });
 
-    document.getElementById('uploadOpenBtn').addEventListener('click', () => {
-      document.getElementById('upload-modal').classList.add('show');
-    });
 
     document.getElementById('close-upload').addEventListener('click', () => {
       document.getElementById('upload-modal').classList.remove('show');
@@ -1097,12 +1110,20 @@
       document.getElementById('unmatched-modal').style.display = 'none';
     });
 
+    let currentRankSet = 'wmonighe';
     document.getElementById('rankSet').addEventListener('change', e => {
-      if (e.target.value === 'custom') {
+      const val = e.target.value;
+      if (val === 'upload') {
+        e.target.value = currentRankSet;
+        document.getElementById('upload-modal').classList.add('show');
+        return;
+      }
+      if (val === 'custom') {
         applyCustomRanks();
       } else {
         restoreOriginalRanks();
       }
+      currentRankSet = val;
     });
 
 
