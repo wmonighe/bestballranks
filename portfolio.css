@@ -90,7 +90,7 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
 /* Display three lineup cards per row */
 #teams{
   display:grid;
-  grid-template-columns:repeat(3,minmax(450px,1fr));
+  grid-template-columns:repeat(3,minmax(495px,1fr));
   gap:40px;
   margin:56px auto;
   padding:0 32px;
