@@ -224,6 +224,9 @@
       justify-content: center;
       z-index: 1000;
     }
+    .modal.show {
+      display: flex;
+    }
     .modal-content {
       background: #fff;
       padding: 1rem;
@@ -355,7 +358,7 @@
         <aside class="rank-controls">
           <header class="rank-set">
             <label for="rankSet" class="rank-label">Active Ranking Set</label>
-            <select id="rankSet" name="rankSet" class="rank-select" disabled>
+            <select id="rankSet" name="rankSet" class="rank-select">
               <option selected>wmonighe</option>
             </select>
           </header>
@@ -371,6 +374,7 @@
             </button>
             <button type="button" class="btn btn-secondary" id="updateBtn">Update</button>
             <button type="button" class="btn btn-ghost" id="resetBtn">Reset</button>
+            <button type="button" class="btn btn-ghost" id="uploadOpenBtn">Upload Rankings</button>
           </div>
         </aside>
     </div>
@@ -637,6 +641,40 @@
       computeRatings();
       sortAndRender(sortState.key, true);
       updateRankingsSource('Custom (uploaded)');
+      refreshRankSetOptions(true);
+    }
+
+    function restoreOriginalRanks() {
+      allRows.forEach(r => {
+        r.wmonigheRank = r.wmonigheRankOrig;
+        r.fantasyPts = r.fantasyPtsOrig;
+      });
+      recomputeWmonighePct();
+      computeRatings();
+      sortAndRender(sortState.key, true);
+      updateRankingsSource('wmonighe');
+      const sel = document.getElementById('rankSet');
+      if (sel) sel.value = 'wmonighe';
+    }
+
+    function refreshRankSetOptions(hasCustom) {
+      const select = document.getElementById('rankSet');
+      if (!select) return;
+      const current = select.value;
+      select.innerHTML = '';
+      const baseOpt = document.createElement('option');
+      baseOpt.value = 'wmonighe';
+      baseOpt.textContent = 'wmonighe';
+      select.appendChild(baseOpt);
+      if (hasCustom) {
+        const customOpt = document.createElement('option');
+        customOpt.value = 'custom';
+        customOpt.textContent = 'Custom (uploaded)';
+        select.appendChild(customOpt);
+        select.value = current === 'custom' ? 'custom' : 'wmonighe';
+      } else {
+        select.value = 'wmonighe';
+      }
     }
 
     function findUnmatchedPlayers() {
@@ -869,9 +907,11 @@
             adpPct,
             postDraftId: getColumn(row, 'P', 'post draft id'),
             wmonigheRank,
+            wmonigheRankOrig: wmonigheRank,
             vorp: getColumn(row, 'Q', 'vorp score'),
             vorpPct: getColumn(row, 'R', 'vorp percentile'),
             fantasyPts,
+            fantasyPtsOrig: fantasyPts,
           };
         });
 
@@ -968,6 +1008,7 @@
         allRows = rowsData;
         computeRatings();
         updatePlayerOptions();
+        refreshRankSetOptions(false);
 
         const headerRow = document.createElement('tr');
         columns.forEach(col => {
@@ -1027,8 +1068,12 @@
       sortAndRender(sortState.key, true);
     });
 
+    document.getElementById('uploadOpenBtn').addEventListener('click', () => {
+      document.getElementById('upload-modal').classList.add('show');
+    });
+
     document.getElementById('close-upload').addEventListener('click', () => {
-      document.getElementById('upload-modal').style.display = 'none';
+      document.getElementById('upload-modal').classList.remove('show');
       updateUnmatchedModal();
     });
 
@@ -1049,6 +1094,14 @@
 
     document.getElementById('close-unmatched').addEventListener('click', () => {
       document.getElementById('unmatched-modal').style.display = 'none';
+    });
+
+    document.getElementById('rankSet').addEventListener('change', e => {
+      if (e.target.value === 'custom') {
+        applyCustomRanks();
+      } else {
+        restoreOriginalRanks();
+      }
     });
 
 
