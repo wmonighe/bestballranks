@@ -374,7 +374,6 @@
             </button>
             <button type="button" class="btn btn-secondary" id="updateBtn">Update</button>
             <button type="button" class="btn btn-ghost" id="resetBtn">Reset</button>
-            <button type="button" class="btn btn-ghost" id="uploadOpenBtn">Upload Rankings</button>
           </div>
         </aside>
     </div>
@@ -564,6 +563,7 @@
     let displayRows = [];
     let customRanks = null;
     let customNames = {};
+    let currentRankSet = 'wmonighe';
 
     function computeRatings() {
       const weights = {
@@ -641,6 +641,7 @@
       computeRatings();
       sortAndRender(sortState.key, true);
       updateRankingsSource('Custom (uploaded)');
+      currentRankSet = 'custom';
       refreshRankSetOptions(true);
     }
 
@@ -654,27 +655,24 @@
       sortAndRender(sortState.key, true);
       updateRankingsSource('wmonighe');
       const sel = document.getElementById('rankSet');
+      currentRankSet = 'wmonighe';
       if (sel) sel.value = 'wmonighe';
     }
 
     function refreshRankSetOptions(hasCustom) {
       const select = document.getElementById('rankSet');
       if (!select) return;
-      const current = select.value;
+      const current = currentRankSet;
       select.innerHTML = '';
-      const baseOpt = document.createElement('option');
-      baseOpt.value = 'wmonighe';
-      baseOpt.textContent = 'wmonighe';
+      const baseOpt = new Option('wmonighe', 'wmonighe');
       select.appendChild(baseOpt);
       if (hasCustom) {
-        const customOpt = document.createElement('option');
-        customOpt.value = 'custom';
-        customOpt.textContent = 'Custom (uploaded)';
+        const customOpt = new Option('Custom (uploaded)', 'custom');
         select.appendChild(customOpt);
-        select.value = current === 'custom' ? 'custom' : 'wmonighe';
-      } else {
-        select.value = 'wmonighe';
       }
+      const uploadOpt = new Option('Upload Rankings…', 'upload');
+      select.appendChild(uploadOpt);
+      select.value = current;
     }
 
     function findUnmatchedPlayers() {
@@ -1068,13 +1066,12 @@
       sortAndRender(sortState.key, true);
     });
 
-    document.getElementById('uploadOpenBtn').addEventListener('click', () => {
-      document.getElementById('upload-modal').classList.add('show');
-    });
 
     document.getElementById('close-upload').addEventListener('click', () => {
       document.getElementById('upload-modal').classList.remove('show');
       updateUnmatchedModal();
+      const sel = document.getElementById('rankSet');
+      if (sel) sel.value = currentRankSet;
     });
 
     document.getElementById('map-all').addEventListener('click', () => {
@@ -1097,7 +1094,10 @@
     });
 
     document.getElementById('rankSet').addEventListener('change', e => {
-      if (e.target.value === 'custom') {
+      if (e.target.value === 'upload') {
+        document.getElementById('upload-modal').classList.add('show');
+        e.target.value = currentRankSet;
+      } else if (e.target.value === 'custom') {
         applyCustomRanks();
       } else {
         restoreOriginalRanks();
