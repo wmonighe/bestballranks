@@ -50,3 +50,23 @@
 .animate-pulse {
   animation:pulse 1.5s infinite;
 }
+
+/* Position Rate My Team CTA in the top left corner */
+#rateMyTeamBtn {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+}
+
+@keyframes ctaPulse {
+  0%,100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+.cta-pulse {
+  animation: ctaPulse 1.5s infinite;
+}
