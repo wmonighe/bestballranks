@@ -321,7 +321,7 @@
     <div id="hamburger-menu">
       <button id="menu-toggle" aria-label="Menu">&#9776;</button>
       <div id="menu-dropdown" class="menu-dropdown">
-        <a href="portfolio.html">Portfolio</a>
+        <a href="portfolio.html" id="rateMyTeamLink">Rate My Team</a>
       </div>
     </div>
     <div id="title-container">
@@ -372,6 +372,7 @@
               />
               Export
             </button>
+            <button type="button" class="btn btn-primary" id="rateMyTeamBtn" aria-label="Rate my fantasy team">Rate My Team</button>
             <button type="button" class="btn btn-secondary" id="updateBtn">Update</button>
             <button type="button" class="btn btn-ghost" id="resetBtn">Reset</button>
             <button type="button" class="btn btn-ghost" id="uploadOpenBtn">Upload Rankings</button>
@@ -1135,6 +1136,22 @@
     });
     uploadInput.addEventListener('change', e => handleFiles(e.target.files));
 
+
+    const rateBtn = document.getElementById('rateMyTeamBtn');
+    const rateLink = document.getElementById('rateMyTeamLink');
+    const hasSeen = localStorage.getItem('hasSeenRateMyTeam');
+    if (rateBtn) {
+      if (!hasSeen) rateBtn.classList.add('animate-pulse');
+      rateBtn.addEventListener('click', () => {
+        localStorage.setItem('hasSeenRateMyTeam', 'true');
+        window.location.href = 'portfolio.html';
+      });
+    }
+    if (rateLink) {
+      rateLink.addEventListener('click', () => {
+        localStorage.setItem('hasSeenRateMyTeam', 'true');
+      });
+    }
 
     showSkeleton();
     loadData();

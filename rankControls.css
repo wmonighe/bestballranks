@@ -42,3 +42,11 @@
   .btn{flex:1 1 auto;}
   .btn svg{margin:0 .3em 0 0;}
 }
+
+@keyframes pulse {
+  0%,100% { opacity:1; }
+  50% { opacity:0.5; }
+}
+.animate-pulse {
+  animation:pulse 1.5s infinite;
+}
