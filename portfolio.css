@@ -90,11 +90,11 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
 /* Display three lineup cards per row */
 #teams{
   display:grid;
-  grid-template-columns:repeat(3,minmax(340px,1fr));
+  grid-template-columns:repeat(3,minmax(408px,1fr));
   gap:40px;
   margin:56px auto;
   padding:0 32px;
-  max-width:1200px;
+  max-width:1440px;
   align-items:start;
 }
 
@@ -104,13 +104,14 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
   border:2px solid var(--bb-blue-500);
   border-radius:var(--radius);
   box-shadow:var(--bb-shadow);
-  padding:20px 18px;
+  padding:24px 22px;
+  font-size:1.2em;
 
   overflow-x:auto;
 }
 .draft-card h2{
   margin:0 0 12px;
-  font-size:18px;
+  font-size:22px;
   color:var(--bb-blue-600);
   font-weight:700;
   min-height:48px;
@@ -122,14 +123,14 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
   background:var(--bb-gold-300);
   border-radius:9999px;
   font-weight:600;
-  font-size:13px;
+  font-size:16px;
 }
 
 /* Player tables */
 .player-table{
   width:100%;
   border-collapse:collapse;
-  font-size:14px;
+  font-size:17px;
   table-layout:fixed;
 }
 .player-table th,
@@ -139,13 +140,13 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
 .player-table thead th{
   background:var(--bb-blue-500);
   color:#fff;
-  padding:8px;
+  padding:10px;
   font-weight:600;
 }
 .player-table tbody tr:nth-child(even){background:var(--bb-blue-50);}
 .player-table tbody tr:hover{background:var(--bb-gold-200);}
 .player-table td{
-  padding:6px 8px;
+  padding:8px 10px;
   border-bottom:1px solid var(--bb-border);
 }
 
