@@ -1099,11 +1099,9 @@
 
 
     const rateBtn = document.getElementById('rateMyTeamBtn');
-    const hasSeen = localStorage.getItem('hasSeenRateMyTeam');
     if (rateBtn) {
-      if (!hasSeen) rateBtn.classList.add('animate-pulse');
+      rateBtn.classList.add('animate-pulse');
       rateBtn.addEventListener('click', () => {
-        localStorage.setItem('hasSeenRateMyTeam', 'true');
         window.location.href = 'portfolio.html';
       });
     }
