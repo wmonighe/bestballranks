@@ -69,6 +69,12 @@ button.upload-btn{
   cursor:pointer;
   transition:var(--transition);
 }
+/* Ensure Upload More and Clear Lineups buttons match in size */
+label.upload-btn,
+button.upload-btn{
+  min-width:170px;
+  text-align:center;
+}
 button.upload-btn:hover{background:var(--bb-blue-600);}
 #clear-lineups{margin-left:12px;}
 
