@@ -60,6 +60,20 @@ label.upload-btn{
 }
 label.upload-btn:hover{background:var(--bb-blue-600);}
 
+/* Compact upload button after CSVs uploaded */
+#upload-container.uploaded{
+  position:fixed;
+  top:20px;
+  right:20px;
+  margin:0;
+  padding:0;
+  background:none;
+  border:none;
+  box-shadow:none;
+  text-align:right;
+}
+#upload-container.uploaded h1{display:none;}
+
 /* File upload rows */
 .upload-row{
   display:flex;

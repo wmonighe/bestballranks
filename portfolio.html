@@ -133,6 +133,15 @@
       if(uploadedFormats.pre) document.getElementById('chk-pre').checked=true;
       if(uploadedFormats.post) document.getElementById('chk-post').checked=true;
       if(uploadedFormats.elim) document.getElementById('chk-elim').checked=true;
+      const uploadContainer=document.getElementById('upload-container');
+      const uploadBtn=document.getElementById('open-modal');
+      if(anyUploaded){
+        uploadContainer.classList.add('uploaded');
+        uploadBtn.textContent='Upload More';
+      }else{
+        uploadContainer.classList.remove('uploaded');
+        uploadBtn.textContent='Upload Exposure CSV';
+      }
     }
 
     async function handleFile(file,statusEl,format){
