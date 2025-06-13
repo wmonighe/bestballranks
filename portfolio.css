@@ -264,7 +264,7 @@ td[data-pos="TE"] .pos-dot{background:var(--te);}
 #format-options{
   display:none;
   text-align:center;
-  margin:30px auto 0;
+  margin:0;
 }
 #format-options p{
   margin:0 0 8px;
@@ -288,8 +288,9 @@ td[data-pos="TE"] .pos-dot{background:var(--te);}
 /* Container for format checkboxes and date filter */
 #portfolio-controls{
   display:flex;
-  flex-direction:column;
+  flex-wrap:wrap;
   align-items:center;
+  gap:16px;
   margin-top:20px;
   padding:0 32px;
 }
@@ -297,7 +298,7 @@ td[data-pos="TE"] .pos-dot{background:var(--te);}
 #date-filter{
   display:none;
   font-weight:600;
-  align-self:flex-end;
+  margin:0;
 }
 #date-filter label{
   display:flex;
@@ -312,8 +313,7 @@ td[data-pos="TE"] .pos-dot{background:var(--te);}
 #sort-control{
   display:none;
   font-weight:600;
-  align-self:flex-end;
-  margin-top:10px;
+  margin:0;
 }
 #sort-control label{
   display:flex;
