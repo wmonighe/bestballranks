@@ -17,6 +17,12 @@
     <div id="message"></div>
   </div>
   <div id="portfolio-wrapper">
+    <div id="format-options" style="display:none;">
+      <p class="info-note">Showing Teams Drafted in the Following Formats:</p>
+      <label class="format-option"><img class="icon" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRltuDZN3yIMK1sh9oDF7ykc7HYDeuCGoZ--g&s" alt="Underdog logo"><input type="checkbox" id="chk-pre"> Pre-Draft</label>
+      <label class="format-option"><img class="icon" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRltuDZN3yIMK1sh9oDF7ykc7HYDeuCGoZ--g&s" alt="Underdog logo"><input type="checkbox" id="chk-post"> Post-Draft</label>
+      <label class="format-option"><img class="icon" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRltuDZN3yIMK1sh9oDF7ykc7HYDeuCGoZ--g&s" alt="Underdog logo"><input type="checkbox" id="chk-elim"> Eliminator</label>
+    </div>
     <div id="teams"></div>
   </div>
 
@@ -112,16 +118,25 @@
     }
 
     const allTeams=[];
+    const uploadedFormats={pre:false,post:false,elim:false};
+
+    function updateFormatOptions(){
+      const container=document.getElementById('format-options');
+      container.style.display='block';
+      document.getElementById('chk-pre').checked=uploadedFormats.pre;
+      document.getElementById('chk-post').checked=uploadedFormats.post;
+      document.getElementById('chk-elim').checked=uploadedFormats.elim;
+    }
 
     async function handleFile(file,statusEl){
-      if(!file)return;
+      if(!file) return false;
       await ratingsPromise;
       try{
         const text=await file.text();
         const lines=text.trim().split(/\r?\n/).filter(l=>l.trim()!=='');
         const headers=lines[0].split(',').map(h=>h.trim());
         const allPresent=requiredHeaders.every(h=>headers.includes(h));
-        if(!allPresent){statusEl.textContent='\u2717 Upload Failure';statusEl.className='status error';return;}
+        if(!allPresent){statusEl.textContent='\u2717 Upload Failure';statusEl.className='status error';return false;}
         const rows=lines.slice(1).map(line=>{const values=line.split(',').map(v=>v.trim());const obj={};headers.forEach((h,i)=>obj[h]=values[i]);return obj;});
         const teams={};
         rows.forEach(r=>{const key=r['Draft Entry'];if(!teams[key]){teams[key]={tournamentTitle:r['Tournament Title'],entryFee:r['Tournament Entry Fee'],picks:[]};}teams[key].picks.push(r);});
@@ -142,9 +157,11 @@
         allTeams.push(...teamArr);
         statusEl.textContent='\u2713 Upload Successful';
         statusEl.className='status success';
+        return true;
       }catch(err){
         statusEl.textContent='\u2717 Upload Failure';
         statusEl.className='status error';
+        return false;
       }
     }
 
@@ -250,19 +267,26 @@
 
     document.getElementById('upload-done').addEventListener('click',()=>{
       document.getElementById('upload-modal').classList.remove('show');
+      updateFormatOptions();
       renderTeams(allTeams);
     });
 
-    document.getElementById('pre-file').addEventListener('change',e=>{
-      handleFile(e.target.files[0],document.getElementById('pre-status'));
+    document.getElementById('pre-file').addEventListener('change',async e=>{
+      const success=await handleFile(e.target.files[0],document.getElementById('pre-status'));
+      if(success) uploadedFormats.pre=true;
+      updateFormatOptions();
       e.target.value='';
     });
-    document.getElementById('post-file').addEventListener('change',e=>{
-      handleFile(e.target.files[0],document.getElementById('post-status'));
+    document.getElementById('post-file').addEventListener('change',async e=>{
+      const success=await handleFile(e.target.files[0],document.getElementById('post-status'));
+      if(success) uploadedFormats.post=true;
+      updateFormatOptions();
       e.target.value='';
     });
-    document.getElementById('elim-file').addEventListener('change',e=>{
-      handleFile(e.target.files[0],document.getElementById('elim-status'));
+    document.getElementById('elim-file').addEventListener('change',async e=>{
+      const success=await handleFile(e.target.files[0],document.getElementById('elim-status'));
+      if(success) uploadedFormats.elim=true;
+      updateFormatOptions();
       e.target.value='';
     });
   </script>
