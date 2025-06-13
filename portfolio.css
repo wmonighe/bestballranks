@@ -117,6 +117,12 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
   font-weight:700;
   min-height:48px;
 }
+.draft-card h2 img.icon{
+  width:1em;
+  height:1em;
+  margin-right:.4em;
+  vertical-align:middle;
+}
 .rating-pill{
   display:inline-block;
   margin-left:8px;
