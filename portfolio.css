@@ -125,6 +125,10 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
   font-weight:600;
   font-size:16px;
 }
+.rating-emojis{
+  margin-left:6px;
+  font-size:16px;
+}
 
 /* Player tables */
 .player-table{
