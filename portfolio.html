@@ -33,11 +33,10 @@
         </label>
       </div>
       <div id="sort-control" style="display:none;">
-        <label>Sort:
-          <select id="sort-order">
-            <option value="desc">Total Rating Descending</option>
-            <option value="asc">Total Rating Ascending</option>
-          </select>
+        <label>Ratings Sort:
+          <button id="sort-toggle" aria-label="Toggle ratings sort">
+            &#8595;
+          </button>
         </label>
       </div>
     </div>
@@ -137,6 +136,7 @@
 
     const allTeams=[];
     const uploadedFormats={pre:false,post:false,elim:false};
+    let sortOrder='desc';
 
     function saveUploads(){
       try{
@@ -366,7 +366,6 @@
         if(endDate&&t.draftDate&&t.draftDate>endDate) return false;
         return true;
       });
-      const sortOrder=document.getElementById('sort-order').value;
       renderTeams(filtered,sortOrder);
     }
 
@@ -437,7 +436,11 @@
     document.getElementById('chk-elim').addEventListener('change',filterAndRender);
     document.getElementById('start-date').addEventListener('change',filterAndRender);
     document.getElementById('end-date').addEventListener('change',filterAndRender);
-    document.getElementById('sort-order').addEventListener('change',filterAndRender);
+    document.getElementById('sort-toggle').addEventListener('click',()=>{
+      sortOrder = sortOrder==='desc' ? 'asc' : 'desc';
+      document.getElementById('sort-toggle').innerHTML = sortOrder==='desc' ? '&#8595;' : '&#8593;';
+      filterAndRender();
+    });
   </script>
 </body>
 </html>
