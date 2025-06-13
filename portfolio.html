@@ -11,14 +11,14 @@
   <link rel="stylesheet" href="portfolio.css">
 </head>
 <body>
-  <div id="upload-container">
-    <h1>Upload Exposure CSV</h1>
-    <label id="open-modal" class="upload-btn">Upload Exposure CSV</label>
-    <button id="clear-lineups" class="upload-btn" style="display:none;">Clear Lineups</button>
-    <div id="message"></div>
-  </div>
   <div id="portfolio-wrapper">
     <div id="portfolio-controls">
+      <div id="upload-container">
+        <h1>Upload Exposure CSV</h1>
+        <label id="open-modal" class="upload-btn">Upload Exposure CSV</label>
+        <button id="clear-lineups" class="upload-btn" style="display:none;">Clear Lineups</button>
+        <div id="message"></div>
+      </div>
       <div id="format-options" style="display:none;">
         <p class="info-note">Showing Teams Drafted in the Following Formats:</p>
         <label id="label-pre" class="format-option"><img class="icon" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRltuDZN3yIMK1sh9oDF7ykc7HYDeuCGoZ--g&s" alt="Underdog logo"><input type="checkbox" id="chk-pre"> Pre-Draft</label>
@@ -206,6 +206,11 @@
         uploadBtn.textContent='Upload Exposure CSV';
         if(clearBtn) clearBtn.style.display='none';
         if(uploadTitle) uploadTitle.style.display='block';
+      }
+      const controls=document.getElementById('portfolio-controls');
+      if(controls){
+        if(anyUploaded) controls.classList.add('with-uploads');
+        else controls.classList.remove('with-uploads');
       }
     }
 
