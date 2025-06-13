@@ -118,9 +118,9 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
   min-height:48px;
 }
 .draft-card h2 img.icon{
-  width:1em;
-  height:1em;
-  margin-right:.4em;
+  width:0.6em;
+  height:0.6em;
+  margin-right:.3em;
   vertical-align:middle;
 }
 .rating-pill{
@@ -147,14 +147,14 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
 
 /* Team summary row */
 .team-summary{
-  display:flex;
+  display:inline-flex;
   flex-wrap:wrap;
   align-items:center;
   gap:8px;
   margin-bottom:8px;
 }
 .team-count{
-  display:flex;
+  display:inline-flex;
   align-items:center;
   font-weight:600;
 }
