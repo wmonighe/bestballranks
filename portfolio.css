@@ -246,7 +246,7 @@ td[data-pos="TE"] .pos-dot{background:var(--te);}
 #format-options{
   display:none;
   text-align:center;
-  margin-top:0;
+  margin-top:50px;
 }
 #format-options p{
   margin:0 0 8px;
