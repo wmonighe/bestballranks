@@ -32,6 +32,14 @@
           <input type="date" id="end-date" min="2025-01-01">
         </label>
       </div>
+      <div id="sort-control" style="display:none;">
+        <label>Sort:
+          <select id="sort-order">
+            <option value="desc">Total Rating Descending</option>
+            <option value="asc">Total Rating Ascending</option>
+          </select>
+        </label>
+      </div>
     </div>
     <div id="teams"></div>
   </div>
@@ -164,9 +172,11 @@
       const postLabel=document.getElementById('label-post');
       const elimLabel=document.getElementById('label-elim');
       const dateFilter=document.getElementById('date-filter');
+      const sortControl=document.getElementById('sort-control');
       const anyUploaded=uploadedFormats.pre||uploadedFormats.post||uploadedFormats.elim;
       container.style.display=anyUploaded?'block':'none';
       if(dateFilter) dateFilter.style.display=anyUploaded?'block':'none';
+      if(sortControl) sortControl.style.display=anyUploaded?'block':'none';
       if(anyUploaded&&dateFilter){
         const startInput=document.getElementById('start-date');
         const endInput=document.getElementById('end-date');
@@ -248,10 +258,11 @@
       }
     }
 
-    function renderTeams(teams){
+    function renderTeams(teams,sortOrder){
       const teamsEl=document.getElementById('teams');
       teamsEl.innerHTML='';
-      teams.sort((a,b)=>b.totalRating-a.totalRating);
+      if(sortOrder==='asc') teams.sort((a,b)=>a.totalRating-b.totalRating);
+      else teams.sort((a,b)=>b.totalRating-a.totalRating);
       teams.forEach(team=>{
         const card=document.createElement('div');
         card.className=`team-card draft-card roster-${team.rosterSize}`;
@@ -350,7 +361,8 @@
         if(endDate&&t.draftDate&&t.draftDate>endDate) return false;
         return true;
       });
-      renderTeams(filtered);
+      const sortOrder=document.getElementById('sort-order').value;
+      renderTeams(filtered,sortOrder);
     }
 
     function standardizeTableHeights(){
@@ -420,6 +432,7 @@
     document.getElementById('chk-elim').addEventListener('change',filterAndRender);
     document.getElementById('start-date').addEventListener('change',filterAndRender);
     document.getElementById('end-date').addEventListener('change',filterAndRender);
+    document.getElementById('sort-order').addEventListener('change',filterAndRender);
   </script>
 </body>
 </html>
