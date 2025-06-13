@@ -19,9 +19,9 @@
   <div id="portfolio-wrapper">
     <div id="format-options" style="display:none;">
       <p class="info-note">Showing Teams Drafted in the Following Formats:</p>
-      <label class="format-option"><img class="icon" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRltuDZN3yIMK1sh9oDF7ykc7HYDeuCGoZ--g&s" alt="Underdog logo"><input type="checkbox" id="chk-pre"> Pre-Draft</label>
-      <label class="format-option"><img class="icon" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRltuDZN3yIMK1sh9oDF7ykc7HYDeuCGoZ--g&s" alt="Underdog logo"><input type="checkbox" id="chk-post"> Post-Draft</label>
-      <label class="format-option"><img class="icon" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRltuDZN3yIMK1sh9oDF7ykc7HYDeuCGoZ--g&s" alt="Underdog logo"><input type="checkbox" id="chk-elim"> Eliminator</label>
+      <label id="label-pre" class="format-option"><img class="icon" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRltuDZN3yIMK1sh9oDF7ykc7HYDeuCGoZ--g&s" alt="Underdog logo"><input type="checkbox" id="chk-pre"> Pre-Draft</label>
+      <label id="label-post" class="format-option"><img class="icon" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRltuDZN3yIMK1sh9oDF7ykc7HYDeuCGoZ--g&s" alt="Underdog logo"><input type="checkbox" id="chk-post"> Post-Draft</label>
+      <label id="label-elim" class="format-option"><img class="icon" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRltuDZN3yIMK1sh9oDF7ykc7HYDeuCGoZ--g&s" alt="Underdog logo"><input type="checkbox" id="chk-elim"> Eliminator</label>
     </div>
     <div id="teams"></div>
   </div>
@@ -122,13 +122,20 @@
 
     function updateFormatOptions(){
       const container=document.getElementById('format-options');
-      container.style.display='block';
-      document.getElementById('chk-pre').checked=uploadedFormats.pre;
-      document.getElementById('chk-post').checked=uploadedFormats.post;
-      document.getElementById('chk-elim').checked=uploadedFormats.elim;
+      const preLabel=document.getElementById('label-pre');
+      const postLabel=document.getElementById('label-post');
+      const elimLabel=document.getElementById('label-elim');
+      const anyUploaded=uploadedFormats.pre||uploadedFormats.post||uploadedFormats.elim;
+      container.style.display=anyUploaded?'block':'none';
+      preLabel.style.display=uploadedFormats.pre?'inline-flex':'none';
+      postLabel.style.display=uploadedFormats.post?'inline-flex':'none';
+      elimLabel.style.display=uploadedFormats.elim?'inline-flex':'none';
+      if(uploadedFormats.pre) document.getElementById('chk-pre').checked=true;
+      if(uploadedFormats.post) document.getElementById('chk-post').checked=true;
+      if(uploadedFormats.elim) document.getElementById('chk-elim').checked=true;
     }
 
-    async function handleFile(file,statusEl){
+    async function handleFile(file,statusEl,format){
       if(!file) return false;
       await ratingsPromise;
       try{
@@ -154,6 +161,7 @@
             team.totalRating=team.totalRating*(18/20);
           }
         });
+        teamArr.forEach(t=>t.format=format);
         allTeams.push(...teamArr);
         statusEl.textContent='\u2713 Upload Successful';
         statusEl.className='status success';
@@ -252,6 +260,15 @@
       requestAnimationFrame(standardizeTableHeights);
     }
 
+    function filterAndRender(){
+      const selected=[];
+      if(document.getElementById('chk-pre').checked) selected.push('pre');
+      if(document.getElementById('chk-post').checked) selected.push('post');
+      if(document.getElementById('chk-elim').checked) selected.push('elim');
+      const filtered=allTeams.filter(t=>selected.includes(t.format));
+      renderTeams(filtered);
+    }
+
     function standardizeTableHeights(){
       ['18','20'].forEach(size=>{
         const tables=document.querySelectorAll(`.team-card.roster-${size} table`);
@@ -268,27 +285,31 @@
     document.getElementById('upload-done').addEventListener('click',()=>{
       document.getElementById('upload-modal').classList.remove('show');
       updateFormatOptions();
-      renderTeams(allTeams);
+      filterAndRender();
     });
 
     document.getElementById('pre-file').addEventListener('change',async e=>{
-      const success=await handleFile(e.target.files[0],document.getElementById('pre-status'));
+      const success=await handleFile(e.target.files[0],document.getElementById('pre-status'),'pre');
       if(success) uploadedFormats.pre=true;
       updateFormatOptions();
       e.target.value='';
     });
     document.getElementById('post-file').addEventListener('change',async e=>{
-      const success=await handleFile(e.target.files[0],document.getElementById('post-status'));
+      const success=await handleFile(e.target.files[0],document.getElementById('post-status'),'post');
       if(success) uploadedFormats.post=true;
       updateFormatOptions();
       e.target.value='';
     });
     document.getElementById('elim-file').addEventListener('change',async e=>{
-      const success=await handleFile(e.target.files[0],document.getElementById('elim-status'));
+      const success=await handleFile(e.target.files[0],document.getElementById('elim-status'),'elim');
       if(success) uploadedFormats.elim=true;
       updateFormatOptions();
       e.target.value='';
     });
+
+    document.getElementById('chk-pre').addEventListener('change',filterAndRender);
+    document.getElementById('chk-post').addEventListener('change',filterAndRender);
+    document.getElementById('chk-elim').addEventListener('change',filterAndRender);
   </script>
 </body>
 </html>
