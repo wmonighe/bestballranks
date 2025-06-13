@@ -130,6 +130,15 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
   font-size:16px;
 }
 
+/* Team logos */
+.team-logo{
+  width:30px;
+  height:30px;
+  object-fit:contain;
+  margin-right:8px;
+  vertical-align:middle;
+}
+
 /* Player tables */
 .player-table{
   width:100%;
