@@ -17,11 +17,20 @@
     <div id="message"></div>
   </div>
   <div id="portfolio-wrapper">
-    <div id="format-options" style="display:none;">
-      <p class="info-note">Showing Teams Drafted in the Following Formats:</p>
-      <label id="label-pre" class="format-option"><img class="icon" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRltuDZN3yIMK1sh9oDF7ykc7HYDeuCGoZ--g&s" alt="Underdog logo"><input type="checkbox" id="chk-pre"> Pre-Draft</label>
-      <label id="label-post" class="format-option"><img class="icon" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRltuDZN3yIMK1sh9oDF7ykc7HYDeuCGoZ--g&s" alt="Underdog logo"><input type="checkbox" id="chk-post"> Post-Draft</label>
-      <label id="label-elim" class="format-option"><img class="icon" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRltuDZN3yIMK1sh9oDF7ykc7HYDeuCGoZ--g&s" alt="Underdog logo"><input type="checkbox" id="chk-elim"> Eliminator</label>
+    <div id="portfolio-controls">
+      <div id="format-options" style="display:none;">
+        <p class="info-note">Showing Teams Drafted in the Following Formats:</p>
+        <label id="label-pre" class="format-option"><img class="icon" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRltuDZN3yIMK1sh9oDF7ykc7HYDeuCGoZ--g&s" alt="Underdog logo"><input type="checkbox" id="chk-pre"> Pre-Draft</label>
+        <label id="label-post" class="format-option"><img class="icon" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRltuDZN3yIMK1sh9oDF7ykc7HYDeuCGoZ--g&s" alt="Underdog logo"><input type="checkbox" id="chk-post"> Post-Draft</label>
+        <label id="label-elim" class="format-option"><img class="icon" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRltuDZN3yIMK1sh9oDF7ykc7HYDeuCGoZ--g&s" alt="Underdog logo"><input type="checkbox" id="chk-elim"> Eliminator</label>
+      </div>
+      <div id="date-filter" style="display:none;">
+        <label>Draft Date:
+          <input type="date" id="start-date" min="2025-01-01">
+          <span>&ndash;</span>
+          <input type="date" id="end-date" min="2025-01-01">
+        </label>
+      </div>
     </div>
     <div id="teams"></div>
   </div>
@@ -125,8 +134,19 @@
       const preLabel=document.getElementById('label-pre');
       const postLabel=document.getElementById('label-post');
       const elimLabel=document.getElementById('label-elim');
+      const dateFilter=document.getElementById('date-filter');
       const anyUploaded=uploadedFormats.pre||uploadedFormats.post||uploadedFormats.elim;
       container.style.display=anyUploaded?'block':'none';
+      if(dateFilter) dateFilter.style.display=anyUploaded?'block':'none';
+      if(anyUploaded&&dateFilter){
+        const startInput=document.getElementById('start-date');
+        const endInput=document.getElementById('end-date');
+        const today=new Date().toISOString().split('T')[0];
+        if(!startInput.value) startInput.value='2025-01-01';
+        if(!endInput.value) endInput.value=today;
+        startInput.max=today;
+        endInput.max=today;
+      }
       preLabel.style.display=uploadedFormats.pre?'inline-flex':'none';
       postLabel.style.display=uploadedFormats.post?'inline-flex':'none';
       elimLabel.style.display=uploadedFormats.elim?'inline-flex':'none';
@@ -164,8 +184,19 @@
           team.picks.sort((a,b)=>parseInt(a['Pick Number'],10)-parseInt(b['Pick Number'],10));
           const firstPick=team.picks[0];
           let dateEntered='';
-          if(firstPick&&firstPick['Picked At']){const d=new Date(firstPick['Picked At']);if(!isNaN(d)){const mm=String(d.getMonth()+1).padStart(2,'0');const dd=String(d.getDate()).padStart(2,'0');dateEntered=`${mm}/${dd}`;}}
+          let draftDate=null;
+          if(firstPick&&firstPick['Picked At']){
+            const d=new Date(firstPick['Picked At']);
+            if(!isNaN(d)){
+              draftDate=d;
+              const mm=String(d.getMonth()+1).padStart(2,'0');
+              const dd=String(d.getDate()).padStart(2,'0');
+              const yy=d.getFullYear();
+              dateEntered=`${mm}/${dd}/${yy}`;
+            }
+          }
           team.dateEntered=dateEntered;
+          team.draftDate=draftDate;
           const rosterSize=team.picks.length;
           team.rosterSize=rosterSize;
           team.totalRating=team.picks.reduce((sum,p)=>{const canon=canonicalName(`${p['First Name']} ${p['Last Name']}`);const rating=parseFloat(ratingMap[canon]);return sum+(isNaN(rating)?0:rating);},0);
@@ -277,7 +308,16 @@
       if(document.getElementById('chk-pre').checked) selected.push('pre');
       if(document.getElementById('chk-post').checked) selected.push('post');
       if(document.getElementById('chk-elim').checked) selected.push('elim');
-      const filtered=allTeams.filter(t=>selected.includes(t.format));
+      const startStr=document.getElementById('start-date').value;
+      const endStr=document.getElementById('end-date').value;
+      const startDate=startStr?new Date(startStr):null;
+      const endDate=endStr?new Date(endStr):null;
+      const filtered=allTeams.filter(t=>{
+        if(!selected.includes(t.format)) return false;
+        if(startDate&&t.draftDate&&t.draftDate<startDate) return false;
+        if(endDate&&t.draftDate&&t.draftDate>endDate) return false;
+        return true;
+      });
       renderTeams(filtered);
     }
 
@@ -322,6 +362,8 @@
     document.getElementById('chk-pre').addEventListener('change',filterAndRender);
     document.getElementById('chk-post').addEventListener('change',filterAndRender);
     document.getElementById('chk-elim').addEventListener('change',filterAndRender);
+    document.getElementById('start-date').addEventListener('change',filterAndRender);
+    document.getElementById('end-date').addEventListener('change',filterAndRender);
   </script>
 </body>
 </html>
