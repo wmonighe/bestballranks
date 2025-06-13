@@ -135,12 +135,15 @@
       if(uploadedFormats.elim) document.getElementById('chk-elim').checked=true;
       const uploadContainer=document.getElementById('upload-container');
       const uploadBtn=document.getElementById('open-modal');
+      const uploadTitle=uploadContainer.querySelector('h1');
       if(anyUploaded){
         uploadContainer.classList.add('uploaded');
         uploadBtn.textContent='Upload More';
+        if(uploadTitle) uploadTitle.style.display='none';
       }else{
         uploadContainer.classList.remove('uploaded');
         uploadBtn.textContent='Upload Exposure CSV';
+        if(uploadTitle) uploadTitle.style.display='block';
       }
     }
 
