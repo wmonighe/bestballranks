@@ -425,7 +425,7 @@
 
     loadUploads();
     updateFormatOptions();
-    filterAndRender();
+    ratingsPromise.then(filterAndRender);
 
     document.getElementById('chk-pre').addEventListener('change',filterAndRender);
     document.getElementById('chk-post').addEventListener('change',filterAndRender);
