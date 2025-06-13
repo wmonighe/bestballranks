@@ -156,9 +156,14 @@
         const card=document.createElement('div');
         card.className=`team-card draft-card roster-${team.rosterSize}`;
         const header=document.createElement('h2');
+        const icon=document.createElement('img');
+        icon.className='icon';
+        icon.src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRltuDZN3yIMK1sh9oDF7ykc7HYDeuCGoZ--g&s';
+        icon.alt='Underdog icon';
+        header.appendChild(icon);
         const feeDisp=parseFloat(team.entryFee).toString();
         const datePart=team.dateEntered?` - Date Entered: ${team.dateEntered}`:'';
-        header.textContent=`${team.tournamentTitle} - $${feeDisp}${datePart} - Total Rating: `;
+        header.append(`${team.tournamentTitle} - $${feeDisp}${datePart} - Total Rating: `);
         const ratingEl=document.createElement('span');
         ratingEl.className='rating-pill';
         const pct=Math.max(0,Math.min(100,((team.totalRating-7.5)/(11-7.5))*100));
