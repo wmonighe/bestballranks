@@ -80,9 +80,7 @@ button.upload-btn:hover{background:var(--bb-blue-600);}
 
 /* Compact upload button after CSVs uploaded */
 #upload-container.uploaded{
-  position:fixed;
-  top:20px;
-  left:20px;
+  position:static;
   margin:0;
   padding:0;
   background:none;
@@ -265,6 +263,7 @@ td[data-pos="TE"] .pos-dot{background:var(--te);}
   display:none;
   text-align:center;
   margin:0;
+  justify-self:center;
 }
 #format-options p{
   margin:0 0 8px;
@@ -287,18 +286,23 @@ td[data-pos="TE"] .pos-dot{background:var(--te);}
 
 /* Container for format checkboxes and date filter */
 #portfolio-controls{
-  display:flex;
-  flex-wrap:wrap;
-  align-items:center;
-  gap:16px;
+  display:block;
   margin-top:20px;
   padding:0 32px;
+}
+#portfolio-controls.with-uploads{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  grid-template-rows:auto auto;
+  align-items:start;
+  gap:16px;
 }
 
 #date-filter{
   display:none;
   font-weight:600;
   margin:0;
+  justify-self:end;
 }
 #date-filter label{
   display:flex;
@@ -314,6 +318,9 @@ td[data-pos="TE"] .pos-dot{background:var(--te);}
   display:none;
   font-weight:600;
   margin:0;
+  justify-self:end;
+  grid-column:3;
+  grid-row:2;
 }
 #sort-control label{
   display:flex;
