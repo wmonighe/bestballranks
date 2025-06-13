@@ -300,26 +300,34 @@
 
         const summary=document.createElement('div');
         summary.className='team-summary';
-        const counts={};
+        const stats={};
         team.picks.forEach(p=>{
           const code=teamMap[p["Team"]]||p["Team"]||'';
-          if(code) counts[code]=(counts[code]||0)+1;
+          if(!code) return;
+          const canon=canonicalName(`${p['First Name']} ${p['Last Name']}`);
+          const rating=parseFloat(ratingMap[canon]);
+          if(!stats[code]) stats[code]={count:0,total:0};
+          stats[code].count++;
+          if(!isNaN(rating)) stats[code].total+=rating;
         });
-        Object.entries(counts).forEach(([code,count])=>{
-          if(count<2) return;
-          const item=document.createElement('div');
-          item.className='team-count';
-          const img=document.createElement('img');
-          img.src=`https://www.fantasynerds.com/images/nfl/team_logos/${code}.png`;
-          img.className='team-logo';
-          img.alt=code;
-          img.onerror=()=>{img.style.display='none';};
-          const span=document.createElement('span');
-          span.textContent=`${count}`;
-          item.appendChild(img);
-          item.appendChild(span);
-          summary.appendChild(item);
-        });
+        Object.entries(stats)
+          .filter(([,v])=>v.count>=2)
+          .sort((a,b)=>b[1].count-a[1].count)
+          .forEach(([code,{count,total}])=>{
+            const item=document.createElement('div');
+            item.className='team-count';
+            item.title=`Total Rating: ${total.toFixed(2)}`;
+            const img=document.createElement('img');
+            img.src=`https://www.fantasynerds.com/images/nfl/team_logos/${code}.png`;
+            img.className='team-logo';
+            img.alt=code;
+            img.onerror=()=>{img.style.display='none';};
+            const span=document.createElement('span');
+            span.textContent=`${count}`;
+            item.appendChild(img);
+            item.appendChild(span);
+            summary.appendChild(item);
+          });
         if(summary.childNodes.length){
           const label=document.createElement('small');
           label.className='summary-label';
