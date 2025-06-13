@@ -145,6 +145,20 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
   vertical-align:middle;
 }
 
+/* Team summary row */
+.team-summary{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:8px;
+  margin-bottom:8px;
+}
+.team-count{
+  display:flex;
+  align-items:center;
+  font-weight:600;
+}
+
 /* Player tables */
 .player-table{
   width:100%;
