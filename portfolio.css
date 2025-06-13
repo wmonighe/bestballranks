@@ -264,7 +264,7 @@ td[data-pos="TE"] .pos-dot{background:var(--te);}
 #format-options{
   display:none;
   text-align:center;
-  margin:50px auto 0;
+  margin:30px auto 0;
 }
 #format-options p{
   margin:0 0 8px;
@@ -305,6 +305,22 @@ td[data-pos="TE"] .pos-dot{background:var(--te);}
   gap:6px;
 }
 #date-filter input[type="date"]{
+  padding:4px;
+  font-family:inherit;
+}
+
+#sort-control{
+  display:none;
+  font-weight:600;
+  align-self:flex-end;
+  margin-top:10px;
+}
+#sort-control label{
+  display:flex;
+  align-items:center;
+  gap:6px;
+}
+#sort-control select{
   padding:4px;
   font-family:inherit;
 }
