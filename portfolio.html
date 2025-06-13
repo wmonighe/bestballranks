@@ -166,7 +166,7 @@
         if(pct>=66) emojiArr=positiveEmojis;
         else if(pct<34) emojiArr=negativeEmojis;
         const colors=colorForPct(pct);
-        ratingEl.textContent=`${pct.toFixed(0)}%`;
+        ratingEl.textContent=`${pct.toFixed(0)}`;
         ratingEl.style.backgroundColor=colors.bg;
         ratingEl.style.color=colors.text;
         header.appendChild(ratingEl);
