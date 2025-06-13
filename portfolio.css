@@ -159,6 +159,15 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
   font-weight:600;
 }
 
+/* Label above the team exposure summary */
+.summary-label{
+  display:block;
+  font-size:14px;
+  font-weight:600;
+  color:var(--bb-muted);
+  margin-bottom:4px;
+}
+
 /* Player tables */
 .player-table{
   width:100%;

@@ -205,6 +205,10 @@
           summary.appendChild(item);
         });
         if(summary.childNodes.length){
+          const label=document.createElement('small');
+          label.className='summary-label';
+          label.textContent='Team Exposure';
+          card.appendChild(label);
           card.appendChild(summary);
         }
         const table=document.createElement('table');
