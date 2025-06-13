@@ -64,13 +64,13 @@ label.upload-btn:hover{background:var(--bb-blue-600);}
 #upload-container.uploaded{
   position:fixed;
   top:20px;
-  right:20px;
+  left:20px;
   margin:0;
   padding:0;
   background:none;
   border:none;
   box-shadow:none;
-  text-align:right;
+  text-align:left;
 }
 #upload-container.uploaded h1{display:none;}
 
