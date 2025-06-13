@@ -173,8 +173,7 @@
         const emojiSpan=document.createElement('span');
         emojiSpan.className='rating-emojis';
         const em1=pickEmoji(emojiArr);
-        const em2=pickEmoji(emojiArr);
-        emojiSpan.textContent=` ${em1}${em2}`;
+        emojiSpan.textContent=` ${em1}`;
         header.appendChild(emojiSpan);
         card.appendChild(header);
         const table=document.createElement('table');
