@@ -59,6 +59,18 @@ label.upload-btn{
   transition:var(--transition);
 }
 label.upload-btn:hover{background:var(--bb-blue-600);}
+button.upload-btn{
+  background:var(--bb-blue-500);
+  color:#fff;
+  padding:12px 22px;
+  border:none;
+  border-radius:var(--radius);
+  font-weight:600;
+  cursor:pointer;
+  transition:var(--transition);
+}
+button.upload-btn:hover{background:var(--bb-blue-600);}
+#clear-lineups{margin-left:12px;}
 
 /* Compact upload button after CSVs uploaded */
 #upload-container.uploaded{

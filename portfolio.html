@@ -14,6 +14,7 @@
   <div id="upload-container">
     <h1>Upload Exposure CSV</h1>
     <label id="open-modal" class="upload-btn">Upload Exposure CSV</label>
+    <button id="clear-lineups" class="upload-btn" style="display:none;">Clear Lineups</button>
     <div id="message"></div>
   </div>
   <div id="portfolio-wrapper">
@@ -129,6 +130,34 @@
     const allTeams=[];
     const uploadedFormats={pre:false,post:false,elim:false};
 
+    function saveUploads(){
+      try{
+        localStorage.setItem('bb_allTeams',JSON.stringify(allTeams));
+        localStorage.setItem('bb_uploadedFormats',JSON.stringify(uploadedFormats));
+      }catch(err){
+        console.error('Error saving uploads',err);
+      }
+    }
+
+    function loadUploads(){
+      try{
+        const teamsStr=localStorage.getItem('bb_allTeams');
+        const formatsStr=localStorage.getItem('bb_uploadedFormats');
+        if(teamsStr&&formatsStr){
+          const savedTeams=JSON.parse(teamsStr);
+          const savedFormats=JSON.parse(formatsStr);
+          if(Array.isArray(savedTeams)&&savedFormats){
+            savedTeams.forEach(t=>{if(t.draftDate)t.draftDate=new Date(t.draftDate);allTeams.push(t);});
+            uploadedFormats.pre=!!savedFormats.pre;
+            uploadedFormats.post=!!savedFormats.post;
+            uploadedFormats.elim=!!savedFormats.elim;
+          }
+        }
+      }catch(err){
+        console.error('Error loading uploads',err);
+      }
+    }
+
     function updateFormatOptions(){
       const container=document.getElementById('format-options');
       const preLabel=document.getElementById('label-pre');
@@ -155,14 +184,17 @@
       if(uploadedFormats.elim) document.getElementById('chk-elim').checked=true;
       const uploadContainer=document.getElementById('upload-container');
       const uploadBtn=document.getElementById('open-modal');
+      const clearBtn=document.getElementById('clear-lineups');
       const uploadTitle=uploadContainer.querySelector('h1');
       if(anyUploaded){
         uploadContainer.classList.add('uploaded');
         uploadBtn.textContent='Upload More';
+        if(clearBtn) clearBtn.style.display='inline-block';
         if(uploadTitle) uploadTitle.style.display='none';
       }else{
         uploadContainer.classList.remove('uploaded');
         uploadBtn.textContent='Upload Exposure CSV';
+        if(clearBtn) clearBtn.style.display='none';
         if(uploadTitle) uploadTitle.style.display='block';
       }
     }
@@ -342,22 +374,46 @@
 
     document.getElementById('pre-file').addEventListener('change',async e=>{
       const success=await handleFile(e.target.files[0],document.getElementById('pre-status'),'pre');
-      if(success) uploadedFormats.pre=true;
+      if(success){
+        uploadedFormats.pre=true;
+        saveUploads();
+      }
       updateFormatOptions();
       e.target.value='';
     });
     document.getElementById('post-file').addEventListener('change',async e=>{
       const success=await handleFile(e.target.files[0],document.getElementById('post-status'),'post');
-      if(success) uploadedFormats.post=true;
+      if(success){
+        uploadedFormats.post=true;
+        saveUploads();
+      }
       updateFormatOptions();
       e.target.value='';
     });
     document.getElementById('elim-file').addEventListener('change',async e=>{
       const success=await handleFile(e.target.files[0],document.getElementById('elim-status'),'elim');
-      if(success) uploadedFormats.elim=true;
+      if(success){
+        uploadedFormats.elim=true;
+        saveUploads();
+      }
       updateFormatOptions();
       e.target.value='';
     });
+
+    document.getElementById('clear-lineups').addEventListener('click',()=>{
+      allTeams.length=0;
+      uploadedFormats.pre=false;
+      uploadedFormats.post=false;
+      uploadedFormats.elim=false;
+      localStorage.removeItem('bb_allTeams');
+      localStorage.removeItem('bb_uploadedFormats');
+      updateFormatOptions();
+      filterAndRender();
+    });
+
+    loadUploads();
+    updateFormatOptions();
+    filterAndRender();
 
     document.getElementById('chk-pre').addEventListener('change',filterAndRender);
     document.getElementById('chk-post').addEventListener('change',filterAndRender);
