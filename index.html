@@ -41,9 +41,11 @@
     tbody tr:hover {
       background-color: #f5f5f5;
     }
+    .bar-cell,
     .sentiment-cell {
       position: relative;
     }
+    .bar-cell::before,
     .sentiment-cell::before {
       content: '';
       position: absolute;
@@ -55,6 +57,7 @@
       border-radius: 4px;
       z-index: 0;
     }
+    .bar-cell span,
     .sentiment-cell span {
       position: relative;
       z-index: 1;
@@ -444,8 +447,10 @@
       },
       {
         header: '🏅 <span id="rankings-source">wmonighe</span> Rankings',
-        cell: r =>
-          `<td>${r.wmonigheRank}${r.wmonighePct ? ' (' + r.wmonighePct + ')' : ''}</td>`,
+        cell: r => {
+          const width = parseFloat(r.wmonighePct) * 100 || 0;
+          return `<td class="bar-cell" style="--width:${width}%"><span>${r.wmonigheRank}${r.wmonighePct ? ' (' + r.wmonighePct + ')' : ''}</span></td>`;
+        },
         sortKey: 'wmonigheRank',
       },
       {
@@ -459,7 +464,8 @@
           ) {
             text = 'Undrafted';
           }
-          return `<td>${text}</td>`;
+          const width = parseFloat(r.adpPct) * 100 || 0;
+          return `<td class="bar-cell" style="--width:${width}%"><span>${text}</span></td>`;
         },
         sortKey: 'adp',
       },
@@ -467,20 +473,23 @@
         header: '🏆 Fantasy Points',
         cell: r => {
           const pctText = r.fpPctDisplay || r.fpPct;
-          return `<td>${r.fantasyPts}${pctText ? ' (' + pctText + ')' : ''}</td>`;
+          const width = parseFloat(r.fpPctValue !== undefined ? r.fpPctValue : r.fpPct) * 100 || 0;
+          return `<td class="bar-cell" style="--width:${width}%"><span>${r.fantasyPts}${pctText ? ' (' + pctText + ')' : ''}</span></td>`;
         },
         sortKey: 'fantasyPts',
       },
       {
         header: '😊 Sentiment',
         cell: r =>
-          `<td class="sentiment-cell" style="--width:${r.sentimentPercent}%"><span>${r.sentiment}${r.sentimentPct ? ' (' + r.sentimentPct + ')' : ''}</span></td>`,
+          `<td class="bar-cell sentiment-cell" style="--width:${r.sentimentPercent}%"><span>${r.sentiment}${r.sentimentPct ? ' (' + r.sentimentPct + ')' : ''}</span></td>`,
         sortKey: 'sentimentValue',
       },
       {
         header: '🎲 Futures Props',
-        cell: r =>
-          `<td>${r.vorp}${r.vorpPct ? ' (' + r.vorpPct + ')' : ''}</td>`,
+        cell: r => {
+          const width = parseFloat(r.vorpPct) * 100 || 0;
+          return `<td class="bar-cell" style="--width:${width}%"><span>${r.vorp}${r.vorpPct ? ' (' + r.vorpPct + ')' : ''}</span></td>`;
+        },
         sortKey: 'vorp',
       },
     ];
