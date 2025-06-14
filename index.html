@@ -390,6 +390,7 @@
     }
 
     const prevWeights = {};
+    let lastChangedKey;
 
     let validateTimeout;
 
@@ -403,20 +404,23 @@
         (sum, k) => sum + (parseInt(weightInputs[k].value, 10) || 0),
         0
       );
-      if (total > 100) {
+
+      if (total > 100 && lastChangedKey) {
         alert('Total percentage cannot exceed 100%.');
-        Object.keys(weightInputs).forEach(k => {
-          weightInputs[k].value = prevWeights[k];
-          updateWeightDisplay(k);
-        });
-      } else {
-        Object.keys(weightInputs).forEach(k => {
-          prevWeights[k] = parseInt(weightInputs[k].value, 10) || 0;
-        });
+        const available = 100 - Object.keys(weightInputs).reduce((sum, k) => {
+          return sum + (k === lastChangedKey ? 0 : (parseInt(weightInputs[k].value, 10) || 0));
+        }, 0);
+        weightInputs[lastChangedKey].value = Math.max(0, available);
+        updateWeightDisplay(lastChangedKey);
       }
+
+      Object.keys(weightInputs).forEach(k => {
+        prevWeights[k] = parseInt(weightInputs[k].value, 10) || 0;
+      });
     }
 
     function handleWeightInput(key) {
+      lastChangedKey = key;
       updateWeightDisplay(key);
       scheduleValidation();
     }
