@@ -10,7 +10,7 @@ export const XP_PER_RATING = 5;
 export const LEVEL_XP = 100;
 
 export function useXP(initialXP = 0): [XPState, (points: number) => void] {
-  const [state, setState] = useState<XPState>({
+  const [state, setState] = useState({
     xp: initialXP % LEVEL_XP,
     level: Math.floor(initialXP / LEVEL_XP),
   });

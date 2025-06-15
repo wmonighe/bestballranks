@@ -6,7 +6,7 @@ export interface StreakState {
 }
 
 export function useStreak(initial: StreakState = { streak: 0, lastDate: null }): [StreakState, () => void] {
-  const [state, setState] = useState<StreakState>(initial);
+  const [state, setState] = useState(initial);
 
   const increment = () => {
     const today = new Date().toDateString();
