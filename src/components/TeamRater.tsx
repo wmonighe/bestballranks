@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Team } from '../types';
 import { fetchNextTeam } from '../api/fetchNextTeam';
 import { rateTeam, Stats } from '../api/rateTeam';
@@ -14,9 +14,9 @@ interface Props {
 }
 
 export const TeamRater = ({ initialTeam, initialStats }: Props) => {
-  const [team, setTeam] = useState<Team>(initialTeam);
-  const [nextTeam, setNextTeam] = useState<Team | null>(null);
-  const [overlayStats, setOverlayStats] = useState<Stats | null>(null);
+  const [team, setTeam] = useState(initialTeam);
+  const [nextTeam, setNextTeam] = useState(null);
+  const [overlayStats, setOverlayStats] = useState(null);
 
   const [xpState, addXP] = useXP(initialStats.xp);
   const [streakState, incStreak] = useStreak({ streak: initialStats.streak, lastDate: null });
