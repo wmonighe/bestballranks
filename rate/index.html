@@ -32,6 +32,30 @@
         .replace(/[^a-z0-9]+/g, ' ')
         .trim();
     }
+    function canonicalField(name) {
+      return (name || "").toString().toLowerCase().replace(/[^a-z0-9]/g, "");
+    }
+
+    function getFantasyPoints(row) {
+      if (row.I || row["Fantasy Points"] || row["FantasyPts"]) {
+        return row.I || row["Fantasy Points"] || row["FantasyPts"];
+      }
+      const key = Object.keys(row).find(k => {
+        const ck = canonicalField(k);
+        return ck.includes("fantasypoints") || ck.includes("fantasypts");
+      });
+      return key ? row[key] : "";
+    }
+
+    function getColumn(row, letter, labelPart) {
+      if (row[letter]) return row[letter];
+      const target = canonicalField(labelPart);
+      const key = Object.keys(row).find(k => canonicalField(k).includes(target));
+      return key ? row[key] : "";
+    }
+
+    const ratingMap = {};
+
 
     function getTeamLogo(player) {
       const team = playerTeamMap[canonicalName(player)];
@@ -154,8 +178,118 @@
     const sheetId = '1rNouBdE-HbWafu-shO_5JLPSrLhr-xuGpXYfyOI-2oY';
     const rankingsUrl = `https://opensheet.elk.sh/${sheetId}/Rankings`;
 
+    const sentimentUrl = `https://opensheet.elk.sh/${sheetId}/Sentiment`;
+
+    async function loadRatings() {
+      try {
+        const [rankRes, sentRes] = await Promise.all([
+          fetch(rankingsUrl),
+          fetch(sentimentUrl)
+        ]);
+        const rankings = await rankRes.json();
+        const sentimentRows = await sentRes.json();
+        const sentimentMap = {};
+        sentimentRows.forEach(r => {
+          const playerName = canonicalName(r.Player || r.player);
+          const score = r.Sentiment || r['Sentiment Score'] || r.F || '';
+          if (playerName) sentimentMap[playerName] = score;
+        });
+        const rowsData = rankings.map(row => {
+          const player = row.Player || row.player;
+          const canon = canonicalName(player);
+          const rowSentiment = row.Sentiment || row['Sentiment Score'] || row.H || '';
+          const sentiment = rowSentiment || sentimentMap[canon] || '';
+          let adp = row.J || row.ADP || row['ADP'] || '';
+          let adpPct = getColumn(row, 'L', 'adp percentile');
+          const isUndrafted =
+            adp.toString().toLowerCase() === 'undrafted' ||
+            adp === '#N/A' ||
+            adp === '-' ||
+            adpPct === '#N/A' ||
+            adpPct === '#VALUE!' ||
+            adpPct === '';
+          if (isUndrafted) {
+            adp = 'Undrafted';
+            adpPct = '0.00';
+          }
+          const fantasyPts = getFantasyPoints(row);
+          const wmonigheRank = getColumn(row, 'G', 'wmonighe rank');
+          return {
+            player,
+            sentimentValue: parseFloat(sentiment),
+            adpPct,
+            wmonigheRank,
+            vorpPct: getColumn(row, 'R', 'vorp percentile'),
+            fantasyPts
+          };
+        });
+        const numericFps = rowsData
+          .map(r => parseFloat(r.fantasyPts))
+          .filter(v => !isNaN(v))
+          .sort((a, b) => a - b);
+        rowsData.forEach(r => {
+          const val = parseFloat(r.fantasyPts);
+          if (!isNaN(val) && numericFps.length) {
+            const rank = numericFps.filter(v => v <= val).length;
+            r.fpPct = (rank / numericFps.length).toFixed(2);
+          } else {
+            r.fpPct = '';
+          }
+        });
+        rowsData.forEach(r => {
+          const rankVal = parseFloat(r.wmonigheRank);
+          if (!isNaN(rankVal)) {
+            let pct = (300 - rankVal) / 299;
+            if (rankVal >= 300) pct = 0;
+            if (pct > 1) pct = 1;
+            if (pct < 0) pct = 0;
+            r.wmonighePct = pct.toFixed(2);
+          } else {
+            r.wmonighePct = '';
+          }
+        });
+        rowsData.forEach(r => {
+          const val = parseFloat(r.vorpPct);
+          r.vorpPct = !isNaN(val) ? parseFloat(val).toFixed(2) : '';
+        });
+        const numericSentiments = rowsData
+          .map(r => r.sentimentValue)
+          .filter(v => !isNaN(v));
+        const minSentiment = numericSentiments.length ? Math.min(...numericSentiments) : 0;
+        const maxSentiment = numericSentiments.length ? Math.max(...numericSentiments) : 0;
+        const range = maxSentiment - minSentiment || 1;
+        rowsData.forEach(r => {
+          if (!isNaN(r.sentimentValue)) {
+            const pctRaw = (r.sentimentValue - minSentiment) / range;
+            r.sentimentPct = pctRaw.toFixed(2);
+          } else {
+            r.sentimentPct = '';
+          }
+        });
+        const weights = { wmonighe: 0.35, adp: 0.35, fp: 0.1, sentiment: 0.05, vorp: 0.15 };
+        rowsData.forEach(r => {
+          const items = [
+            { v: parseFloat(r.wmonighePct), w: weights.wmonighe },
+            { v: parseFloat(r.adpPct), w: weights.adp },
+            { v: parseFloat(r.fpPct), w: weights.fp },
+            { v: parseFloat(r.sentimentPct), w: weights.sentiment },
+            { v: parseFloat(r.vorpPct), w: weights.vorp }
+          ].filter(i => !isNaN(i.v) && i.w > 0);
+          const totalWeight = items.reduce((a, b) => a + b.w, 0);
+          let rating = '';
+          if (items.length && totalWeight > 0) {
+            const sum = items.reduce((s, i) => s + i.v * i.w, 0);
+            rating = (sum / totalWeight).toFixed(2);
+          }
+          ratingMap[canonicalName(r.player)] = rating;
+        });
+      } catch (err) {
+        console.error('Error loading ratings', err);
+      }
+    }
     async function loadTeams() {
       try {
+        await loadRatings();
         const rows = await fetch(rankingsUrl).then(res => res.json());
         rows.forEach(r => {
           const player = r.Player || r.player;
@@ -163,6 +297,14 @@
           if (player && team) {
             playerTeamMap[canonicalName(player)] = team;
           }
+        });
+        teams.forEach(team => {
+          ['QB', 'RB', 'WR', 'TE'].forEach(pos => {
+            team.players[pos] = team.players[pos].filter(p => {
+              const rating = parseFloat(ratingMap[canonicalName(p)]);
+              return !isNaN(rating) && rating > 0.1;
+            });
+          });
         });
       } catch (err) {
         console.error('Error loading team data:', err);
