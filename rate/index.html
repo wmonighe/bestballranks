@@ -41,7 +41,7 @@
         : '';
     }
 
-    const TeamVotingCard = ({ team }) => {
+    const TeamVotingCard = ({ team, onVote }) => {
       const { name, players } = team;
       const yesVotes = team.yesVotes || 0;
       const noVotes = team.noVotes || 0;
@@ -135,11 +135,11 @@
             </div>
           </div>
           <div className="flex justify-center space-x-2 mt-4">
-            <button className="flex items-center justify-center bg-green-600 text-white text-xs font-medium px-2 py-1 rounded hover:bg-green-700 active:bg-green-800 transition-colors duration-200">
+            <button onClick={() => onVote('yes')} className="flex items-center justify-center bg-green-600 text-white text-xs font-medium px-2 py-1 rounded hover:bg-green-700 active:bg-green-800 transition-colors duration-200">
               <span className="mr-1">👍</span>
               Yes
             </button>
-            <button className="flex items-center justify-center bg-red-600 text-white text-xs font-medium px-2 py-1 rounded hover:bg-red-700 active:bg-red-800 transition-colors duration-200">
+            <button onClick={() => onVote('no')} className="flex items-center justify-center bg-red-600 text-white text-xs font-medium px-2 py-1 rounded hover:bg-red-700 active:bg-red-800 transition-colors duration-200">
               <span className="mr-1">👎</span>
               No
             </button>
@@ -169,39 +169,76 @@
       }
     }
 
-    const demoTeam = {
-      name: 'Demo Team',
-      players: {
-        QB: ['Patrick Mahomes', 'Jalen Hurts', 'Lamar Jackson'],
-        RB: [
-          'Christian McCaffrey',
-          'Austin Ekeler',
-          'Bijan Robinson',
-          'Saquon Barkley',
-          'Jonathan Taylor',
-          'Nick Chubb'
-        ],
-        WR: [
-          'Justin Jefferson',
-          "Ja'Marr Chase",
-          'Cooper Kupp',
-          'Tyreek Hill',
-          'Stefon Diggs',
-          'A.J. Brown',
-          'CeeDee Lamb',
-          'Davante Adams'
-        ],
-        TE: ['Travis Kelce', 'Mark Andrews']
+    const teams = [
+      {
+        name: 'Demo Team',
+        players: {
+          QB: ['Patrick Mahomes', 'Jalen Hurts', 'Lamar Jackson'],
+          RB: [
+            'Christian McCaffrey',
+            'Austin Ekeler',
+            'Bijan Robinson',
+            'Saquon Barkley',
+            'Jonathan Taylor',
+            'Nick Chubb'
+          ],
+          WR: [
+            'Justin Jefferson',
+            "Ja'Marr Chase",
+            'Cooper Kupp',
+            'Tyreek Hill',
+            'Stefon Diggs',
+            'A.J. Brown',
+            'CeeDee Lamb',
+            'Davante Adams'
+          ],
+          TE: ['Travis Kelce', 'Mark Andrews']
+        },
+        yesVotes: 10,
+        noVotes: 3
       },
-      yesVotes: 10,
-      noVotes: 3
-    };
+      {
+        name: 'Team A',
+        players: {
+          QB: ['Josh Allen', 'Tua Tagovailoa'],
+          RB: ['Derrick Henry', 'Dalvin Cook'],
+          WR: ["Ja'Marr Chase", 'Stefon Diggs', 'Tyreek Hill'],
+          TE: ['George Kittle']
+        },
+        yesVotes: 5,
+        noVotes: 2
+      },
+      {
+        name: 'Team B',
+        players: {
+          QB: ['Joe Burrow', 'Justin Herbert'],
+          RB: ['Alvin Kamara', 'Tony Pollard'],
+          WR: ['DK Metcalf', 'CeeDee Lamb', 'A.J. Brown'],
+          TE: ['Darren Waller']
+        },
+        yesVotes: 2,
+        noVotes: 6
+      }
+    ];
+
+    function App() {
+      const [index, setIndex] = React.useState(0);
+
+      const handleVote = type => {
+        const team = teams[index];
+        team[`${type}Votes`] = (team[`${type}Votes`] || 0) + 1;
+        setIndex((index + 1) % teams.length);
+      };
+
+      React.useEffect(() => {
+        loadTeams();
+      }, []);
+
+      return <TeamVotingCard team={teams[index]} onVote={handleVote} />;
+    }
 
     const root = ReactDOM.createRoot(document.getElementById('app'));
-
-    loadTeams().then(() => {
-      root.render(<TeamVotingCard team={demoTeam} />);
-    });
+    root.render(<App />);
   </script>
 </body>
 </html>
