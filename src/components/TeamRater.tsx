@@ -2,11 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Team } from '../types';
 import { fetchNextTeam } from '../api/fetchNextTeam';
 import { rateTeam, Stats } from '../api/rateTeam';
-import { useXP, XP_PER_RATING } from '../hooks/useXP';
-import { useStreak } from '../hooks/useStreak';
-import { RatingOverlay } from './RatingOverlay';
-import { motion, AnimatePresence } from 'framer-motion';
-import { toast } from 'react-toastify';
+import { RatingSummary } from './RatingSummary';
 
 interface Props {
   initialTeam: Team;
@@ -15,11 +11,8 @@ interface Props {
 
 export const TeamRater = ({ initialTeam, initialStats }: Props) => {
   const [team, setTeam] = useState(initialTeam);
-  const [nextTeam, setNextTeam] = useState(null);
-  const [overlayStats, setOverlayStats] = useState(null);
-
-  const [xpState, addXP] = useXP(initialStats.xp);
-  const [streakState, incStreak] = useStreak({ streak: initialStats.streak, lastDate: null });
+  const [nextTeam, setNextTeam] = useState<Team | null>(null);
+  const [overlayStats, setOverlayStats] = useState<Stats | null>(null);
 
   useEffect(() => {
     fetchNextTeam().then(setNextTeam).catch(() => {});
@@ -28,36 +21,23 @@ export const TeamRater = ({ initialTeam, initialStats }: Props) => {
   const handleVote = async (rating: 'up' | 'down') => {
     try {
       const updated = await rateTeam({ teamId: team.id, rating });
-      addXP(XP_PER_RATING);
-      incStreak();
       setOverlayStats(updated);
       if (nextTeam) {
         setTeam(nextTeam);
         fetchNextTeam().then(setNextTeam).catch(() => {});
       }
-      toast.success('Rating submitted');
     } catch (err) {
-      toast.error('Error submitting rating');
+      // ignore
     }
   };
 
   return (
     <div className="relative w-full max-w-lg mx-auto">
-      <AnimatePresence>
-        {overlayStats && (
-          <RatingOverlay stats={overlayStats} onDismiss={() => setOverlayStats(null)} />
-        )}
-      </AnimatePresence>
+      {overlayStats && (
+        <RatingSummary stats={overlayStats} onDismiss={() => setOverlayStats(null)} />
+      )}
       <div className="overflow-hidden h-96 relative">
-        <AnimatePresence initial={false} custom={team.id}>
-          <motion.div
-            key={team.id}
-            initial={{ x: 300, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: -300, opacity: 0 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-            className="absolute inset-0"
-          >
+        <div className="absolute inset-0">
             {/* Render team info */}
             <div className="bg-white rounded-lg shadow p-4 h-full flex flex-col">
               <h2 className="text-xl font-bold mb-2 text-center">{team.name}</h2>
@@ -88,8 +68,8 @@ export const TeamRater = ({ initialTeam, initialStats }: Props) => {
                 </button>
               </div>
             </div>
-          </motion.div>
-        </AnimatePresence>
+          </div>
+        </div>
       </div>
     </div>
   );

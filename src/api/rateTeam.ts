@@ -4,10 +4,6 @@ export interface RateRequest {
 }
 export interface Stats {
   teamsRated: number;
-  xp: number;
-  level: number;
-  streak: number;
-  percentile: number;
 }
 
 export async function rateTeam(req: RateRequest): Promise<Stats> {

@@ -10,14 +10,10 @@
       "imports": {
         "react": "https://esm.sh/react@18",
         "react-dom": "https://esm.sh/react-dom@18",
-        "react-dom/client": "https://esm.sh/react-dom@18/client",
-        "framer-motion": "https://esm.sh/framer-motion@10",
-        "react-toastify": "https://esm.sh/react-toastify@9",
-        "react-confetti": "https://esm.sh/react-confetti@1"
+        "react-dom/client": "https://esm.sh/react-dom@18/client"
       }
     }
   </script>
-  <link rel="stylesheet" href="https://esm.sh/react-toastify@9/dist/ReactToastify.css" />
   <style>
     .team-logo {
       width: 30px;
@@ -34,7 +30,6 @@
     import React from 'react';
     import { createRoot } from 'react-dom/client';
     import { TeamRater } from './dist/components/TeamRater.js';
-    import { ToastContainer } from 'react-toastify';
 
     const demoTeams = [
       {
@@ -75,7 +70,7 @@
       }
     ];
 
-    const stats = { teamsRated: 0, xp: 0, level: 1, streak: 0, percentile: 0 };
+    const stats = { teamsRated: 0 };
     let idx = 0;
     const originalFetch = window.fetch.bind(window);
     window.fetch = async (url, opts) => {
@@ -86,10 +81,6 @@
       }
       if (url.endsWith('/api/rate')) {
         stats.teamsRated++;
-        stats.xp += 5;
-        stats.level = Math.floor(stats.xp / 100) + 1;
-        stats.streak++;
-        stats.percentile = Math.max(0, 100 - stats.teamsRated);
         return new Response(JSON.stringify(stats), { headers: { 'Content-Type': 'application/json' } });
       }
       return originalFetch(url, opts);
@@ -101,10 +92,7 @@
       const res = await fetch('/api/nextTeam');
       const team = await res.json();
       root.render(
-        React.createElement(React.Fragment, null,
-          React.createElement(TeamRater, { initialTeam: team, initialStats: stats }),
-          React.createElement(ToastContainer, { position: 'bottom-center' })
-        )
+        React.createElement(TeamRater, { initialTeam: team, initialStats: stats })
       );
     }
 
