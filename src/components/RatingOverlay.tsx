@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { Stats } from '../api/rateTeam';
 import Confetti from 'react-confetti';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BADGES } from '../constants/gamification';
 
 interface Props {
