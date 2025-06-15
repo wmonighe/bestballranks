@@ -6,7 +6,7 @@ the browser and displayed in a table.
 
 ## Usage
 
-Open `index.html` in a modern web browser. The page will fetch data from the
+Open `rank.html` in a modern web browser. The page will fetch data from the
 public spreadsheet and populate the table with the following columns. Above the
 table are slider controls that let you adjust the weighting of each metric when
 calculating the **Rating** value. Move the sliders and click **Update** to
@@ -23,7 +23,7 @@ recompute ratings.
 
 Note: values shown in parentheses represent the percentile rank for that metric.
 
-The spreadsheet ID and sheet names are configured directly in `index.html`.
+The spreadsheet ID and sheet names are configured directly in `rank.html`.
 
 ### Team Logos
 
