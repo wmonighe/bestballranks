@@ -64,6 +64,7 @@
         <input type="file" id="elim-file" accept=".csv">
         <span id="elim-status" class="status"></span>
       </div>
+      <div id="db-status" class="status"></div>
       <button id="upload-done">Done</button>
     </div>
   </div>
@@ -77,7 +78,9 @@
 
     const sheetId = '1rNouBdE-HbWafu-shO_5JLPSrLhr-xuGpXYfyOI-2oY';
     const rankingsUrl = `https://opensheet.elk.sh/${sheetId}/Rankings`;
-    const sentimentUrl = `https://opensheet.elk.sh/${sheetId}/Sentiment`;
+      const sentimentUrl = `https://opensheet.elk.sh/${sheetId}/Sentiment`;
+
+      const dbStatusEl = document.getElementById('db-status');
 
     function canonicalName(name){return (name||'').toString().toLowerCase().replace(/[.'’]/g,'').replace(/[^a-z0-9]+/g,' ').trim();}
     function canonicalField(name){return (name||'').toString().toLowerCase().replace(/[^a-z0-9]/g,'');}
@@ -216,22 +219,28 @@
       }
     }
 
-    async function uploadRowsToSupabase(rows,format){
-      try{
-        const allowed=['pre','post','elim'];
-        if(!allowed.includes(format)) return;
-        if(typeof supabase==='undefined') return;
-        for(let i=0;i<rows.length;i+=500){
-          const batch=rows.slice(i,i+500);
-          const{error}=await supabase
-            .from('underdog_draft_upload')
-            .insert(batch);
-          if(error) console.error('Supabase upload error',error);
+      async function uploadRowsToSupabase(rows,format){
+        try{
+          const allowed=['pre','post','elim'];
+          if(!allowed.includes(format)) return false;
+          if(typeof supabase==='undefined') return false;
+          let success=true;
+          for(let i=0;i<rows.length;i+=500){
+            const batch=rows.slice(i,i+500);
+            const {error}=await supabase
+              .from('underdog_draft_upload')
+              .insert(batch);
+            if(error){
+              console.error('Supabase upload error',error);
+              success=false;
+            }
+          }
+          return success;
+        }catch(err){
+          console.error('Supabase upload error',err);
+          return false;
         }
-      }catch(err){
-        console.error('Supabase upload error',err);
       }
-    }
 
     async function handleFile(file,statusEl,format){
       if(!file) return false;
@@ -243,7 +252,16 @@
         const allPresent=requiredHeaders.every(h=>headers.includes(h));
         if(!allPresent){statusEl.textContent='\u2717 Upload Failure';statusEl.className='status error';return false;}
         const rows=lines.slice(1).map(line=>{const values=line.split(',').map(v=>v.trim());const obj={};headers.forEach((h,i)=>obj[h]=values[i]);return obj;});
-        await uploadRowsToSupabase(rows,format);
+        const dbSuccess = await uploadRowsToSupabase(rows,format);
+        if(dbStatusEl){
+          if(dbSuccess){
+            dbStatusEl.textContent='lineup written to database';
+            dbStatusEl.className='status success';
+          }else{
+            dbStatusEl.textContent='database failure';
+            dbStatusEl.className='status error';
+          }
+        }
         const teams={};
         rows.forEach(r=>{const key=r['Draft Entry'];if(!teams[key]){teams[key]={tournamentTitle:r['Tournament Title'],entryFee:r['Tournament Entry Fee'],picks:[]};}teams[key].picks.push(r);});
         const teamArr=Object.values(teams);
