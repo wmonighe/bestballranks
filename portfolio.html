@@ -216,6 +216,23 @@
       }
     }
 
+    async function uploadRowsToSupabase(rows,format){
+      try{
+        const allowed=['pre','post','elim'];
+        if(!allowed.includes(format)) return;
+        if(typeof supabase==='undefined') return;
+        for(let i=0;i<rows.length;i+=500){
+          const batch=rows.slice(i,i+500);
+          const{error}=await supabase
+            .from('underdog_draft_upload')
+            .insert(batch);
+          if(error) console.error('Supabase upload error',error);
+        }
+      }catch(err){
+        console.error('Supabase upload error',err);
+      }
+    }
+
     async function handleFile(file,statusEl,format){
       if(!file) return false;
       await ratingsPromise;
@@ -226,6 +243,7 @@
         const allPresent=requiredHeaders.every(h=>headers.includes(h));
         if(!allPresent){statusEl.textContent='\u2717 Upload Failure';statusEl.className='status error';return false;}
         const rows=lines.slice(1).map(line=>{const values=line.split(',').map(v=>v.trim());const obj={};headers.forEach((h,i)=>obj[h]=values[i]);return obj;});
+        await uploadRowsToSupabase(rows,format);
         const teams={};
         rows.forEach(r=>{const key=r['Draft Entry'];if(!teams[key]){teams[key]={tournamentTitle:r['Tournament Title'],entryFee:r['Tournament Entry Fee'],picks:[]};}teams[key].picks.push(r);});
         const teamArr=Object.values(teams);
