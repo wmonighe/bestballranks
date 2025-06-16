@@ -20,6 +20,7 @@
 </head>
 <body class="bg-gray-100 p-4 min-h-screen flex items-center justify-center">
   <div id="app" class="max-w-4xl w-full"></div>
+  <div id="toast" class="hidden fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white px-4 py-2 rounded shadow-lg transition-opacity"></div>
   <script type="text/babel">
     const teamMap = { JAX: 'JAC' };
     const playerTeamMap = {};
@@ -393,9 +394,21 @@
     function App() {
       const [index, setIndex] = React.useState(0);
 
+      const showToast = vote => {
+        const toast = document.getElementById('toast');
+        const rand = Math.floor(Math.random() * 101);
+        const label = vote === 'yes' ? 'Yes' : 'No';
+        toast.textContent = `You voted ${label} on this team. ${rand} % of voters joined you in liking this team`;
+        toast.classList.remove('hidden');
+        setTimeout(() => {
+          toast.classList.add('hidden');
+        }, 3000);
+      };
+
       const handleVote = type => {
         const team = teams[index];
         team[`${type}Votes`] = (team[`${type}Votes`] || 0) + 1;
+        showToast(type);
         setIndex((index + 1) % teams.length);
       };
 
