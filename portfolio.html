@@ -253,12 +253,15 @@
             const batch=rows.slice(i,i+500);
             const first=batch[0];
             if(first){
-              const keys = Object.keys(first);
-              const values = keys
-                .map(k => (first[k] === null ? 'NULL' : JSON.stringify(first[k])))
-                .join(', ');
-              const quoted = keys.map(k => `"${k}"`).join(', ');
-              lastSqlQuery = `INSERT INTO underdog_draft_upload (${quoted}) VALUES (${values});`;
+              const keys=Object.keys(first);
+              const values=keys.map(k=>{
+                const v=first[k];
+                if(v===null||v===undefined||v==='') return 'NULL';
+                if(typeof v==='number') return v;
+                return `'${v.toString().replace(/'/g,"''")}'`;
+              }).join(', ');
+              const quoted=keys.map(k=>`"${k}"`).join(', ');
+              lastSqlQuery=`INSERT INTO underdog_draft_upload (${quoted}) VALUES (${values});`;
             }
             const {error}=await supabase
               .from('underdog_draft_upload')
@@ -284,12 +287,27 @@
         const headers=lines[0].split(',').map(h=>h.trim());
         const allPresent=requiredHeaders.every(h=>headers.includes(h));
         if(!allPresent){statusEl.textContent='\u2717 Upload Failure';statusEl.className='status error';return false;}
+        const intFields=[
+          'Pick Number','Draft Size','Tournament Size','Draft Pool Size','Weekly Winner Size'
+        ];
+        const floatFields=[
+          'Draft Entry Fee','Draft Total Prizes','Tournament Entry Fee','Tournament Total Prizes',
+          'Draft Pool Entry Fee','Draft Pool Total Prizes','Weekly Winner Entry Fee','Weekly Winner Total Prizes'
+        ];
+        const uuidFields=[
+          'Appearance','Draft','Draft Entry','Tournament','Draft Pool','Weekly Winner'
+        ];
         const rows=lines.slice(1).map(line=>{
           const values=line.split(',').map(v=>v.trim());
           const obj={};
           headers.forEach((h,i)=>{
-            let val = values[i];
-            if(h==='Weekly Winner Size' && !val) val=null;
+            let val=values[i];
+            if((intFields.includes(h)||floatFields.includes(h)||uuidFields.includes(h)||h==='Picked At') && val==='') val=null;
+            if(intFields.includes(h)&&val!==null){
+              const n=parseInt(val,10);val=isNaN(n)?null:n;
+            }else if(floatFields.includes(h)&&val!==null){
+              const n=parseFloat(val);val=isNaN(n)?null:n;
+            }
             obj[h]=val;
           });
           return obj;
