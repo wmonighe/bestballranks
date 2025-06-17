@@ -69,6 +69,13 @@
       <pre id="db-query" class="db-query"></pre>
     </div>
   </div>
+  <div id="query-modal" class="modal">
+    <div class="modal-content">
+      <h2>SQL Query</h2>
+      <pre id="query-content"></pre>
+      <button id="query-done">Done</button>
+    </div>
+  </div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="supabase.js"></script>
 
@@ -448,8 +455,20 @@
 
     document.getElementById('upload-done').addEventListener('click',()=>{
       document.getElementById('upload-modal').classList.remove('show');
+      if(lastSqlQuery){
+        const content=document.getElementById('query-content');
+        if(content){
+          content.textContent=lastSqlQuery;
+        }
+        const qmodal=document.getElementById('query-modal');
+        if(qmodal) qmodal.classList.add('show');
+      }
       updateFormatOptions();
       filterAndRender();
+    });
+
+    document.getElementById('query-done').addEventListener('click',()=>{
+      document.getElementById('query-modal').classList.remove('show');
     });
 
     document.getElementById('pre-file').addEventListener('change',async e=>{

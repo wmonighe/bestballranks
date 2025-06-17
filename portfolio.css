@@ -120,6 +120,13 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
   word-break:break-all;
   display:none;
 }
+#query-content{
+  margin-top:12px;
+  font-family:monospace;
+  white-space:pre-wrap;
+  word-break:break-all;
+  text-align:left;
+}
 
 /* Create a responsive masonry-like grid for each draft card */
 #portfolio-wrapper{
