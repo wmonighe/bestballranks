@@ -113,6 +113,12 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
 .status.success{color:green;}
 .status.error{color:red;}
 #db-status{margin-top:8px;}
+#db-query{
+  margin-top:4px;
+  font-family:monospace;
+  white-space:pre-wrap;
+  word-break:break-all;
+}
 
 /* Create a responsive masonry-like grid for each draft card */
 #portfolio-wrapper{
