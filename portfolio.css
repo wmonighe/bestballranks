@@ -118,6 +118,7 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
   font-family:monospace;
   white-space:pre-wrap;
   word-break:break-all;
+  display:none;
 }
 
 /* Create a responsive masonry-like grid for each draft card */

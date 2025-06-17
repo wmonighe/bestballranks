@@ -65,8 +65,8 @@
         <span id="elim-status" class="status"></span>
       </div>
       <div id="db-status" class="status"></div>
-      <pre id="db-query" class="db-query"></pre>
       <button id="upload-done">Done</button>
+      <pre id="db-query" class="db-query"></pre>
     </div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
@@ -84,6 +84,7 @@
       const dbStatusEl = document.getElementById('db-status');
       const dbQueryEl = document.getElementById('db-query');
       let lastSqlQuery = '';
+      if(dbQueryEl) dbQueryEl.style.display='none';
 
     function canonicalName(name){return (name||'').toString().toLowerCase().replace(/[.'’]/g,'').replace(/[^a-z0-9]+/g,' ').trim();}
     function canonicalField(name){return (name||'').toString().toLowerCase().replace(/[^a-z0-9]/g,'');}
@@ -266,11 +267,17 @@
           if(dbSuccess){
             dbStatusEl.textContent='lineup written to database';
             dbStatusEl.className='status success';
-            if(dbQueryEl) dbQueryEl.textContent='';
+            if(dbQueryEl){
+              dbQueryEl.textContent='';
+              dbQueryEl.style.display='none';
+            }
           }else{
             dbStatusEl.textContent='database failure';
             dbStatusEl.className='status error';
-            if(dbQueryEl) dbQueryEl.textContent=lastSqlQuery;
+            if(dbQueryEl){
+              dbQueryEl.textContent=lastSqlQuery;
+              dbQueryEl.style.display='block';
+            }
           }
         }
         const teams={};
