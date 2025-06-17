@@ -253,11 +253,12 @@
             const batch=rows.slice(i,i+500);
             const first=batch[0];
             if(first){
-              const keys=Object.keys(first);
-              const values=keys.map(k=>
-                first[k]===null ? 'NULL' : JSON.stringify(first[k])
-              ).join(', ');
-              lastSqlQuery=`INSERT INTO underdog_draft_upload (${keys.join(', ')}) VALUES (${values});`;
+              const keys = Object.keys(first);
+              const values = keys
+                .map(k => (first[k] === null ? 'NULL' : JSON.stringify(first[k])))
+                .join(', ');
+              const quoted = keys.map(k => `"${k}"`).join(', ');
+              lastSqlQuery = `INSERT INTO underdog_draft_upload (${quoted}) VALUES (${values});`;
             }
             const {error}=await supabase
               .from('underdog_draft_upload')
