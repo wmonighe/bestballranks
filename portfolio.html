@@ -65,6 +65,7 @@
         <span id="elim-status" class="status"></span>
       </div>
       <div id="db-status" class="status"></div>
+      <pre id="db-query" class="db-query"></pre>
       <button id="upload-done">Done</button>
     </div>
   </div>
@@ -81,6 +82,8 @@
       const sentimentUrl = `https://opensheet.elk.sh/${sheetId}/Sentiment`;
 
       const dbStatusEl = document.getElementById('db-status');
+      const dbQueryEl = document.getElementById('db-query');
+      let lastSqlQuery = '';
 
     function canonicalName(name){return (name||'').toString().toLowerCase().replace(/[.'’]/g,'').replace(/[^a-z0-9]+/g,' ').trim();}
     function canonicalField(name){return (name||'').toString().toLowerCase().replace(/[^a-z0-9]/g,'');}
@@ -227,6 +230,12 @@
           let success=true;
           for(let i=0;i<rows.length;i+=500){
             const batch=rows.slice(i,i+500);
+            const first=batch[0];
+            if(first){
+              const keys=Object.keys(first);
+              const values=keys.map(k=>JSON.stringify(first[k])).join(', ');
+              lastSqlQuery=`INSERT INTO underdog_draft_upload (${keys.join(', ')}) VALUES (${values});`;
+            }
             const {error}=await supabase
               .from('underdog_draft_upload')
               .insert(batch);
@@ -257,9 +266,11 @@
           if(dbSuccess){
             dbStatusEl.textContent='lineup written to database';
             dbStatusEl.className='status success';
+            if(dbQueryEl) dbQueryEl.textContent='';
           }else{
             dbStatusEl.textContent='database failure';
             dbStatusEl.className='status error';
+            if(dbQueryEl) dbQueryEl.textContent=lastSqlQuery;
           }
         }
         const teams={};
