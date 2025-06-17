@@ -254,7 +254,9 @@
             const first=batch[0];
             if(first){
               const keys=Object.keys(first);
-              const values=keys.map(k=>JSON.stringify(first[k])).join(', ');
+              const values=keys.map(k=>
+                first[k]===null ? 'NULL' : JSON.stringify(first[k])
+              ).join(', ');
               lastSqlQuery=`INSERT INTO underdog_draft_upload (${keys.join(', ')}) VALUES (${values});`;
             }
             const {error}=await supabase
@@ -281,7 +283,16 @@
         const headers=lines[0].split(',').map(h=>h.trim());
         const allPresent=requiredHeaders.every(h=>headers.includes(h));
         if(!allPresent){statusEl.textContent='\u2717 Upload Failure';statusEl.className='status error';return false;}
-        const rows=lines.slice(1).map(line=>{const values=line.split(',').map(v=>v.trim());const obj={};headers.forEach((h,i)=>obj[h]=values[i]);return obj;});
+        const rows=lines.slice(1).map(line=>{
+          const values=line.split(',').map(v=>v.trim());
+          const obj={};
+          headers.forEach((h,i)=>{
+            let val = values[i];
+            if(h==='Weekly Winner Size' && !val) val=null;
+            obj[h]=val;
+          });
+          return obj;
+        });
         const dbSuccess = await uploadRowsToSupabase(rows,format);
         if(dbStatusEl){
           if(dbSuccess){
