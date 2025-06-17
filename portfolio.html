@@ -249,6 +249,21 @@
           if(!allowed.includes(format)) return false;
           if(typeof supabase==='undefined') return false;
           let success=true;
+
+          const entryIds=[...new Set(rows.map(r=>r['Draft Entry']).filter(v=>v))];
+          if(entryIds.length){
+            const {data:existing,error:selectErr}=await supabase
+              .from('underdog_draft_upload')
+              .select('"Draft Entry"')
+              .in('Draft Entry',entryIds);
+            if(selectErr){
+              console.error('Supabase fetch error',selectErr);
+            }else if(existing){
+              const existingSet=new Set(existing.map(e=>e['Draft Entry']));
+              rows=rows.filter(r=>!existingSet.has(r['Draft Entry']));
+            }
+          }
+
           for(let i=0;i<rows.length;i+=500){
             const batch=rows.slice(i,i+500);
             const first=batch[0];
