@@ -120,6 +120,18 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
   word-break:break-all;
   display:none;
 }
+#last-query-container{
+  margin:20px 32px 0;
+}
+#last-query-container p{
+  margin:0 0 4px;
+  font-weight:600;
+}
+#last-query{
+  font-family:monospace;
+  white-space:pre-wrap;
+  word-break:break-all;
+}
 #query-content{
   margin-top:12px;
   font-family:monospace;

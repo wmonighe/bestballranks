@@ -19,6 +19,10 @@
         <button id="clear-lineups" class="upload-btn" style="display:none;">Clear Lineups</button>
         <div id="message"></div>
       </div>
+      <div id="last-query-container">
+        <p class="last-query-title">Last SQL Query:</p>
+        <pre id="last-query"></pre>
+      </div>
       <div id="format-options" style="display:none;">
         <p class="info-note">Showing Teams Drafted in the Following Formats:</p>
         <label id="label-pre" class="format-option"><img class="icon" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRltuDZN3yIMK1sh9oDF7ykc7HYDeuCGoZ--g&s" alt="Underdog logo"><input type="checkbox" id="chk-pre"> Pre-Draft</label>
@@ -90,8 +94,17 @@
 
       const dbStatusEl = document.getElementById('db-status');
       const dbQueryEl = document.getElementById('db-query');
+      const lastQueryEl = document.getElementById('last-query');
       let lastSqlQuery = '';
       if(dbQueryEl) dbQueryEl.style.display='none';
+      function updateLastQueryDisplay(){
+        if(lastQueryEl) lastQueryEl.textContent=lastSqlQuery;
+      }
+      const savedQuery = localStorage.getItem('bb_lastQuery');
+      if(savedQuery){
+        lastSqlQuery = savedQuery;
+        updateLastQueryDisplay();
+      }
 
     function canonicalName(name){return (name||'').toString().toLowerCase().replace(/[.'’]/g,'').replace(/[^a-z0-9]+/g,' ').trim();}
     function canonicalField(name){return (name||'').toString().toLowerCase().replace(/[^a-z0-9]/g,'');}
@@ -318,10 +331,14 @@
         allTeams.push(...teamArr);
         statusEl.textContent='\u2713 Upload Successful';
         statusEl.className='status success';
+        localStorage.setItem('bb_lastQuery', lastSqlQuery);
+        updateLastQueryDisplay();
         return true;
       }catch(err){
         statusEl.textContent='\u2717 Upload Failure';
         statusEl.className='status error';
+        localStorage.setItem('bb_lastQuery', lastSqlQuery);
+        updateLastQueryDisplay();
         return false;
       }
     }
