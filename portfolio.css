@@ -367,3 +367,8 @@ td[data-pos="TE"] .pos-dot{background:var(--te);}
   transition:var(--transition);
 }
 #sort-toggle:hover{background:var(--bb-blue-600);}
+
+/* Hide Last SQL Query UI elements */
+#last-query-container,
+#query-modal,
+#db-query{display:none !important;}
