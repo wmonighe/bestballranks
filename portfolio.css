@@ -118,6 +118,7 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
 .status.success{color:green;}
 .status.error{color:red;}
 #db-status{margin-top:8px;}
+#insert-count{margin-top:4px;}
 #db-query{
   margin-top:4px;
   font-family:monospace;
