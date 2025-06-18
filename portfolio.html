@@ -45,6 +45,7 @@
       </div>
     </div>
     <div id="teams"></div>
+    <div id="pagination"></div>
   </div>
 
   <div id="upload-modal" class="modal">
@@ -173,6 +174,9 @@
     const uploadedFormats={pre:false,post:false,elim:false};
     let sortOrder='desc';
     let uploading=false;
+    let currentPage=1;
+    const pageSize=100;
+    let filteredTeams=[];
 
     function saveUploads(){
       try{
@@ -515,6 +519,34 @@
       requestAnimationFrame(standardizeTableHeights);
     }
 
+    function showPage(page){
+      const totalPages=Math.max(1,Math.ceil(filteredTeams.length/pageSize));
+      if(page<1) page=1;
+      if(page>totalPages) page=totalPages;
+      currentPage=page;
+      const start=(currentPage-1)*pageSize;
+      const slice=filteredTeams.slice(start,start+pageSize);
+      renderTeams(slice,sortOrder);
+      const pagination=document.getElementById('pagination');
+      if(!pagination) return;
+      pagination.innerHTML='';
+      if(totalPages>1){
+        const prev=document.createElement('button');
+        prev.textContent='Prev';
+        prev.disabled=currentPage===1;
+        prev.addEventListener('click',()=>showPage(currentPage-1));
+        pagination.appendChild(prev);
+        const info=document.createElement('span');
+        info.textContent=` Page ${currentPage} of ${totalPages} `;
+        pagination.appendChild(info);
+        const next=document.createElement('button');
+        next.textContent='Next';
+        next.disabled=currentPage===totalPages;
+        next.addEventListener('click',()=>showPage(currentPage+1));
+        pagination.appendChild(next);
+      }
+    }
+
     function filterAndRender(){
       const selected=[];
       if(document.getElementById('chk-pre').checked) selected.push('pre');
@@ -530,7 +562,8 @@
         if(endDate&&t.draftDate&&t.draftDate>endDate) return false;
         return true;
       });
-      renderTeams(filtered,sortOrder);
+      filteredTeams=filtered;
+      showPage(1);
     }
 
     function standardizeTableHeights(){
