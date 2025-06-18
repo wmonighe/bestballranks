@@ -73,6 +73,7 @@
       </div>
       <div id="db-status" class="status"></div>
       <button id="upload-done">Done</button>
+      <div id="insert-count" class="status"></div>
       <pre id="db-query" class="db-query"></pre>
     </div>
   </div>
@@ -97,8 +98,10 @@
 
       const dbStatusEl = document.getElementById('db-status');
       const dbQueryEl = document.getElementById('db-query');
+      const insertCountEl = document.getElementById('insert-count');
       const lastQueryEl = document.getElementById('last-query');
       let lastSqlQuery = '';
+      let lastInsertCount = 0;
       if(dbQueryEl) dbQueryEl.style.display='none';
       function updateLastQueryDisplay(){
         if(lastQueryEl) lastQueryEl.textContent=lastSqlQuery;
@@ -261,6 +264,7 @@
           if(!allowed.includes(format)) return false;
           if(typeof supabase==='undefined') return false;
           let success=true;
+          lastInsertCount=0;
 
           const entryIds=[...new Set(rows.map(r=>r['Draft Entry']).filter(v=>v))];
           if(entryIds.length){
@@ -275,6 +279,8 @@
               rows=rows.filter(r=>!existingSet.has(r['Draft Entry']));
             }
           }
+
+          lastInsertCount = rows.length;
 
           for(let i=0;i<rows.length;i+=500){
             const batch=rows.slice(i,i+500);
@@ -302,6 +308,7 @@
               progressCb(pct);
             }
           }
+          if(!success) lastInsertCount = 0;
           return success;
         }catch(err){
           console.error('Supabase upload error',err);
@@ -349,6 +356,9 @@
           if(progressEl){progressEl.value=pct;}
         });
         if(progressEl){progressEl.style.display='none';progressEl.value=0;}
+        if(insertCountEl){
+          insertCountEl.textContent = dbSuccess ? `Inserted ${lastInsertCount} rows.` : '';
+        }
         if(dbStatusEl){
           if(dbSuccess){
             dbStatusEl.textContent='lineup written to database';
@@ -534,6 +544,7 @@
 
     document.getElementById('open-modal').addEventListener('click',()=>{
       document.getElementById('upload-modal').classList.add('show');
+      if(insertCountEl) insertCountEl.textContent='';
     });
 
     document.getElementById('upload-done').addEventListener('click',()=>{
