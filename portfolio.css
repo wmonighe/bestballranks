@@ -378,3 +378,27 @@ td[data-pos="TE"] .pos-dot{background:var(--te);}
 #last-query-container,
 #query-modal,
 #db-query{display:none !important;}
+
+/* Pagination controls */
+#pagination{
+  text-align:center;
+  margin:20px 0;
+}
+#pagination button{
+  padding:4px 8px;
+  margin:0 6px;
+  font-family:inherit;
+  background:var(--bb-blue-500);
+  color:#fff;
+  border:none;
+  border-radius:var(--radius);
+  cursor:pointer;
+  transition:var(--transition);
+}
+#pagination button[disabled]{
+  opacity:0.5;
+  cursor:default;
+}
+#pagination button:not([disabled]):hover{
+  background:var(--bb-blue-600);
+}
