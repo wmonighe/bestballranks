@@ -44,7 +44,11 @@
         </label>
       </div>
     </div>
-    <div id="teams"></div>
+      <div id="exposure-panel" class="collapsed">
+        <div id="exposure-header" class="panel-header">Exposure Summary &#9660;</div>
+        <div class="panel-content"></div>
+      </div>
+      <div id="teams"></div>
     <div id="pagination"></div>
   </div>
 
@@ -519,7 +523,7 @@
       requestAnimationFrame(standardizeTableHeights);
     }
 
-    function showPage(page){
+  function showPage(page){
       const totalPages=Math.max(1,Math.ceil(filteredTeams.length/pageSize));
       if(page<1) page=1;
       if(page>totalPages) page=totalPages;
@@ -545,9 +549,37 @@
         next.addEventListener('click',()=>showPage(currentPage+1));
         pagination.appendChild(next);
       }
-    }
+  }
 
-    function filterAndRender(){
+  function updateExposureSummary(){
+    const panel=document.getElementById('exposure-panel');
+    const content=panel.querySelector('.panel-content');
+    const total=filteredTeams.length;
+    const freq={};
+    filteredTeams.forEach(team=>{
+      team.picks.forEach(p=>{
+        const name=`${p['First Name']} ${p['Last Name']}`.trim();
+        if(name) freq[name]=(freq[name]||0)+1;
+      });
+    });
+    const rows=Object.entries(freq).sort((a,b)=>b[1]-a[1]);
+    const table=document.createElement('table');
+    table.innerHTML='<thead><tr><th>Player</th><th>Appearances</th><th>% of Lineups</th></tr></thead>';
+    const tbody=document.createElement('tbody');
+    rows.forEach(([name,count])=>{
+      const pct=total?((count/total)*100).toFixed(1):'0';
+      const tr=document.createElement('tr');
+      tr.innerHTML=`<td>${name}</td><td>${count}</td><td>${pct}%</td>`;
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    content.innerHTML='';
+    content.appendChild(table);
+    const header=document.getElementById('exposure-header');
+    panel.style.maxHeight=header.offsetHeight+'px';
+  }
+
+  function filterAndRender(){
       const selected=[];
       if(document.getElementById('chk-pre').checked) selected.push('pre');
       if(document.getElementById('chk-post').checked) selected.push('post');
@@ -562,9 +594,10 @@
         if(endDate&&t.draftDate&&t.draftDate>endDate) return false;
         return true;
       });
-      filteredTeams=filtered;
-      showPage(1);
-    }
+    filteredTeams=filtered;
+    showPage(1);
+    updateExposureSummary();
+  }
 
     function standardizeTableHeights(){
       ['18','20'].forEach(size=>{
@@ -670,11 +703,28 @@
     document.getElementById('chk-elim').addEventListener('change',filterAndRender);
     document.getElementById('start-date').addEventListener('change',filterAndRender);
     document.getElementById('end-date').addEventListener('change',filterAndRender);
-    document.getElementById('sort-toggle').addEventListener('click',()=>{
-      sortOrder = sortOrder==='desc' ? 'asc' : 'desc';
-      document.getElementById('sort-toggle').innerHTML = sortOrder==='desc' ? '&#8595;' : '&#8593;';
-      filterAndRender();
-    });
+  document.getElementById('sort-toggle').addEventListener('click',()=>{
+    sortOrder = sortOrder==='desc' ? 'asc' : 'desc';
+    document.getElementById('sort-toggle').innerHTML = sortOrder==='desc' ? '&#8595;' : '&#8593;';
+    filterAndRender();
+  });
+
+  const exposureHeader=document.getElementById('exposure-header');
+  const exposurePanel=document.getElementById('exposure-panel');
+  exposureHeader.addEventListener('click',()=>{
+    const expanded=!exposurePanel.classList.contains('expanded');
+    if(expanded){
+      exposurePanel.classList.add('expanded');
+      exposurePanel.classList.remove('collapsed');
+      exposurePanel.style.maxHeight=exposurePanel.scrollHeight+'px';
+      exposureHeader.innerHTML='Exposure Summary &#9650;';
+    }else{
+      exposurePanel.classList.remove('expanded');
+      exposurePanel.classList.add('collapsed');
+      exposurePanel.style.maxHeight=exposureHeader.offsetHeight+'px';
+      exposureHeader.innerHTML='Exposure Summary &#9660;';
+    }
+  });
   </script>
 </body>
 </html>
