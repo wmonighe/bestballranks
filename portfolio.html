@@ -48,6 +48,17 @@
     <div id="pagination"></div>
   </div>
 
+  <div id="exposure-sidebar" class="collapsed">
+    <button id="exposure-toggle" aria-label="Toggle exposure sidebar">&#9654;</button>
+    <div id="exposure-content">
+      <h3>Player Exposure</h3>
+      <table id="exposure-table" class="player-table">
+        <thead><tr><th>Player</th><th>#</th><th>%</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+
   <div id="upload-modal" class="modal">
     <div class="modal-content">
       <h2>Select CSVs to Upload</h2>
@@ -564,6 +575,38 @@
       });
       filteredTeams=filtered;
       showPage(1);
+      updateExposureSidebar();
+    }
+
+    function computePlayerExposure(teams){
+      const map={};
+      teams.forEach(team=>{
+        const seen=new Set();
+        team.picks.forEach(p=>{
+          const name=`${p['First Name']} ${p['Last Name']}`;
+          const canon=canonicalName(name);
+          if(seen.has(canon)) return;
+          seen.add(canon);
+          if(!map[canon]) map[canon]={name,count:0};
+          map[canon].count++;
+        });
+      });
+      const total=teams.length||1;
+      return Object.values(map)
+        .sort((a,b)=>b.count-a.count||a.name.localeCompare(b.name))
+        .map(p=>({name:p.name,count:p.count,pct:((p.count/total)*100).toFixed(1)}));
+    }
+
+    function updateExposureSidebar(){
+      const tbody=document.querySelector('#exposure-table tbody');
+      if(!tbody) return;
+      tbody.innerHTML='';
+      const exposures=computePlayerExposure(filteredTeams);
+      exposures.forEach(p=>{
+        const tr=document.createElement('tr');
+        tr.innerHTML=`<td>${p.name}</td><td>${p.count}</td><td>${p.pct}%</td>`;
+        tbody.appendChild(tr);
+      });
     }
 
     function standardizeTableHeights(){
@@ -674,6 +717,18 @@
       sortOrder = sortOrder==='desc' ? 'asc' : 'desc';
       document.getElementById('sort-toggle').innerHTML = sortOrder==='desc' ? '&#8595;' : '&#8593;';
       filterAndRender();
+    });
+
+    document.getElementById('exposure-toggle').addEventListener('click',()=>{
+      const sb=document.getElementById('exposure-sidebar');
+      const expanded=sb.classList.toggle('expanded');
+      if(expanded){
+        sb.classList.remove('collapsed');
+        document.getElementById('exposure-toggle').innerHTML='&#9664;';
+      }else{
+        sb.classList.add('collapsed');
+        document.getElementById('exposure-toggle').innerHTML='&#9654;';
+      }
     });
   </script>
 </body>
