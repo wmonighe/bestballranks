@@ -151,50 +151,6 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
   display:block;
 }
 
-/* Collapsible exposure summary panel */
-#exposure-panel{
-  margin:20px 32px;
-  border:2px solid var(--bb-blue-500);
-  border-radius:var(--radius);
-  background:var(--bb-surface);
-  overflow:hidden;
-  transition:max-height var(--transition);
-}
-#exposure-panel .panel-header{
-  background:var(--bb-blue-500);
-  color:#fff;
-  font-weight:600;
-  padding:10px 16px;
-  cursor:pointer;
-}
-#exposure-panel.collapsed .panel-header{
-  position:sticky;
-  top:0;
-  z-index:5;
-}
-#exposure-panel .panel-content{
-  padding:16px;
-}
-#exposure-panel table{
-  width:100%;
-  border-collapse:collapse;
-  table-layout:fixed;
-}
-#exposure-panel th,
-#exposure-panel td{
-  padding:8px 10px;
-  border-bottom:1px solid var(--bb-border);
-  word-break:break-word;
-  text-align:left;
-}
-#exposure-panel th{background:var(--bb-blue-50);}
-
-@media(max-width:700px){
-  #exposure-panel{
-    margin:12px 16px;
-  }
-}
-
 /* Display lineup cards in a centered responsive grid */
 #teams{
   display:grid;
