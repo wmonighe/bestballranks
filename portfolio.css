@@ -109,6 +109,11 @@ label.browse-btn{
   transition:var(--transition);
 }
 label.browse-btn:hover{background:var(--bb-blue-600);}
+.upload-progress{
+  width:120px;
+  height:8px;
+  vertical-align:middle;
+}
 .status{font-weight:600;}
 .status.success{color:green;}
 .status.error{color:red;}

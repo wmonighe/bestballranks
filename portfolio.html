@@ -54,18 +54,21 @@
         <span>Pre-Draft (Underdog)</span>
         <label for="pre-file" class="browse-btn">Browse</label>
         <input type="file" id="pre-file" accept=".csv">
+        <progress id="pre-progress" max="100" value="0" class="upload-progress" style="display:none;"></progress>
         <span id="pre-status" class="status"></span>
       </div>
       <div class="upload-row">
         <span>Post-Draft (Underdog)</span>
         <label for="post-file" class="browse-btn">Browse</label>
         <input type="file" id="post-file" accept=".csv">
+        <progress id="post-progress" max="100" value="0" class="upload-progress" style="display:none;"></progress>
         <span id="post-status" class="status"></span>
       </div>
       <div class="upload-row">
         <span>Eliminator</span>
         <label for="elim-file" class="browse-btn">Browse</label>
         <input type="file" id="elim-file" accept=".csv">
+        <progress id="elim-progress" max="100" value="0" class="upload-progress" style="display:none;"></progress>
         <span id="elim-status" class="status"></span>
       </div>
       <div id="db-status" class="status"></div>
@@ -166,6 +169,7 @@
     const allTeams=[];
     const uploadedFormats={pre:false,post:false,elim:false};
     let sortOrder='desc';
+    let uploading=false;
 
     function saveUploads(){
       try{
@@ -243,7 +247,15 @@
       }
     }
 
-      async function uploadRowsToSupabase(rows,format){
+    function setUploading(state){
+      uploading=state;
+      ['pre-file','post-file','elim-file'].forEach(id=>{
+        const el=document.getElementById(id);
+        if(el) el.disabled=state;
+      });
+    }
+
+      async function uploadRowsToSupabase(rows,format,progressCb){
         try{
           const allowed=['pre','post','elim'];
           if(!allowed.includes(format)) return false;
@@ -285,6 +297,10 @@
               console.error('Supabase upload error',error);
               success=false;
             }
+            if(progressCb){
+              const pct=Math.min(100,Math.round(((i+batch.length)/rows.length)*100));
+              progressCb(pct);
+            }
           }
           return success;
         }catch(err){
@@ -293,10 +309,11 @@
         }
       }
 
-    async function handleFile(file,statusEl,format){
+    async function handleFile(file,statusEl,format,progressEl){
       if(!file) return false;
       await ratingsPromise;
       try{
+        if(statusEl){statusEl.textContent='Uploading...';statusEl.className='status';}
         const text=await file.text();
         const lines=text.trim().split(/\r?\n/).filter(l=>l.trim()!=='');
         const headers=lines[0].split(',').map(h=>h.trim());
@@ -327,7 +344,11 @@
           });
           return obj;
         });
-        const dbSuccess = await uploadRowsToSupabase(rows,format);
+        if(progressEl){progressEl.style.display='inline';progressEl.value=0;}
+        const dbSuccess = await uploadRowsToSupabase(rows,format,pct=>{
+          if(progressEl){progressEl.value=pct;}
+        });
+        if(progressEl){progressEl.style.display='none';progressEl.value=0;}
         if(dbStatusEl){
           if(dbSuccess){
             dbStatusEl.textContent='lineup written to database';
@@ -534,31 +555,55 @@
     });
 
     document.getElementById('pre-file').addEventListener('change',async e=>{
-      const success=await handleFile(e.target.files[0],document.getElementById('pre-status'),'pre');
+      if(uploading) return;
+      setUploading(true);
+      const success=await handleFile(
+        e.target.files[0],
+        document.getElementById('pre-status'),
+        'pre',
+        document.getElementById('pre-progress')
+      );
       if(success){
         uploadedFormats.pre=true;
         saveUploads();
       }
       updateFormatOptions();
       e.target.value='';
+      setUploading(false);
     });
     document.getElementById('post-file').addEventListener('change',async e=>{
-      const success=await handleFile(e.target.files[0],document.getElementById('post-status'),'post');
+      if(uploading) return;
+      setUploading(true);
+      const success=await handleFile(
+        e.target.files[0],
+        document.getElementById('post-status'),
+        'post',
+        document.getElementById('post-progress')
+      );
       if(success){
         uploadedFormats.post=true;
         saveUploads();
       }
       updateFormatOptions();
       e.target.value='';
+      setUploading(false);
     });
     document.getElementById('elim-file').addEventListener('change',async e=>{
-      const success=await handleFile(e.target.files[0],document.getElementById('elim-status'),'elim');
+      if(uploading) return;
+      setUploading(true);
+      const success=await handleFile(
+        e.target.files[0],
+        document.getElementById('elim-status'),
+        'elim',
+        document.getElementById('elim-progress')
+      );
       if(success){
         uploadedFormats.elim=true;
         saveUploads();
       }
       updateFormatOptions();
       e.target.value='';
+      setUploading(false);
     });
 
     document.getElementById('clear-lineups').addEventListener('click',()=>{
