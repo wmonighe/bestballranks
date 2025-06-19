@@ -707,7 +707,7 @@
       msg.innerHTML=`My lineup scored ${pct}. How do your teams compare? <a href="portfolio.html">See now.</a>`;
       clone.appendChild(msg);
       clone.style.width=card.offsetWidth+'px';
-      html2canvas(clone).then(canvas=>{
+      html2canvas(clone,{useCORS:true}).then(canvas=>{
         document.getElementById('share-image').src=canvas.toDataURL();
         document.getElementById('share-link').value=location.origin+'/portfolio.html';
         document.getElementById('share-modal').classList.add('show');
