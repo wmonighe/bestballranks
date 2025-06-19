@@ -44,6 +44,16 @@
           </button>
         </label>
       </div>
+      <div id="view-control" style="display:none;">
+        <label>View Mode:
+          <button id="view-card" class="view-toggle selected" aria-label="Card view">
+            <i class="fa-solid fa-th-large" aria-hidden="true"></i>
+          </button>
+          <button id="view-list" class="view-toggle" aria-label="List view">
+            <i class="fa-solid fa-list" aria-hidden="true"></i>
+          </button>
+        </label>
+      </div>
     </div>
     <div id="teams"></div>
     <div id="pagination"></div>
@@ -202,6 +212,7 @@
     const allTeams=[];
     const uploadedFormats={pre:false,post:false,elim:false};
     let sortOrder='desc';
+    let viewMode='card';
     let uploading=false;
     let currentPage=1;
     const pageSize=21;
@@ -242,10 +253,12 @@
       const elimLabel=document.getElementById('label-elim');
       const dateFilter=document.getElementById('date-filter');
       const sortControl=document.getElementById('sort-control');
+      const viewControl=document.getElementById('view-control');
       const anyUploaded=uploadedFormats.pre||uploadedFormats.post||uploadedFormats.elim;
       container.style.display=anyUploaded?'block':'none';
       if(dateFilter) dateFilter.style.display=anyUploaded?'block':'none';
       if(sortControl) sortControl.style.display=anyUploaded?'block':'none';
+      if(viewControl) viewControl.style.display=anyUploaded?'block':'none';
       if(anyUploaded&&dateFilter){
         const startInput=document.getElementById('start-date');
         const endInput=document.getElementById('end-date');
@@ -833,6 +846,16 @@
       sortOrder = sortOrder==='desc' ? 'asc' : 'desc';
       document.getElementById('sort-toggle').innerHTML = sortOrder==='desc' ? '&#8595;' : '&#8593;';
       filterAndRender();
+    });
+    document.getElementById('view-card').addEventListener('click',()=>{
+      viewMode='card';
+      document.getElementById('view-card').classList.add('selected');
+      document.getElementById('view-list').classList.remove('selected');
+    });
+    document.getElementById('view-list').addEventListener('click',()=>{
+      viewMode='list';
+      document.getElementById('view-list').classList.add('selected');
+      document.getElementById('view-card').classList.remove('selected');
     });
 
     initExposureDrawer();
