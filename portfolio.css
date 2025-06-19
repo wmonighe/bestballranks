@@ -154,10 +154,10 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
 /* Display lineup cards in a centered responsive grid */
 #teams{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(400px,1fr));
-  gap:16px;
-  margin:24px auto;
-  padding:0 24px;
+  grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+  gap:12px;
+  margin:20px auto;
+  padding:0 20px;
   max-width:1880px;
   align-items:start;
   justify-content:center;
@@ -170,17 +170,17 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
   border:2px solid var(--bb-blue-500);
   border-radius:var(--radius);
   box-shadow:var(--bb-shadow);
-  padding:8px;
-  font-size:.9em;
+  padding:6px;
+  font-size:.72em;
 
   overflow-x:auto;
 }
 .draft-card h2{
-  margin:0 0 6px;
-  font-size:16px;
+  margin:0 0 5px;
+  font-size:13px;
   color:var(--bb-blue-600);
   font-weight:700;
-  min-height:28px;
+  min-height:22px;
 }
 .draft-card h2 img.icon{
   width:0.6em;
@@ -191,20 +191,20 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
 .rating-pill{
   display:inline-block;
   margin-left:8px;
-  padding:2px 6px;
+  padding:2px 5px;
   border-radius:9999px;
   font-weight:600;
-  font-size:12px;
+  font-size:10px;
 }
 .rating-emojis{
   margin-left:6px;
-  font-size:16px;
+  font-size:13px;
 }
 
 /* Team logos */
 .team-logo{
-  width:20px;
-  height:20px;
+  width:16px;
+  height:16px;
   object-fit:contain;
   margin-right:8px;
   vertical-align:middle;
@@ -215,8 +215,8 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
   display:inline-flex;
   flex-wrap:wrap;
   align-items:center;
-  gap:8px;
-  margin-bottom:8px;
+  gap:6px;
+  margin-bottom:6px;
 }
 .team-count{
   display:inline-flex;
@@ -227,7 +227,7 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
 /* Label above the team exposure summary */
 .summary-label{
   display:block;
-  font-size:12px;
+  font-size:10px;
   font-weight:600;
   color:var(--bb-muted);
   margin-bottom:4px;
@@ -237,7 +237,7 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
 .player-table{
   width:100%;
   border-collapse:collapse;
-  font-size:12px;
+  font-size:10px;
   table-layout:fixed;
 }
 .player-table th,
@@ -251,13 +251,13 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
 .player-table thead th{
   background:var(--bb-blue-500);
   color:#fff;
-  padding:4px;
+  padding:3px;
   font-weight:600;
 }
 .player-table tbody tr:nth-child(even){background:var(--bb-blue-50);}
 .player-table tbody tr:hover{background:var(--bb-gold-200);}
 .player-table td{
-  padding:2px 4px;
+  padding:2px 3px;
   border-bottom:1px solid var(--bb-border);
 }
 
