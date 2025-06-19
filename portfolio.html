@@ -186,7 +186,7 @@
     let sortOrder='desc';
     let uploading=false;
     let currentPage=1;
-    const pageSize=20;
+    const pageSize=21;
     let filteredTeams=[];
 
     function saveUploads(){
@@ -434,11 +434,9 @@
       }
     }
 
-    function renderTeams(teams,sortOrder){
+    function renderTeams(teams){
       const teamsEl=document.getElementById('teams');
       teamsEl.innerHTML='';
-      if(sortOrder==='asc') teams.sort((a,b)=>a.totalRating-b.totalRating);
-      else teams.sort((a,b)=>b.totalRating-a.totalRating);
       teams.forEach(team=>{
         const card=document.createElement('div');
         card.className=`team-card draft-card roster-${team.rosterSize}`;
@@ -537,7 +535,7 @@
       currentPage=page;
       const start=(currentPage-1)*pageSize;
       const slice=filteredTeams.slice(start,start+pageSize);
-      renderTeams(slice,sortOrder);
+      renderTeams(slice);
       const pagination=document.getElementById('pagination');
       if(!pagination) return;
       pagination.innerHTML='';
@@ -574,6 +572,8 @@
         return true;
       });
       filteredTeams=filtered;
+      if(sortOrder==='asc') filteredTeams.sort((a,b)=>a.totalRating-b.totalRating);
+      else filteredTeams.sort((a,b)=>b.totalRating-a.totalRating);
       showPage(1);
       updateExposureSidebar();
     }
