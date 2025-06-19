@@ -154,10 +154,10 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
 /* Display lineup cards in a centered responsive grid */
 #teams{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(520px,1fr));
-  gap:32px;
-  margin:56px auto;
-  padding:0 64px;
+  grid-template-columns:repeat(auto-fit,minmax(400px,1fr));
+  gap:16px;
+  margin:24px auto;
+  padding:0 24px;
   max-width:1880px;
   align-items:start;
   justify-content:center;
@@ -170,17 +170,17 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
   border:2px solid var(--bb-blue-500);
   border-radius:var(--radius);
   box-shadow:var(--bb-shadow);
-  padding:20px 18px;
-  font-size:1.1em;
+  padding:8px;
+  font-size:.9em;
 
   overflow-x:auto;
 }
 .draft-card h2{
-  margin:0 0 12px;
-  font-size:20px;
+  margin:0 0 6px;
+  font-size:16px;
   color:var(--bb-blue-600);
   font-weight:700;
-  min-height:44px;
+  min-height:28px;
 }
 .draft-card h2 img.icon{
   width:0.6em;
@@ -191,20 +191,20 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
 .rating-pill{
   display:inline-block;
   margin-left:8px;
-  padding:2px 10px;
+  padding:2px 6px;
   border-radius:9999px;
   font-weight:600;
-  font-size:16px;
+  font-size:12px;
 }
 .rating-emojis{
   margin-left:6px;
-  font-size:24px;
+  font-size:16px;
 }
 
 /* Team logos */
 .team-logo{
-  width:30px;
-  height:30px;
+  width:20px;
+  height:20px;
   object-fit:contain;
   margin-right:8px;
   vertical-align:middle;
@@ -227,7 +227,7 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
 /* Label above the team exposure summary */
 .summary-label{
   display:block;
-  font-size:14px;
+  font-size:12px;
   font-weight:600;
   color:var(--bb-muted);
   margin-bottom:4px;
@@ -237,7 +237,7 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
 .player-table{
   width:100%;
   border-collapse:collapse;
-  font-size:17px;
+  font-size:12px;
   table-layout:fixed;
 }
 .player-table th,
@@ -251,13 +251,13 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
 .player-table thead th{
   background:var(--bb-blue-500);
   color:#fff;
-  padding:10px;
+  padding:4px;
   font-weight:600;
 }
 .player-table tbody tr:nth-child(even){background:var(--bb-blue-50);}
 .player-table tbody tr:hover{background:var(--bb-gold-200);}
 .player-table td{
-  padding:8px 10px;
+  padding:2px 4px;
   border-bottom:1px solid var(--bb-border);
 }
 
