@@ -127,7 +127,7 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
   display:none;
 }
 #last-query-container{
-  margin:20px 32px 0;
+  margin:20px 64px 0;
 }
 #last-query-container p{
   margin:0 0 4px;
@@ -157,7 +157,7 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
   grid-template-columns:repeat(auto-fit,minmax(520px,1fr));
   gap:32px;
   margin:56px auto;
-  padding:0 32px;
+  padding:0 64px;
   max-width:1880px;
   align-items:start;
   justify-content:center;
@@ -323,7 +323,7 @@ td[data-pos="TE"] .pos-dot{background:var(--te);}
 #portfolio-controls{
   display:block;
   margin-top:20px;
-  padding:0 32px;
+  padding:0 64px;
 }
 #portfolio-controls.with-uploads{
   display:grid;
