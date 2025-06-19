@@ -154,7 +154,7 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
 /* Display lineup cards in a centered responsive grid */
 #teams{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+  grid-template-columns:repeat(auto-fit,minmax(352px,1fr));
   gap:12px;
   margin:20px auto;
   padding:0 20px;
@@ -165,19 +165,20 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
 
 /* Draft card styling */
 
+
 .draft-card{
   background:var(--bb-surface);
   border:2px solid var(--bb-blue-500);
   border-radius:var(--radius);
   box-shadow:var(--bb-shadow);
   padding:6px;
-  font-size:.72em;
+  font-size:.79em;
 
   overflow-x:auto;
 }
 .draft-card h2{
   margin:0 0 5px;
-  font-size:13px;
+  font-size:14px;
   color:var(--bb-blue-600);
   font-weight:700;
   min-height:22px;
@@ -194,11 +195,11 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
   padding:2px 5px;
   border-radius:9999px;
   font-weight:600;
-  font-size:10px;
+  font-size:11px;
 }
 .rating-emojis{
   margin-left:6px;
-  font-size:13px;
+  font-size:14px;
 }
 
 /* Team logos */
@@ -227,7 +228,7 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
 /* Label above the team exposure summary */
 .summary-label{
   display:block;
-  font-size:10px;
+  font-size:11px;
   font-weight:600;
   color:var(--bb-muted);
   margin-bottom:4px;
@@ -237,7 +238,7 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
 .player-table{
   width:100%;
   border-collapse:collapse;
-  font-size:10px;
+  font-size:11px;
   table-layout:fixed;
 }
 .player-table th,
