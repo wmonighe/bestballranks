@@ -49,7 +49,7 @@
   </div>
 
   <div id="exposure-sidebar" class="collapsed">
-    <button id="exposure-toggle" aria-label="Toggle exposure sidebar">&#9654;</button>
+    <button id="exposure-toggle" aria-label="Toggle exposure sidebar">&#9664;</button>
     <div id="exposure-content">
       <h3>Player Exposure</h3>
       <table id="exposure-table" class="player-table">
@@ -724,10 +724,10 @@
       const expanded=sb.classList.toggle('expanded');
       if(expanded){
         sb.classList.remove('collapsed');
-        document.getElementById('exposure-toggle').innerHTML='&#9664;';
+        document.getElementById('exposure-toggle').innerHTML='&#9654;';
       }else{
         sb.classList.add('collapsed');
-        document.getElementById('exposure-toggle').innerHTML='&#9654;';
+        document.getElementById('exposure-toggle').innerHTML='&#9664;';
       }
     });
   </script>
