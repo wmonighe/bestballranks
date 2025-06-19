@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="portfolio.css">
 </head>
 <body>
@@ -48,16 +49,23 @@
     <div id="pagination"></div>
   </div>
 
-  <div id="exposure-sidebar" class="collapsed">
-    <button id="exposure-toggle" aria-label="Toggle exposure sidebar">&#9664;</button>
-    <div id="exposure-content">
+  <button id="exposureFab" role="button" tabindex="0" aria-label="Open player exposure drawer" class="exposure-fab">
+    <i class="fa-solid fa-chart-pie" aria-hidden="true"></i>
+    <span class="fa-fallback">EXP</span>
+  </button>
+  <aside id="exposureDrawer" aria-hidden="true">
+    <div class="drawer-header">
       <h3>Player Exposure</h3>
+      <button class="drawer-close" aria-label="Close player exposure drawer"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
+    </div>
+    <div class="drawer-body">
       <table id="exposure-table" class="player-table">
         <thead><tr><th>Player</th><th>#</th><th>%</th></tr></thead>
         <tbody></tbody>
       </table>
     </div>
-  </div>
+  </aside>
+  <div id="exposureScrim" tabindex="-1" aria-hidden="true"></div>
 
   <div id="upload-modal" class="modal">
     <div class="modal-content">
@@ -609,6 +617,64 @@
       });
     }
 
+    function initExposureDrawer(){
+      const fab=document.getElementById('exposureFab');
+      const drawer=document.getElementById('exposureDrawer');
+      const scrim=document.getElementById('exposureScrim');
+      const closeBtn=drawer.querySelector('.drawer-close');
+      const main=document.getElementById('portfolio-wrapper');
+      const focusSel='button,[href],input,select,textarea,[tabindex]:not([tabindex="-1"])';
+      let lastFocused=null;
+
+      function handleKeydown(e){
+        if(e.key==='Escape') close();
+        if(e.key==='Tab'){
+          const items=drawer.querySelectorAll(focusSel);
+          if(items.length===0) return;
+          const first=items[0];
+          const last=items[items.length-1];
+          if(e.shiftKey && document.activeElement===first){
+            e.preventDefault();
+            last.focus();
+          }else if(!e.shiftKey && document.activeElement===last){
+            e.preventDefault();
+            first.focus();
+          }
+        }
+      }
+
+      function open(){
+        lastFocused=document.activeElement;
+        updateExposureSidebar();
+        drawer.classList.add('open');
+        drawer.setAttribute('aria-hidden','false');
+        scrim.classList.add('show');
+        main.setAttribute('aria-hidden','true');
+        const first=drawer.querySelector(focusSel);
+        if(first) first.focus();
+        document.addEventListener('keydown',handleKeydown);
+      }
+
+      function close(){
+        drawer.classList.remove('open');
+        drawer.setAttribute('aria-hidden','true');
+        scrim.classList.remove('show');
+        main.removeAttribute('aria-hidden');
+        document.removeEventListener('keydown',handleKeydown);
+        if(lastFocused) fab.focus();
+      }
+
+      fab.addEventListener('click',open);
+      fab.addEventListener('keydown',e=>{
+        if(e.key==='Enter' || e.key===' '){
+          e.preventDefault();
+          open();
+        }
+      });
+      closeBtn.addEventListener('click',close);
+      scrim.addEventListener('click',close);
+    }
+
     function standardizeTableHeights(){
       ['18','20'].forEach(size=>{
         const tables=document.querySelectorAll(`.team-card.roster-${size} table`);
@@ -719,17 +785,7 @@
       filterAndRender();
     });
 
-    document.getElementById('exposure-toggle').addEventListener('click',()=>{
-      const sb=document.getElementById('exposure-sidebar');
-      const expanded=sb.classList.toggle('expanded');
-      if(expanded){
-        sb.classList.remove('collapsed');
-        document.getElementById('exposure-toggle').innerHTML='&#9654;';
-      }else{
-        sb.classList.add('collapsed');
-        document.getElementById('exposure-toggle').innerHTML='&#9664;';
-      }
-    });
+    initExposureDrawer();
   </script>
 </body>
 </html>
