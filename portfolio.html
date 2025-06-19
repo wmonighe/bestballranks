@@ -104,6 +104,16 @@
       <button id="query-done">Done</button>
     </div>
   </div>
+  <div id="share-modal" class="modal">
+    <div class="modal-content">
+      <h2>Share Lineup</h2>
+      <img id="share-image" alt="Share preview" />
+      <input id="share-link" type="text" readonly value="" />
+      <button id="copy-link" class="upload-btn">Copy Link</button>
+      <button id="share-close" class="upload-btn">Close</button>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="supabase.js"></script>
 
@@ -474,6 +484,11 @@
         emojiSpan.textContent=` ${em1}`;
         header.appendChild(emojiSpan);
         card.appendChild(header);
+        const share=document.createElement("button");
+        share.className="share-btn";
+        share.textContent="Share";
+        share.addEventListener("click",()=>showShare(card,pct.toFixed(0)));
+        card.appendChild(share);
 
         const summary=document.createElement('div');
         summary.className='team-summary';
@@ -676,13 +691,36 @@
     }
 
     function standardizeTableHeights(){
-      ['18','20'].forEach(size=>{
+      ["18","20"].forEach(size=>{
         const tables=document.querySelectorAll(`.team-card.roster-${size} table`);
         let max=0;
         tables.forEach(t=>{if(t.offsetHeight>max)max=t.offsetHeight;});
-        tables.forEach(t=>{if(max)t.style.height=max+'px';});
+        tables.forEach(t=>{if(max)t.style.height=max+"px";});
       });
     }
+
+    const showShare=(function(){
+      const modal=document.getElementById("share-modal");
+      const img=document.getElementById("share-image");
+      const link=document.getElementById("share-link");
+      document.getElementById("share-close").addEventListener("click",()=>modal.classList.remove("show"));
+      document.getElementById("copy-link").addEventListener("click",()=>{navigator.clipboard&&navigator.clipboard.writeText(link.value);});
+      return function(card,score){
+        link.value=window.location.origin+"/portfolio.html";
+        html2canvas(card).then(c=>{
+          const ctx=c.getContext("2d");
+          const h=c.height;
+          ctx.fillStyle="rgba(0,0,0,0.7)";
+          ctx.fillRect(0,h-40,c.width,40);
+          ctx.fillStyle="#fff";
+          ctx.font="16px sans-serif";
+          ctx.fillText(`My lineup scored ${score}.`,10,h-26);
+          ctx.fillText("How do your teams compare? See now",10,h-10);
+          img.src=c.toDataURL("image/png");
+          modal.classList.add("show");
+        });
+      };
+    })();
 
     document.getElementById('open-modal').addEventListener('click',()=>{
       document.getElementById('upload-modal').classList.add('show');

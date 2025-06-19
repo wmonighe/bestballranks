@@ -172,6 +172,7 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
   box-shadow:var(--bb-shadow);
   padding:6px;
   font-size:.72em;
+  position:relative;
 
   overflow-x:auto;
 }
@@ -200,6 +201,12 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
   margin-left:6px;
   font-size:13px;
 }
+.share-btn{position:absolute;top:4px;right:6px;background:none;border:none;color:var(--bb-blue-600);cursor:pointer;font-size:12px;}
+.share-btn:hover{color:var(--bb-blue-500);}
+#share-link{width:100%;margin-top:8px;word-break:break-all;}
+#share-modal .modal-content img{max-width:100%;height:auto;margin-bottom:8px;}
+#copy-link,#share-close{margin-top:8px;}
+
 
 /* Team logos */
 .team-logo{
