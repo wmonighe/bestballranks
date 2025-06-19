@@ -721,22 +721,24 @@
       clone.appendChild(msg);
       clone.style.width=card.offsetWidth+'px';
       const showModal=canvas=>{
-        document.getElementById('share-image').src=canvas.toDataURL();
-        document.getElementById('share-link').value=location.origin+'/portfolio.html';
-        document.getElementById('share-modal').classList.add('show');
+        try{
+          document.getElementById('share-image').src=canvas.toDataURL();
+          document.getElementById('share-link').value=location.origin+'/portfolio.html';
+          document.getElementById('share-modal').classList.add('show');
+        }catch(err){
+          clone.querySelectorAll('img.team-logo').forEach(img=>{
+            const abbr=(img.alt||'').slice(0,3).toUpperCase();
+            const span=document.createElement('span');
+            span.className='team-abbr';
+            span.textContent=abbr;
+            img.replaceWith(span);
+          });
+          clone.querySelectorAll('img').forEach(img=>img.remove());
+          html2canvas(clone).then(showModal);
+        }
       };
 
-      html2canvas(clone,{useCORS:true}).then(showModal).catch(()=>{
-        clone.querySelectorAll('img.team-logo').forEach(img=>{
-          const abbr=(img.alt||'').slice(0,3).toUpperCase();
-          const span=document.createElement('span');
-          span.className='team-abbr';
-          span.textContent=abbr;
-          img.replaceWith(span);
-        });
-        clone.querySelectorAll('img').forEach(img=>img.remove());
-        html2canvas(clone).then(showModal);
-      });
+      html2canvas(clone,{useCORS:true}).then(showModal);
     }
 
     document.getElementById('open-modal').addEventListener('click',()=>{
