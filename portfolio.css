@@ -412,7 +412,7 @@ td[data-pos="TE"] .pos-dot{background:var(--te);}
   background:var(--bb-surface);
   border-left:2px solid var(--bb-blue-500);
   box-shadow:var(--bb-shadow);
-  width:20px;
+  width:60px;
   overflow:hidden;
   transition:width var(--transition);
   z-index:1500;
@@ -420,16 +420,25 @@ td[data-pos="TE"] .pos-dot{background:var(--te);}
 #exposure-sidebar.expanded{width:260px;}
 #exposure-sidebar.collapsed #exposure-content{display:none;}
 #exposure-toggle{
-  width:20px;
-  height:40px;
+  position:absolute;
+  top:50%;
+  left:5px;
+  transform:translateY(-50%);
+  width:50px;
+  height:50px;
   background:var(--bb-blue-500);
   color:#fff;
   border:none;
+  border-radius:50%;
   cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:24px;
 }
 #exposure-content{
   padding:8px;
-  height:calc(100% - 40px);
+  height:100%;
   overflow-y:auto;
 }
 #exposure-sidebar h3{
