@@ -248,6 +248,18 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
   margin-right:8px;
   vertical-align:middle;
 }
+/* Fallback abbreviation shown when team logo cannot be loaded */
+.team-abbr{
+  display:inline-block;
+  width:16px;
+  height:16px;
+  line-height:16px;
+  margin-right:8px;
+  text-align:center;
+  font-size:10px;
+  font-weight:600;
+  vertical-align:middle;
+}
 
 /* Team summary row */
 .team-summary{
