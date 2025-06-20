@@ -162,6 +162,10 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
   align-items:start;
   justify-content:center;
 }
+#teams.list-view{
+  display:block;
+  overflow-x:auto;
+}
 
 /* Draft card styling */
 
@@ -311,6 +315,26 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
   padding:2px 3px;
   border-bottom:1px solid var(--bb-border);
 }
+
+/* Table used for List view */
+.lineup-table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:12px;
+  margin:20px 0;
+}
+.lineup-table th{
+  background:var(--bb-blue-500);
+  color:#fff;
+  padding:4px;
+  text-align:left;
+}
+.lineup-table td{
+  vertical-align:top;
+  padding:4px;
+  border-bottom:1px solid var(--bb-border);
+}
+.lineup-table ul{margin:0;padding-left:16px;}
 
 /* Position color dots */
 .pos-dot{

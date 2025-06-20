@@ -468,6 +468,65 @@
     function renderTeams(teams){
       const teamsEl=document.getElementById('teams');
       teamsEl.innerHTML='';
+      teamsEl.classList.toggle('list-view', viewMode==='list');
+
+      if(viewMode==='list'){
+        const table=document.createElement('table');
+        table.className='lineup-table';
+        table.innerHTML='<thead><tr><th>Contest</th><th>Date Drafted</th><th>QBs</th><th>RBs</th><th>WRs</th><th>TEs</th><th>Total Rating</th><th>Team Exposure</th></tr></thead>';
+        const tbody=document.createElement('tbody');
+        teams.forEach(team=>{
+          const tr=document.createElement('tr');
+          const feeDisp=parseFloat(team.entryFee).toString();
+          const contest=`${team.tournamentTitle} - $${feeDisp}`;
+          const qbList=team.picks.filter(p=>p['Position']==='QB').map(p=>`<li>${p['First Name']} ${p['Last Name']}</li>`).join('');
+          const rbList=team.picks.filter(p=>p['Position']==='RB').map(p=>`<li>${p['First Name']} ${p['Last Name']}</li>`).join('');
+          const wrList=team.picks.filter(p=>p['Position']==='WR').map(p=>`<li>${p['First Name']} ${p['Last Name']}</li>`).join('');
+          const teList=team.picks.filter(p=>p['Position']==='TE').map(p=>`<li>${p['First Name']} ${p['Last Name']}</li>`).join('');
+          const pct=Math.max(0,Math.min(100,((team.totalRating-7.5)/(11-7.5))*100));
+          const colors=colorForPct(pct);
+          const rating=`<span class="rating-pill" style="background-color:${colors.bg};color:${colors.text};">${pct.toFixed(0)}</span>`;
+
+          const stats={};
+          team.picks.forEach(p=>{
+            const code=teamMap[p['Team']]||p['Team']||'';
+            if(!code) return;
+            const canon=canonicalName(`${p['First Name']} ${p['Last Name']}`);
+            const rating=parseFloat(ratingMap[canon]);
+            if(!stats[code]) stats[code]={count:0,total:0};
+            stats[code].count++;
+            if(!isNaN(rating)) stats[code].total+=rating;
+          });
+          const exposure=document.createElement('div');
+          exposure.className='team-summary';
+          Object.entries(stats)
+            .filter(([,v])=>v.count>=2)
+            .sort((a,b)=>b[1].count-a[1].count)
+            .forEach(([code,{count,total}])=>{
+              const item=document.createElement('div');
+              item.className='team-count';
+              item.title=`Total Rating: ${total.toFixed(2)}`;
+              const img=document.createElement('img');
+              img.src=`https://www.fantasynerds.com/images/nfl/team_logos/${code}.png`;
+              img.className='team-logo';
+              img.alt=code;
+              img.onerror=()=>{img.style.display='none';};
+              const span=document.createElement('span');
+              span.textContent=`${count}`;
+              item.appendChild(img);
+              item.appendChild(span);
+              exposure.appendChild(item);
+            });
+
+          tr.innerHTML=`<td>${contest}</td><td>${team.dateEntered||''}</td><td><ul>${qbList}</ul></td><td><ul>${rbList}</ul></td><td><ul>${wrList}</ul></td><td><ul>${teList}</ul></td><td>${rating}</td><td></td>`;
+          tr.querySelector('td:last-child').appendChild(exposure);
+          tbody.appendChild(tr);
+        });
+        table.appendChild(tbody);
+        teamsEl.appendChild(table);
+        return;
+      }
+
       teams.forEach(team=>{
         const card=document.createElement('div');
         card.className=`team-card draft-card roster-${team.rosterSize}`;
@@ -853,11 +912,13 @@
       viewMode='card';
       document.getElementById('view-card').classList.add('selected');
       document.getElementById('view-list').classList.remove('selected');
+      filterAndRender();
     });
     document.getElementById('view-list').addEventListener('click',()=>{
       viewMode='list';
       document.getElementById('view-list').classList.add('selected');
       document.getElementById('view-card').classList.remove('selected');
+      filterAndRender();
     });
 
     initExposureDrawer();
