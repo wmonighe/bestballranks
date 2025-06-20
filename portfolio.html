@@ -118,8 +118,6 @@
     <div class="modal-content">
       <h2>Share Lineup</h2>
       <img id="share-image" alt="Share preview" style="max-width:100%;height:auto;">
-      <input id="share-link" type="text" readonly>
-      <button id="copy-link">Copy Link</button>
       <button id="share-close">Close</button>
     </div>
   </div>
@@ -782,7 +780,6 @@
       const showModal=canvas=>{
         try{
           document.getElementById('share-image').src=canvas.toDataURL();
-          document.getElementById('share-link').value=location.origin+'/portfolio.html';
           document.getElementById('share-modal').classList.add('show');
         }catch(err){
           clone.querySelectorAll('img.team-logo').forEach(img=>{
@@ -825,10 +822,6 @@
 
     document.getElementById('share-close').addEventListener('click',()=>{
       document.getElementById('share-modal').classList.remove('show');
-    });
-    document.getElementById('copy-link').addEventListener('click',()=>{
-      const val=document.getElementById('share-link').value;
-      navigator.clipboard.writeText(val);
     });
 
     document.getElementById('pre-file').addEventListener('change',async e=>{

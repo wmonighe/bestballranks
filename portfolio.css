@@ -234,15 +234,6 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
   font-weight:700;
 }
 
-#share-link{
-  width:100%;
-  margin-top:8px;
-  padding:6px;
-  font-size:14px;
-  font-family:inherit;
-}
-
-#copy-link{margin-top:8px;}
 
 /* Team logos */
 .team-logo{
