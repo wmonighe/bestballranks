@@ -215,7 +215,7 @@
     let viewMode='card';
     let uploading=false;
     let currentPage=1;
-    const pageSize=21;
+    let pageSize=21;
     let filteredTeams=[];
 
     function saveUploads(){
@@ -910,12 +910,14 @@
     });
     document.getElementById('view-card').addEventListener('click',()=>{
       viewMode='card';
+      pageSize=21;
       document.getElementById('view-card').classList.add('selected');
       document.getElementById('view-list').classList.remove('selected');
       filterAndRender();
     });
     document.getElementById('view-list').addEventListener('click',()=>{
       viewMode='list';
+      pageSize=100;
       document.getElementById('view-list').classList.add('selected');
       document.getElementById('view-card').classList.remove('selected');
       filterAndRender();
