@@ -635,3 +635,23 @@ td[data-pos="TE"] .pos-dot{background:var(--te);}
   opacity:1;
   visibility:visible;
 }
+
+/* Navigation bar styles */
+.main-nav{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:#fff;
+  border-bottom:1px solid #ddd;
+  padding:0.5rem 1rem;
+}
+.main-nav a{
+  text-decoration:none;
+  color:#1565C0;
+  margin-right:1rem;
+  font-weight:600;
+}
+.main-nav .nav-right a{
+  margin-left:1rem;
+  margin-right:0;
+}
