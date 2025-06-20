@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Authenticate</title>
+  <style>
+    .modal { max-width: 400px; padding: 1em; }
+  </style>
+</head>
+<body>
+  <dialog id="signup" class="modal">
+    <form id="signup-form">
+      <h2>Sign Up</h2>
+      <input id="su-email" type="email" placeholder="Email" required>
+      <input id="su-password" type="password" placeholder="Password" required>
+      <button type="submit">Sign Up</button>
+      <p><a href="#" id="goto-login">Already have an account? Log In</a></p>
+    </form>
+  </dialog>
+
+  <dialog id="login" class="modal">
+    <form id="login-form">
+      <h2>Login</h2>
+      <input id="li-email" type="email" placeholder="Email" required>
+      <input id="li-password" type="password" placeholder="Password" required>
+      <button type="submit">Login</button>
+      <button id="google-btn" type="button">Sign in with Google</button>
+      <p><a href="#" id="goto-signup">Need an account? Sign Up</a></p>
+      <p><a href="#" id="reset-link">Forgot Password?</a></p>
+    </form>
+  </dialog>
+
+  <script type="module">
+    import { init, signUp, signIn, signInWithGoogle } from './auth.js';
+
+    const params = new URLSearchParams(location.search);
+    const next = params.get('next') || '/rank.html';
+    const mode = params.get('mode') === 'signup' ? 'signup' : 'login';
+
+    const signupDlg = document.getElementById('signup');
+    const loginDlg = document.getElementById('login');
+
+    function show(dlg){ if(!dlg.open) dlg.showModal(); }
+
+    document.getElementById('goto-login').onclick = e => { e.preventDefault(); signupDlg.close(); show(loginDlg); };
+    document.getElementById('goto-signup').onclick = e => { e.preventDefault(); loginDlg.close(); show(signupDlg); };
+
+    document.getElementById('signup-form').onsubmit = async e => {
+      e.preventDefault();
+      const email = document.getElementById('su-email').value;
+      const pwd = document.getElementById('su-password').value;
+      const { error } = await signUp(email, pwd);
+      if (error) return alert(error.message);
+      location.replace(next);
+    };
+
+    document.getElementById('login-form').onsubmit = async e => {
+      e.preventDefault();
+      const email = document.getElementById('li-email').value;
+      const pwd = document.getElementById('li-password').value;
+      const { error } = await signIn(email, pwd);
+      if (error) return alert(error.message);
+      location.replace(next);
+    };
+
+    document.getElementById('google-btn').onclick = () => {
+      signInWithGoogle(location.origin + '/auth.html?next=' + encodeURIComponent(next));
+    };
+
+    document.getElementById('reset-link').onclick = async e => {
+      e.preventDefault();
+      const email = document.getElementById('li-email').value;
+      if(!email) return alert('Enter your email first.');
+      const { error } = await window.supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: location.origin + '/reset.html'
+      });
+      if (error) alert(error.message); else alert('Password reset email sent.');
+    };
+
+    init().then(() => {
+      if (window.Auth.currentUser()) location.replace(next);
+      else show(mode === 'signup' ? signupDlg : loginDlg);
+    });
+  </script>
+</body>
+</html>
