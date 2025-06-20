@@ -18,7 +18,7 @@
       <a href="/portfolio">Team Rater</a>
     </div>
     <div class="nav-right">
-      <a href="#">Sign Up</a>
+      <a href="#" id="signup-link">Sign Up</a>
       <a href="#">Login</a>
     </div>
   </nav>
@@ -129,6 +129,30 @@
       <h2>Share Lineup</h2>
       <img id="share-image" alt="Share preview" style="max-width:100%;height:auto;">
       <button id="share-close">Close</button>
+    </div>
+  </div>
+  <div id="signup-modal" class="modal">
+    <div class="modal-content">
+      <h2>Create Account</h2>
+      <form id="signup-form">
+        <label for="signup-first">First Name
+          <input id="signup-first" type="text" autocomplete="given-name" required>
+        </label>
+        <label for="signup-last">Last Name
+          <input id="signup-last" type="text" autocomplete="family-name" required>
+        </label>
+        <label for="signup-email">Email
+          <input id="signup-email" type="email" autocomplete="email" required>
+        </label>
+        <label for="signup-pass">Password
+          <input id="signup-pass" type="password" autocomplete="new-password" required>
+        </label>
+        <label for="signup-pass-conf">Confirm Password
+          <input id="signup-pass-conf" type="password" autocomplete="new-password" required>
+        </label>
+        <button type="submit">Sign Up</button>
+      </form>
+      <p class="switch-auth">Already have an account? <a href="#">Sign in</a></p>
     </div>
   </div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
@@ -924,6 +948,36 @@
       document.getElementById('view-list').classList.add('selected');
       document.getElementById('view-card').classList.remove('selected');
       filterAndRender();
+    });
+
+    const signupModal = document.getElementById('signup-modal');
+    document.getElementById('signup-link').addEventListener('click', e => {
+      e.preventDefault();
+      signupModal.classList.add('show');
+    });
+    signupModal.addEventListener('click', e => {
+      if (e.target === signupModal) signupModal.classList.remove('show');
+    });
+    document.getElementById('signup-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      const first = document.getElementById('signup-first').value.trim();
+      const last = document.getElementById('signup-last').value.trim();
+      const email = document.getElementById('signup-email').value.trim();
+      const pass = document.getElementById('signup-pass').value;
+      const confirm = document.getElementById('signup-pass-conf').value;
+      if (pass !== confirm) { alert('Passwords do not match'); return; }
+      try {
+        const { error } = await window.supabase.auth.signUp({
+          email,
+          password: pass,
+          options: { data: { first_name: first, last_name: last } }
+        });
+        if (error) throw error;
+        alert('Check your email for confirmation.');
+        signupModal.classList.remove('show');
+      } catch (err) {
+        alert(err.message || 'Sign up failed');
+      }
     });
 
     initExposureDrawer();

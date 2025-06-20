@@ -358,6 +358,36 @@ td[data-pos="TE"] .pos-dot{background:var(--te);}
   width:90%;
   text-align:center;
 }
+#signup-modal .modal-content{ text-align:left; }
+#signup-form{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  margin-top:10px;
+}
+#signup-form label{
+  display:flex;
+  flex-direction:column;
+  font-weight:600;
+  font-size:.9rem;
+}
+#signup-form input{
+  padding:8px;
+  font-family:inherit;
+  border:1px solid var(--bb-border);
+  border-radius:var(--radius);
+}
+#signup-form button{
+  padding:10px;
+  background:var(--bb-blue-500);
+  color:#fff;
+  border:none;
+  border-radius:var(--radius);
+  cursor:pointer;
+  transition:var(--transition);
+}
+#signup-form button:hover{background:var(--bb-blue-600);}
+.switch-auth{text-align:center;margin-top:8px;font-size:.9rem;}
 
 /* Format filter section */
 #format-options{
