@@ -200,7 +200,35 @@
       width: 90%;
       text-align: center;
     }
+    #signup-modal .modal-content {text-align:left;}
+    #signup-form {
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      margin-top:10px;
     }
+    #signup-form label {
+      display:flex;
+      flex-direction:column;
+      font-weight:600;
+      font-size:.9rem;
+    }
+    #signup-form input {
+      padding:8px;
+      font-family:inherit;
+      border:1px solid #ccc;
+      border-radius:4px;
+    }
+    #signup-form button {
+      padding:10px;
+      background:#1e90ff;
+      color:#fff;
+      border:none;
+      border-radius:4px;
+      cursor:pointer;
+    }
+    #signup-form button:hover {background:#1565C0;}
+    .switch-auth {text-align:center;margin-top:8px;font-size:.9rem;}
     .drop-zone {
       border: 2px dashed #1e90ff;
       padding: 1rem;
@@ -286,7 +314,7 @@
       <a href="/portfolio">Team Rater</a>
     </div>
     <div class="nav-right">
-      <a href="#">Sign Up</a>
+      <a href="#" id="signup-link">Sign Up</a>
       <a href="#">Login</a>
     </div>
   </nav>
@@ -376,6 +404,30 @@
         <button id="map-all" class="btn">Map All</button>
         <button id="close-unmatched" class="btn btn-outline">Close</button>
       </div>
+    </div>
+  </div>
+  <div id="signup-modal" class="modal">
+    <div class="modal-content">
+      <h3>Create Account</h3>
+      <form id="signup-form">
+        <label for="signup-first">First Name
+          <input id="signup-first" type="text" autocomplete="given-name" required>
+        </label>
+        <label for="signup-last">Last Name
+          <input id="signup-last" type="text" autocomplete="family-name" required>
+        </label>
+        <label for="signup-email">Email
+          <input id="signup-email" type="email" autocomplete="email" required>
+        </label>
+        <label for="signup-pass">Password
+          <input id="signup-pass" type="password" autocomplete="new-password" required>
+        </label>
+        <label for="signup-pass-conf">Confirm Password
+          <input id="signup-pass-conf" type="password" autocomplete="new-password" required>
+        </label>
+        <button type="submit">Sign Up</button>
+      </form>
+      <p class="switch-auth">Already have an account? <a href="#">Sign in</a></p>
     </div>
   </div>
   <datalist id="players-datalist"></datalist>
@@ -1113,6 +1165,36 @@
       handleFiles(e.dataTransfer.files);
     });
     uploadInput.addEventListener('change', e => handleFiles(e.target.files));
+
+    const signupModal = document.getElementById('signup-modal');
+    document.getElementById('signup-link').addEventListener('click', e => {
+      e.preventDefault();
+      signupModal.classList.add('show');
+    });
+    signupModal.addEventListener('click', e => {
+      if (e.target === signupModal) signupModal.classList.remove('show');
+    });
+    document.getElementById('signup-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      const first = document.getElementById('signup-first').value.trim();
+      const last = document.getElementById('signup-last').value.trim();
+      const email = document.getElementById('signup-email').value.trim();
+      const pass = document.getElementById('signup-pass').value;
+      const confirm = document.getElementById('signup-pass-conf').value;
+      if (pass !== confirm) { alert('Passwords do not match'); return; }
+      try {
+        const { error } = await window.supabase.auth.signUp({
+          email,
+          password: pass,
+          options: { data: { first_name: first, last_name: last } }
+        });
+        if (error) throw error;
+        alert('Check your email for confirmation.');
+        signupModal.classList.remove('show');
+      } catch (err) {
+        alert(err.message || 'Sign up failed');
+      }
+    });
 
 
     const rateBtn = document.getElementById('rateMyTeamBtn');
