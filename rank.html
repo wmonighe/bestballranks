@@ -315,7 +315,7 @@
     </div>
     <div class="nav-right">
       <a href="#" id="signup-link">Sign Up</a>
-      <a href="#">Login</a>
+      <a href="#" class="login-link">Login</a>
     </div>
   </nav>
   <svg style="display:none" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><symbol id="icon-download" viewBox="0 0 16 16"><path d="M8 1v9m0 0l-3-3m3 3l3-3M1 14h14" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol></svg>
@@ -427,7 +427,7 @@
         </label>
         <button type="submit">Sign Up</button>
       </form>
-      <p class="switch-auth">Already have an account? <a href="#">Sign in</a></p>
+      <p class="switch-auth">Already have an account? <a href="#" class="login-link">Sign in</a></p>
     </div>
   </div>
   <datalist id="players-datalist"></datalist>
@@ -1176,24 +1176,20 @@
     });
     document.getElementById('signup-form').addEventListener('submit', async e => {
       e.preventDefault();
-      const first = document.getElementById('signup-first').value.trim();
-      const last = document.getElementById('signup-last').value.trim();
-      const email = document.getElementById('signup-email').value.trim();
-      const pass = document.getElementById('signup-pass').value;
-      const confirm = document.getElementById('signup-pass-conf').value;
-      if (pass !== confirm) { alert('Passwords do not match'); return; }
       try {
-        const { error } = await window.supabase.auth.signUp({
-          email,
-          password: pass,
-          options: { data: { first_name: first, last_name: last } }
-        });
+        const { error } = await window.supabase.auth.signInWithOAuth({ provider: 'google' });
         if (error) throw error;
-        alert('Check your email for confirmation.');
         signupModal.classList.remove('show');
       } catch (err) {
         alert(err.message || 'Sign up failed');
       }
+    });
+
+    document.querySelectorAll('.login-link').forEach(link => {
+      link.addEventListener('click', async e => {
+        e.preventDefault();
+        await window.supabase.auth.signInWithOAuth({ provider: 'google' });
+      });
     });
 
 
