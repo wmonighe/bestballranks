@@ -8,3 +8,27 @@ window.supabase = window.supabase.createClient(
   SUPABASE_ANON_KEY
 );
 
+// Insert the authenticated user into the Users table if they don't exist yet
+// Exposed globally so any page can call it after login
+window.ensureUserRow = async function(user) {
+  if (!user) return;
+  const { data, error } = await window.supabase
+    .from('Users')
+    .select('id')
+    .eq('id', user.id)
+    .maybeSingle();
+  if (error) {
+    console.error('Error checking user row', error);
+    return;
+  }
+  if (!data) {
+    const { error: insertErr } = await window.supabase.from('Users').insert({
+      id: user.id,
+      email: user.email,
+      username: '',
+      date_created: new Date().toISOString()
+    });
+    if (insertErr) console.error('Error inserting user row', insertErr);
+  }
+};
+
