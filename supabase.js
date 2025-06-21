@@ -8,6 +8,16 @@ window.supabase = window.supabase.createClient(
   SUPABASE_ANON_KEY
 );
 
+// Log out the current user and refresh the page to update UI
+window.logOut = async function() {
+  try {
+    await window.supabase.auth.signOut();
+  } finally {
+    // Regardless of result, reload so onAuthStateChange hooks run
+    window.location.reload();
+  }
+};
+
 // Insert the authenticated user into the Users table if they don't exist yet
 // Exposed globally so any page can call it after login
 window.ensureUserRow = async function(user) {

@@ -1121,9 +1121,9 @@
           <img src="${user.user_metadata.avatar_url}" class="avatar" alt="${user.user_metadata.full_name}">
           <a href="#" id="logout-link">Log Out</a>
         `;
-        document.getElementById('logout-link').addEventListener('click', async e => {
+        document.getElementById('logout-link').addEventListener('click', e => {
           e.preventDefault();
-          await window.supabase.auth.signOut();
+          window.logOut();
         });
       } else {
         nav.innerHTML = `<a href="#" class="login-link google-login"><img src="https://developers.google.com/identity/images/g-logo.png" alt="Google logo" />Login with Google</a>`;
