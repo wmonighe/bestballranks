@@ -1061,15 +1061,25 @@
     async function fetchDraftIds() {
       if (draftIdMap) return draftIdMap;
       try {
-        const { data, error } = await window.supabase
-          .from('player_draft_ids')
-          .select('*');
-        if (error) {
-          console.error('Error fetching draft ids', error);
-          return {};
+        const CHUNK = 1000;
+        let start = 0;
+        let allRows = [];
+        while (true) {
+          const { data, error } = await window.supabase
+            .from('player_draft_ids')
+            .select('*')
+            .range(start, start + CHUNK - 1);
+          if (error) {
+            console.error('Error fetching draft ids', error);
+            return {};
+          }
+          if (!data || data.length === 0) break;
+          allRows.push(...data);
+          if (data.length < CHUNK) break;
+          start += CHUNK;
         }
         draftIdMap = {};
-        data.forEach(r => {
+        allRows.forEach(r => {
           const canon = canonicalName(r.player);
           const existing = draftIdMap[canon];
           if (!existing || parseInt(r.season, 10) > parseInt(existing.season, 10)) {
