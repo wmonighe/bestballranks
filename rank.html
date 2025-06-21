@@ -1071,10 +1071,17 @@
         draftIdMap = {};
         data.forEach(r => {
           const canon = canonicalName(r.player);
-          draftIdMap[canon] = r;
-          const altCanon = altCanonicalName(r.player);
-          if (!draftIdMap[altCanon]) {
-            draftIdMap[altCanon] = r;
+          const existing = draftIdMap[canon];
+          if (!existing || parseInt(r.season, 10) > parseInt(existing.season, 10)) {
+            draftIdMap[canon] = r;
+          }
+        });
+        // Add alt canonical names after determining the latest season record
+        Object.values(draftIdMap).forEach(rec => {
+          const altCanon = altCanonicalName(rec.player);
+          const existing = draftIdMap[altCanon];
+          if (!existing || parseInt(rec.season, 10) > parseInt(existing.season, 10)) {
+            draftIdMap[altCanon] = rec;
           }
         });
         return draftIdMap;
