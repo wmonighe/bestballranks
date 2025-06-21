@@ -1136,10 +1136,12 @@
 
     window.supabase.auth.onAuthStateChange((_event, session) => {
       updateAuthUI(session?.user);
+      if (session?.user) window.ensureUserRow(session.user);
     });
 
     window.supabase.auth.getSession().then(({ data }) => {
       updateAuthUI(data.session?.user);
+      if (data.session?.user) window.ensureUserRow(data.session.user);
     });
 
 
