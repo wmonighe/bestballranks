@@ -522,10 +522,16 @@
     function canonicalName(name) {
       return (name || '')
         .toString()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
         .toLowerCase()
         .replace(/[.'’]/g, '')
         .replace(/[^a-z0-9]+/g, ' ')
         .trim();
+    }
+
+    function altCanonicalName(name) {
+      return canonicalName(name).replace(/\s+/g, '');
     }
 
     function canonicalField(name) {
@@ -1066,6 +1072,10 @@
         data.forEach(r => {
           const canon = canonicalName(r.player);
           draftIdMap[canon] = r;
+          const altCanon = altCanonicalName(r.player);
+          if (!draftIdMap[altCanon]) {
+            draftIdMap[altCanon] = r;
+          }
         });
         return draftIdMap;
       } catch (err) {
@@ -1079,8 +1089,12 @@
       const rows = displayRows
         .map(r => {
           const canon = canonicalName(r.player);
-          const rec = map[canon] || {};
-          const id = rec[type] || '';
+          let rec = map[canon];
+          if (!rec) {
+            const alt = altCanonicalName(r.player);
+            rec = map[alt];
+          }
+          const id = (rec && rec[type]) || '';
           return `${id},${r.player || ''}`;
         })
         .join('\n');
