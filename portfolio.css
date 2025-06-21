@@ -655,3 +655,13 @@ td[data-pos="TE"] .pos-dot{background:var(--te);}
   margin-left:1rem;
   margin-right:0;
 }
+.main-nav .nav-right{
+  display:flex;
+  align-items:center;
+}
+.main-nav img.avatar{
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  margin-right:.5rem;
+}
