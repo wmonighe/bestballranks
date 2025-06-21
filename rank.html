@@ -1056,7 +1056,7 @@
       if (draftIdMap) return draftIdMap;
       try {
         const { data, error } = await window.supabase
-          .from('draft_player_ids')
+          .from('player_draft_ids')
           .select('*');
         if (error) {
           console.error('Error fetching draft ids', error);
