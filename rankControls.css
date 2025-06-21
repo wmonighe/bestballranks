@@ -9,6 +9,7 @@
   display:flex;
   gap:.75rem;
   flex-wrap:wrap;
+  position:relative;
 }
 
 .btn {
@@ -95,3 +96,23 @@
 }
 .google-login:hover {background:#f7f8f9;}
 .google-login img{width:18px;height:18px;margin-right:.5rem;}
+
+/* Export dropdown */
+.export-wrap{position:relative;}
+.export-options{
+  display:none;
+  position:absolute;
+  top:100%;
+  right:0;
+  background:#fff;
+  border:1px solid #c7ced6;
+  border-radius:.5rem;
+  box-shadow:0 2px 6px rgba(0,0,0,0.15);
+  padding:.25rem;
+  margin-top:.25rem;
+  z-index:10;
+  flex-direction:column;
+  gap:.25rem;
+}
+.export-options.show{display:flex;}
+.export-options .export-option{justify-content:flex-start;}
