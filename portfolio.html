@@ -18,7 +18,7 @@
       <a href="/portfolio">Team Rater</a>
     </div>
     <div class="nav-right">
-      <a href="#" class="login-link">Login</a>
+      <a href="#" class="login-link google-login"><img src="https://developers.google.com/identity/images/g-logo.png" alt="Google logo" />Login with Google</a>
     </div>
   </nav>
   <div id="portfolio-wrapper">
@@ -939,7 +939,7 @@
           await window.supabase.auth.signOut();
         });
       } else {
-        nav.innerHTML = `<a href="#" class="login-link">Login</a>`;
+        nav.innerHTML = `<a href="#" class="login-link google-login"><img src="https://developers.google.com/identity/images/g-logo.png" alt="Google logo" />Login with Google</a>`;
         nav.querySelector('.login-link').addEventListener('click', async e => {
           e.preventDefault();
           await window.supabase.auth.signInWithOAuth({ provider: 'google' });
