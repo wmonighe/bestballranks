@@ -336,14 +336,34 @@
 
           <div class="action-bar">
             <button type="button" class="btn btn-secondary" id="updateBtn">Update</button>
-            <button type="button" class="btn btn-primary" id="exportBtn">
-              <img
-                class="icon"
-                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRltuDZN3yIMK1sh9oDF7ykc7HYDeuCGoZ--g&s"
-                alt="Export icon"
-              />
-              Export
-            </button>
+            <div class="export-wrap">
+              <button type="button" class="btn btn-primary" id="exportBtn">
+                <img
+                  class="icon"
+                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRltuDZN3yIMK1sh9oDF7ykc7HYDeuCGoZ--g&s"
+                  alt="Export icon"
+                />
+                Export
+              </button>
+              <div id="exportOptions" class="export-options">
+                <button type="button" class="btn btn-secondary export-option" data-type="predraft">
+                  <img class="icon" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRltuDZN3yIMK1sh9oDF7ykc7HYDeuCGoZ--g&s" alt="Download icon" />
+                  Pre-Draft
+                </button>
+                <button type="button" class="btn btn-secondary export-option" data-type="eliminator">
+                  <img class="icon" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRltuDZN3yIMK1sh9oDF7ykc7HYDeuCGoZ--g&s" alt="Download icon" />
+                  Eliminator
+                </button>
+                <button type="button" class="btn btn-secondary export-option" data-type="marathon">
+                  <img class="icon" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRltuDZN3yIMK1sh9oDF7ykc7HYDeuCGoZ--g&s" alt="Download icon" />
+                  Marathon
+                </button>
+                <button type="button" class="btn btn-secondary export-option" data-type="sprint">
+                  <img class="icon" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRltuDZN3yIMK1sh9oDF7ykc7HYDeuCGoZ--g&s" alt="Download icon" />
+                  Sprint
+                </button>
+              </div>
+            </div>
             <button type="button" class="btn btn-ghost" id="resetBtn">Reset</button>
           </div>
         </aside>
@@ -1027,21 +1047,77 @@
       }
     }
 
-    document.getElementById('exportBtn').addEventListener('click', () => {
+    const exportBtn = document.getElementById('exportBtn');
+    const exportOptions = document.getElementById('exportOptions');
+    const exportWrap = document.querySelector('.export-wrap');
+    let draftIdMap = null;
+
+    async function fetchDraftIds() {
+      if (draftIdMap) return draftIdMap;
+      try {
+        const { data, error } = await window.supabase
+          .from('draft_player_ids')
+          .select('*');
+        if (error) {
+          console.error('Error fetching draft ids', error);
+          return {};
+        }
+        draftIdMap = {};
+        data.forEach(r => {
+          const canon = canonicalName(r.player);
+          draftIdMap[canon] = r;
+        });
+        return draftIdMap;
+      } catch (err) {
+        console.error('Error loading draft ids', err);
+        return {};
+      }
+    }
+
+    function buildCsv(type, map) {
       const header = 'id,Name\n';
       const rows = displayRows
-        .map(r => `${r.postDraftId || ''},${r.player || ''}`)
+        .map(r => {
+          const canon = canonicalName(r.player);
+          const rec = map[canon] || {};
+          const id = rec[type] || '';
+          return `${id},${r.player || ''}`;
+        })
         .join('\n');
-      const csv = header + rows;
+      return header + rows;
+    }
+
+    async function handleExport(type) {
+      const map = await fetchDraftIds();
+      const csv = buildCsv(type, map);
       const blob = new Blob([csv], { type: 'text/csv' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'Underdog Post-Draft Best Ball Rankings.csv';
+      const name = type.charAt(0).toUpperCase() + type.slice(1);
+      a.download = `Underdog ${name} Best Ball Rankings.csv`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+    }
+
+    exportBtn.addEventListener('click', e => {
+      e.stopPropagation();
+      exportOptions.classList.toggle('show');
+    });
+
+    document.querySelectorAll('.export-option').forEach(btn => {
+      btn.addEventListener('click', async e => {
+        e.stopPropagation();
+        exportOptions.classList.remove('show');
+        const type = btn.dataset.type;
+        await handleExport(type);
+      });
+    });
+
+    document.addEventListener('click', () => {
+      exportOptions.classList.remove('show');
     });
 
     document.getElementById('resetBtn').addEventListener('click', () => {
