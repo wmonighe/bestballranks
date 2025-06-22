@@ -154,7 +154,8 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
 /* Display lineup cards in a centered responsive grid */
 #teams{
   display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(352px,1fr));
+  /* Increased width for larger lineup cards */
+  grid-template-columns:repeat(auto-fit,minmax(388px,1fr));
   gap:12px;
   margin:20px auto;
   padding:0 20px;
@@ -176,7 +177,8 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
   border-radius:var(--radius);
   box-shadow:var(--bb-shadow);
   padding:6px;
-  font-size:.79em;
+  /* Slightly larger overall font size */
+  font-size:.87em;
   position:relative;
 
   overflow-x:auto;
