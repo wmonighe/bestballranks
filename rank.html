@@ -294,7 +294,6 @@
   <script src="supabase.js"></script>
   <header id="top-controls">
     <div id="title-container">
-      <button type="button" class="btn btn-primary" id="rateMyTeamBtn" aria-label="Rate my fantasy teams">Rate My Teams</button>
       <h1 id="page-title">Best Ball Rankings Builder</h1>
     </div>
     <div class="controls">
@@ -1251,16 +1250,6 @@
       if (data.session?.user) window.ensureUserRow(data.session.user);
     });
 
-
-    const rateBtn = document.getElementById('rateMyTeamBtn');
-    if (rateBtn) {
-      rateBtn.classList.add('animate-pulse');
-      // Stop pulsing after 3 seconds
-      setTimeout(() => rateBtn.classList.remove('animate-pulse'), 3000);
-      rateBtn.addEventListener('click', () => {
-        window.location.href = 'portfolio.html';
-      });
-    }
 
     showSkeleton();
     loadData();
