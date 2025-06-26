@@ -7,37 +7,3 @@ window.supabase = window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_ANON_KEY
 );
-
-// Log out the current user and refresh the page to update UI
-window.logOut = async function() {
-  try {
-    await window.supabase.auth.signOut();
-  } finally {
-    // Regardless of result, reload so onAuthStateChange hooks run
-    window.location.reload();
-  }
-};
-
-// Insert the authenticated user into the Users table if they don't exist yet
-// Exposed globally so any page can call it after login
-window.ensureUserRow = async function(user) {
-  if (!user) return;
-
-  const { error } = await window.supabase
-    .from('Users')
-    .insert(
-      {
-        id: user.id,
-        email: user.email,
-        username: '',
-        date_created: new Date().toISOString()
-      },
-      {
-        onConflict: 'email',
-        ignoreDuplicates: true
-      }
-    );
-
-  if (error) console.error('Error inserting user row', error);
-};
-
