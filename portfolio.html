@@ -126,16 +126,8 @@
       <button id="query-done">Done</button>
     </div>
   </div>
-  <div id="share-modal" class="modal">
-    <div class="modal-content">
-      <h2>Share Lineup</h2>
-      <img id="share-image" alt="Share preview" style="max-width:100%;height:auto;">
-      <button id="share-close">Close</button>
-    </div>
-  </div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
   <script src="supabase.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
   <script>
     const requiredHeaders = [
@@ -573,11 +565,6 @@
         const em1=pickEmoji(emojiArr);
         emojiSpan.textContent=` ${em1}`;
         header.appendChild(emojiSpan);
-        const shareBtn=document.createElement('button');
-        shareBtn.className='share-btn';
-        shareBtn.textContent='Share';
-        shareBtn.addEventListener('click',()=>openShareModal(team,card));
-        card.appendChild(shareBtn);
         card.appendChild(header);
 
         const summary=document.createElement('div');
@@ -789,33 +776,6 @@
       });
     }
 
-    function openShareModal(team,card){
-      const pct=Math.max(0,Math.min(100,((team.totalRating-7.5)/(11-7.5))*100)).toFixed(0);
-      const clone=card.cloneNode(true);
-      const msg=document.createElement('div');
-      msg.className='share-message';
-      msg.innerHTML=`My lineup scored ${pct}. How do your teams compare? <a href="portfolio.html">See now.</a>`;
-      clone.appendChild(msg);
-      clone.style.width=card.offsetWidth+'px';
-      const showModal=canvas=>{
-        try{
-          document.getElementById('share-image').src=canvas.toDataURL();
-          document.getElementById('share-modal').classList.add('show');
-        }catch(err){
-          clone.querySelectorAll('img.team-logo').forEach(img=>{
-            const abbr=(img.alt||'').slice(0,3).toUpperCase();
-            const span=document.createElement('span');
-            span.className='team-abbr';
-            span.textContent=abbr;
-            img.replaceWith(span);
-          });
-          clone.querySelectorAll('img').forEach(img=>img.remove());
-          html2canvas(clone).then(showModal);
-        }
-      };
-
-      html2canvas(clone,{useCORS:true}).then(showModal);
-    }
 
     document.getElementById('open-modal').addEventListener('click',()=>{
       document.getElementById('upload-modal').classList.add('show');
@@ -847,9 +807,6 @@
       document.getElementById('query-modal').classList.remove('show');
     });
 
-    document.getElementById('share-close').addEventListener('click',()=>{
-      document.getElementById('share-modal').classList.remove('show');
-    });
 
     document.getElementById('pre-file').addEventListener('change',async e=>{
       if(uploading) return;

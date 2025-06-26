@@ -209,32 +209,6 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
   font-size:14px;
 }
 
-/* Share button on lineup cards */
-.share-btn{
-  position:absolute;
-  top:4px;
-  right:4px;
-  background:var(--bb-blue-500);
-  color:#fff;
-  border:none;
-  border-radius:var(--radius);
-  padding:2px 6px;
-  font-size:11px;
-  cursor:pointer;
-}
-.share-btn:hover{background:var(--bb-blue-600);}
-
-/* Message included in share preview */
-.share-message{
-  margin-top:8px;
-  font-weight:600;
-  text-align:center;
-}
-.share-message a{
-  color:var(--bb-blue-600);
-  text-decoration:none;
-  font-weight:700;
-}
 
 
 /* Team logos */
@@ -243,18 +217,6 @@ label.browse-btn:hover{background:var(--bb-blue-600);}
   height:16px;
   object-fit:contain;
   margin-right:8px;
-  vertical-align:middle;
-}
-/* Fallback abbreviation shown when team logo cannot be loaded */
-.team-abbr{
-  display:inline-block;
-  width:16px;
-  height:16px;
-  line-height:16px;
-  margin-right:8px;
-  text-align:center;
-  font-size:10px;
-  font-weight:600;
   vertical-align:middle;
 }
 
