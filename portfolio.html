@@ -33,7 +33,7 @@
         <pre id="last-query"></pre>
       </div>
       <div id="format-options" style="display:none;">
-        <p class="info-note">Showing Teams Drafted in the Following Formats:</p>
+        <p id="formats-note" class="info-note">Showing Teams Drafted in the Following Formats:</p>
         <label id="label-pre" class="format-option"><img class="icon" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRltuDZN3yIMK1sh9oDF7ykc7HYDeuCGoZ--g&s" alt="Underdog logo"><input type="checkbox" id="chk-pre"> Post-Draft</label>
         <label id="label-post" class="format-option"><img class="icon" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRltuDZN3yIMK1sh9oDF7ykc7HYDeuCGoZ--g&s" alt="Underdog logo"><input type="checkbox" id="chk-post"> Post-Draft</label>
         <label id="label-elim" class="format-option"><img class="icon" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRltuDZN3yIMK1sh9oDF7ykc7HYDeuCGoZ--g&s" alt="Underdog logo"><input type="checkbox" id="chk-elim"> Eliminator</label>
@@ -109,6 +109,10 @@
         <progress id="elim-progress" max="100" value="0" class="upload-progress" style="display:none;"></progress>
         <span id="elim-status" class="status"></span>
       </div>
+        <div class="upload-row">
+          <span>Underdog Username:</span>
+          <input type="text" id="ud-username" maxlength="180">
+        </div>
       <div id="db-status" class="status"></div>
       <button id="upload-done">Done</button>
       <div id="insert-count" class="status"></div>
@@ -224,9 +228,11 @@
     let pageSize=21;
     let filteredTeams=[];
 
+    let underdogUsername="";
     function saveUploads(){
       try{
         localStorage.setItem('bb_allTeams',JSON.stringify(allTeams));
+        localStorage.setItem("bb_username",underdogUsername);
         localStorage.setItem('bb_uploadedFormats',JSON.stringify(uploadedFormats));
       }catch(err){
         console.error('Error saving uploads',err);
@@ -237,6 +243,8 @@
       try{
         const teamsStr=localStorage.getItem('bb_allTeams');
         const formatsStr=localStorage.getItem('bb_uploadedFormats');
+        const uname = localStorage.getItem("bb_username");
+        if(uname) underdogUsername = uname;
         if(teamsStr&&formatsStr){
           const savedTeams=JSON.parse(teamsStr);
           const savedFormats=JSON.parse(formatsStr);
@@ -257,6 +265,10 @@
       const preLabel=document.getElementById('label-pre');
       const postLabel=document.getElementById('label-post');
       const elimLabel=document.getElementById('label-elim');
+      const note=document.getElementById("formats-note");
+      if(note){
+        note.textContent=underdogUsername?`Showing Teams Drafted by ${underdogUsername} in the Following Formats:`:"Showing Teams Drafted in the Following Formats:";
+      }
       const dateFilter=document.getElementById('date-filter');
       const sortControl=document.getElementById('sort-control');
       const viewControl=document.getElementById('view-control');
@@ -808,10 +820,17 @@
     document.getElementById('open-modal').addEventListener('click',()=>{
       document.getElementById('upload-modal').classList.add('show');
       if(insertCountEl) insertCountEl.textContent='';
+        const userInput=document.getElementById("ud-username");
+        if(userInput) userInput.value=underdogUsername;
     });
 
     document.getElementById('upload-done').addEventListener('click',()=>{
       document.getElementById('upload-modal').classList.remove('show');
+      const userInput=document.getElementById("ud-username");
+      if(userInput) {
+        underdogUsername=userInput.value.trim();
+        localStorage.setItem("bb_username",underdogUsername);
+      }
       if(lastSqlQuery){
         const content=document.getElementById('query-content');
         if(content){
