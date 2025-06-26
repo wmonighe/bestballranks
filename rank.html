@@ -1249,10 +1249,21 @@
       if (session?.user) window.ensureUserRow(session.user);
     });
 
-    window.supabase.auth.getSession().then(({ data }) => {
-      updateAuthUI(data.session?.user);
-      if (data.session?.user) window.ensureUserRow(data.session.user);
-    });
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('code')) {
+      window.supabase.auth.exchangeCodeForSession(window.location.href)
+        .then(({ data, error }) => {
+          if (error) console.error('Error exchanging code', error);
+          history.replaceState({}, document.title, window.location.pathname);
+          updateAuthUI(data?.user);
+          if (data?.user) window.ensureUserRow(data.user);
+        });
+    } else {
+      window.supabase.auth.getSession().then(({ data }) => {
+        updateAuthUI(data.session?.user);
+        if (data.session?.user) window.ensureUserRow(data.session.user);
+      });
+    }
 
 
     showSkeleton();
