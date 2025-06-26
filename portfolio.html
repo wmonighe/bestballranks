@@ -89,6 +89,10 @@
     <div class="modal-content">
       <h2>Select CSVs to Upload</h2>
       <div class="upload-row">
+        <span>Underdog Username:</span>
+        <input type="text" id="ud-username" maxlength="180">
+      </div>
+      <div class="upload-row">
         <span>Pre-Draft (Underdog)</span>
         <label for="pre-file" class="browse-btn">Browse</label>
         <input type="file" id="pre-file" accept=".csv">
@@ -109,10 +113,6 @@
         <progress id="elim-progress" max="100" value="0" class="upload-progress" style="display:none;"></progress>
         <span id="elim-status" class="status"></span>
       </div>
-        <div class="upload-row">
-          <span>Underdog Username:</span>
-          <input type="text" id="ud-username" maxlength="180">
-        </div>
       <div id="db-status" class="status"></div>
       <button id="upload-done">Done</button>
       <div id="insert-count" class="status"></div>
@@ -820,8 +820,18 @@
     document.getElementById('open-modal').addEventListener('click',()=>{
       document.getElementById('upload-modal').classList.add('show');
       if(insertCountEl) insertCountEl.textContent='';
-        const userInput=document.getElementById("ud-username");
-        if(userInput) userInput.value=underdogUsername;
+      const userInput=document.getElementById('ud-username');
+      if(userInput) userInput.value=underdogUsername;
+      ['pre','post','elim'].forEach(prefix=>{
+        const file=document.getElementById(`${prefix}-file`);
+        const status=document.getElementById(`${prefix}-status`);
+        const prog=document.getElementById(`${prefix}-progress`);
+        if(file) file.value='';
+        if(status){status.textContent='';status.className='status';}
+        if(prog){prog.style.display='none';prog.value=0;}
+      });
+      if(dbStatusEl){dbStatusEl.textContent='';dbStatusEl.className='status';}
+      if(dbQueryEl){dbQueryEl.textContent='';dbQueryEl.style.display='none';}
     });
 
     document.getElementById('upload-done').addEventListener('click',()=>{
