@@ -562,6 +562,7 @@
     let displayRows = [];
     let customRanks = null;
     let customNames = {};
+    let adpMap = {};
 
     function computeRatings() {
       const weights = {
@@ -693,10 +694,16 @@
 
     function findUnmatchedPlayers() {
       const set = new Set(allRows.map(r => canonicalName(r.player)));
-      return Object.keys(customRanks || {}).filter(c => !set.has(c)).map(c => ({
-        canon: c,
-        name: customNames[c] || c,
-      }));
+      return Object.keys(customRanks || {})
+        .filter(c => !set.has(c))
+        .filter(c => {
+          const val = adpMap[c];
+          return val !== undefined && val < 300;
+        })
+        .map(c => ({
+          canon: c,
+          name: customNames[c] || c,
+        }));
     }
 
     function updateUnmatchedModal() {
@@ -1020,6 +1027,15 @@
         });
 
         allRows = rowsData;
+        adpMap = {};
+        rowsData.forEach(r => {
+          const val = parseFloat(r.adp);
+          if (!isNaN(val)) {
+            const canon = canonicalName(r.player);
+            adpMap[canon] = val;
+            adpMap[altCanonicalName(r.player)] = val;
+          }
+        });
         computeRatings();
         updatePlayerOptions();
         refreshRankSetOptions(false);
