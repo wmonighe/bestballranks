@@ -314,6 +314,18 @@
       });
     }
 
+    async function saveDrafter(username){
+      if(typeof supabase==='undefined' || !username) return;
+      try{
+        await supabase.from('teams').insert({
+          team_name: `temp_${Date.now()}`,
+          drafter: username
+        });
+      }catch(err){
+        console.error('Supabase teams insert error',err);
+      }
+    }
+
       async function uploadRowsToSupabase(rows,format,progressCb){
         try{
           const allowed=['pre','post','elim'];
@@ -797,10 +809,11 @@
     document.getElementById('upload-done').addEventListener('click',()=>{
       document.getElementById('upload-modal').classList.remove('show');
       const userInput=document.getElementById("ud-username");
-      if(userInput) {
-        underdogUsername=userInput.value.trim();
-        localStorage.setItem("bb_username",underdogUsername);
-      }
+        if(userInput) {
+          underdogUsername=userInput.value.trim();
+          localStorage.setItem("bb_username",underdogUsername);
+          saveDrafter(underdogUsername);
+        }
       if(lastSqlQuery){
         const content=document.getElementById('query-content');
         if(content){
