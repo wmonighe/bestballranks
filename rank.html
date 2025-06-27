@@ -654,7 +654,10 @@
           r.wmonigheRank = customRanks[canon];
         } else {
           r.wmonigheRank = '';
-          r.fantasyPts = 'N/A';
+          r.fantasyPts = '0';
+          r.fpPct = '0.00';
+          r.fpPctValue = '0.00';
+          r.fpPctDisplay = '';
         }
       });
       recomputeWmonighePct();
@@ -670,7 +673,15 @@
     function restoreOriginalRanks() {
       allRows.forEach(r => {
         r.wmonigheRank = r.wmonigheRankOrig;
-        r.fantasyPts = r.fantasyPtsOrig;
+        const raw = r.fantasyPtsOrig;
+        if (raw === '' || raw === '#N/A' || raw === 'N/A') {
+          r.fantasyPts = '0';
+          r.fpPct = '0.00';
+          r.fpPctValue = '0.00';
+          r.fpPctDisplay = '';
+        } else {
+          r.fantasyPts = raw;
+        }
       });
       recomputeWmonighePct();
       computeRatings();
@@ -937,7 +948,9 @@
             adp = 'Undrafted';
             adpPct = '0.00';
           }
-          const fantasyPts = getFantasyPoints(row);
+          const fpRaw = getFantasyPoints(row);
+          const hasFp = fpRaw !== '' && fpRaw !== '#N/A' && fpRaw !== 'N/A';
+          const fantasyPts = hasFp ? fpRaw : '0';
           const wmonigheRank = getColumn(row, 'G', 'wmonighe rank');
 
           const teamMap = { JAX: 'JAC' };
@@ -964,15 +977,16 @@
             vorp: getColumn(row, 'Q', 'vorp score'),
             vorpPct: getColumn(row, 'R', 'vorp percentile'),
             fantasyPts,
-            fantasyPtsOrig: fantasyPts,
+            fantasyPtsOrig: fpRaw,
+            hasFantasyPts: hasFp,
           };
         });
 
         // Add fantasy points percentiles by position
         const fpsByPos = {};
         rowsData.forEach(r => {
-          const val = parseFloat(r.fantasyPts);
-          if (!isNaN(val)) {
+          const val = parseFloat(r.fantasyPtsOrig);
+          if (r.hasFantasyPts && !isNaN(val)) {
             const pos = r.position || 'NA';
             let include = true;
             if (pos === 'QB') include = val > 50;
@@ -985,31 +999,26 @@
         Object.keys(fpsByPos).forEach(pos => fpsByPos[pos].sort((a, b) => a - b));
 
         rowsData.forEach(r => {
-          const val = parseFloat(r.fantasyPts);
+          const val = parseFloat(r.fantasyPtsOrig);
           const pos = r.position || 'NA';
           const arr = fpsByPos[pos];
-          if (pos === 'QB') {
-            if (!isNaN(val) && val > 50 && arr && arr.length) {
+          if (!r.hasFantasyPts || isNaN(val) || !arr || !arr.length) {
+            r.fpPct = '0.00';
+            r.fpPctValue = '0.00';
+          } else if (pos === 'QB') {
+            if (val > 50) {
               const rank = arr.filter(v => v <= val).length;
               r.fpPct = (rank / arr.length).toFixed(2);
               r.fpPctValue = r.fpPct;
-            } else if (!isNaN(val)) {
+            } else {
               r.fpPct = '0.00';
               r.fpPctValue = '0.00';
               r.fpPctDisplay = 'Unranked';
-            } else {
-              r.fpPct = '';
-              r.fpPctValue = '';
             }
           } else {
-            if (!isNaN(val) && arr && arr.length) {
-              const rank = arr.filter(v => v <= val).length;
-              r.fpPct = (rank / arr.length).toFixed(2);
-              r.fpPctValue = r.fpPct;
-            } else {
-              r.fpPct = '';
-              r.fpPctValue = '';
-            }
+            const rank = arr.filter(v => v <= val).length;
+            r.fpPct = (rank / arr.length).toFixed(2);
+            r.fpPctValue = r.fpPct;
           }
         });
 
