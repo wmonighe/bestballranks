@@ -259,6 +259,23 @@
       from { left: -100%; }
       to { left: 100%; }
     }
+    .table-wrap {
+      position: relative;
+    }
+    .table-wrap.fade-bottom::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 3rem;
+      pointer-events: none;
+      background: linear-gradient(to bottom, rgba(255,255,255,0), #fff);
+    }
+    #load-more {
+      display: block;
+      margin: 1rem auto 0;
+    }
     .info-note {
       text-align: center;
       font-size: 0.9rem;
@@ -369,13 +386,13 @@
   </header>
   <p class="info-note">Values in parentheses indicate percentile rank.</p>
   <div id="loading-message" class="loading-msg">Loading player rankings…</div>
-  <table id="rankings-table">
-    <thead></thead>
-    <tbody></tbody>
-  </table>
-  <div style="text-align:center; margin-top:1rem;">
-    <button id="load-more" class="btn btn-secondary" style="display:none;">Load More</button>
+  <div class="table-wrap">
+    <table id="rankings-table">
+      <thead></thead>
+      <tbody></tbody>
+    </table>
   </div>
+  <button id="load-more" class="btn btn-secondary" style="display:none;">Load More</button>
   <div id="upload-modal" class="modal">
     <div class="modal-content">
       <h3>Upload Custom Rankings</h3>
@@ -811,6 +828,10 @@
       const btn = document.getElementById('load-more');
       if (btn) {
         btn.style.display = rows.length > displayLimit ? 'block' : 'none';
+      }
+      const wrapper = document.querySelector('.table-wrap');
+      if (wrapper) {
+        wrapper.classList.toggle('fade-bottom', rows.length > displayLimit);
       }
     }
 
