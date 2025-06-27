@@ -373,6 +373,9 @@
     <thead></thead>
     <tbody></tbody>
   </table>
+  <div style="text-align:center; margin-top:1rem;">
+    <button id="load-more" class="btn btn-secondary" style="display:none;">Load More</button>
+  </div>
   <div id="upload-modal" class="modal">
     <div class="modal-content">
       <h3>Upload Custom Rankings</h3>
@@ -560,6 +563,7 @@
     let allRows = [];
     let sortState = { key: null, asc: true };
     let displayRows = [];
+    let displayLimit = 300;
     let customRanks = null;
     let customNames = {};
     let adpMap = {};
@@ -796,13 +800,18 @@
       displayRows = rows;
       const tbody = document.querySelector('#rankings-table tbody');
       tbody.innerHTML = '';
-      rows.forEach((r, i) => {
+      const toShow = rows.slice(0, displayLimit);
+      toShow.forEach((r, i) => {
         const tr = document.createElement('tr');
         columns.forEach(col => {
           tr.insertAdjacentHTML('beforeend', col.cell(r, i));
         });
         tbody.appendChild(tr);
       });
+      const btn = document.getElementById('load-more');
+      if (btn) {
+        btn.style.display = rows.length > displayLimit ? 'block' : 'none';
+      }
     }
 
     function showSkeleton() {
@@ -832,6 +841,8 @@
       }
       const msg = document.getElementById('loading-message');
       if (msg) msg.style.display = 'block';
+      const btn = document.getElementById('load-more');
+      if (btn) btn.style.display = 'none';
     }
 
     function sortAndRender(key, preserve) {
@@ -1232,6 +1243,11 @@
       handleFiles(e.dataTransfer.files);
     });
     uploadInput.addEventListener('change', e => handleFiles(e.target.files));
+
+    document.getElementById('load-more').addEventListener('click', () => {
+      displayLimit = Infinity;
+      renderRows(displayRows);
+    });
 
 
 
