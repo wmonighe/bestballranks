@@ -117,9 +117,7 @@
         <progress id="elim-progress" max="100" value="0" class="upload-progress" style="display:none;"></progress>
         <span id="elim-status" class="status"></span>
       </div>
-      <div id="db-status" class="status"></div>
       <button id="upload-done">Done</button>
-      <div id="insert-count" class="status"></div>
       <pre id="db-query" class="db-query"></pre>
     </div>
   </div>
@@ -142,9 +140,7 @@
     const rankingsUrl = `https://opensheet.elk.sh/${sheetId}/Rankings`;
       const sentimentUrl = `https://opensheet.elk.sh/${sheetId}/Sentiment`;
 
-      const dbStatusEl = document.getElementById('db-status');
       const dbQueryEl = document.getElementById('db-query');
-      const insertCountEl = document.getElementById('insert-count');
       const lastQueryEl = document.getElementById('last-query');
       let lastSqlQuery = '';
       let lastInsertCount = 0;
@@ -428,26 +424,7 @@
           if(progressEl){progressEl.value=pct;}
         });
         if(progressEl){progressEl.style.display='none';progressEl.value=0;}
-        if(insertCountEl){
-          insertCountEl.textContent = dbSuccess ? `Inserted ${lastInsertCount} rows.` : '';
-        }
-        if(dbStatusEl){
-          if(dbSuccess){
-            dbStatusEl.textContent='lineup written to database';
-            dbStatusEl.className='status success';
-            if(dbQueryEl){
-              dbQueryEl.textContent='';
-              dbQueryEl.style.display='none';
-            }
-          }else{
-            dbStatusEl.textContent='database failure';
-            dbStatusEl.className='status error';
-            if(dbQueryEl){
-              dbQueryEl.textContent=lastSqlQuery;
-              dbQueryEl.style.display='block';
-            }
-          }
-        }
+        if(dbQueryEl){dbQueryEl.textContent=''; dbQueryEl.style.display='none';}
         const teams={};
         rows.forEach(r=>{const key=r['Draft Entry'];if(!teams[key]){teams[key]={tournamentTitle:r['Tournament Title'],entryFee:r['Tournament Entry Fee'],picks:[]};}teams[key].picks.push(r);});
         const teamArr=Object.values(teams);
@@ -795,7 +772,6 @@
 
     document.getElementById('open-modal').addEventListener('click',()=>{
       document.getElementById('upload-modal').classList.add('show');
-      if(insertCountEl) insertCountEl.textContent='';
       const userInput=document.getElementById('ud-username');
       if(userInput) userInput.value=underdogUsername;
       ['pre','post','elim'].forEach(prefix=>{
@@ -806,7 +782,6 @@
         if(status){status.textContent='';status.className='status';}
         if(prog){prog.style.display='none';prog.value=0;}
       });
-      if(dbStatusEl){dbStatusEl.textContent='';dbStatusEl.className='status';}
       if(dbQueryEl){dbQueryEl.textContent='';dbQueryEl.style.display='none';}
     });
 
