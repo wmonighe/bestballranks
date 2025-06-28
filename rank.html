@@ -317,27 +317,27 @@
         <div>
           <label for="weight-wmonighe" id="rank-label">Rankings</label>
           <input type="range" id="weight-wmonighe" min="0" max="100" value="35" />
-          <span id="weight-wmonighe-val">35%</span>
+          <span id="weight-wmonighe-val" class="weight-display" contenteditable="true" tabindex="0">35%</span>
         </div>
         <div>
           <label for="weight-adp">ADP</label>
           <input type="range" id="weight-adp" min="0" max="100" value="35" />
-          <span id="weight-adp-val">35%</span>
+          <span id="weight-adp-val" class="weight-display" contenteditable="true" tabindex="0">35%</span>
         </div>
         <div>
           <label for="weight-fp">Fantasy Points</label>
           <input type="range" id="weight-fp" min="0" max="100" value="10" />
-          <span id="weight-fp-val">10%</span>
+          <span id="weight-fp-val" class="weight-display" contenteditable="true" tabindex="0">10%</span>
         </div>
         <div>
           <label for="weight-sentiment">Sentiment</label>
           <input type="range" id="weight-sentiment" min="0" max="100" value="5" />
-          <span id="weight-sentiment-val">5%</span>
+          <span id="weight-sentiment-val" class="weight-display" contenteditable="true" tabindex="0">5%</span>
         </div>
         <div>
           <label for="weight-vorp">Futures Props</label>
           <input type="range" id="weight-vorp" min="0" max="100" value="15" />
-          <span id="weight-vorp-val">15%</span>
+          <span id="weight-vorp-val" class="weight-display" contenteditable="true" tabindex="0">15%</span>
         </div>
       </div>
         <aside class="rank-controls">
@@ -430,11 +430,83 @@
       vorp: document.getElementById('weight-vorp'),
     };
 
+    const weightDisplays = {
+      wmonighe: document.getElementById('weight-wmonighe-val'),
+      adp: document.getElementById('weight-adp-val'),
+      fp: document.getElementById('weight-fp-val'),
+      sentiment: document.getElementById('weight-sentiment-val'),
+      vorp: document.getElementById('weight-vorp-val'),
+    };
+
+    const addPriority = ['adp', 'fp', 'sentiment', 'wmonighe', 'vorp'];
+    const subPriority = [...addPriority].reverse();
+
     function updateWeightDisplay(key) {
       const el = document.getElementById(`weight-${key}-val`);
       if (el && weightInputs[key]) {
         el.textContent = `${weightInputs[key].value}%`;
       }
+    }
+
+    function applyWeightEdit(key, newVal) {
+      newVal = Math.max(0, Math.min(100, Math.round(newVal)));
+      const weights = {};
+      Object.keys(weightInputs).forEach(k => {
+        weights[k] = parseInt(weightInputs[k].value, 10) || 0;
+      });
+      const oldVal = weights[key];
+      let diff = newVal - oldVal;
+      weights[key] = newVal;
+      const others = Object.keys(weightInputs).filter(k => k !== key);
+
+      if (diff > 0) {
+        let base = Math.floor(diff / others.length);
+        let remainder = diff % others.length;
+        others.forEach(k => {
+          const deduct = Math.min(base, weights[k]);
+          weights[k] -= deduct;
+          remainder += base - deduct;
+        });
+        const order = subPriority.filter(k => k !== key);
+        for (const o of order) {
+          while (remainder > 0 && weights[o] > 0) {
+            weights[o]--;
+            remainder--;
+          }
+          if (remainder <= 0) break;
+        }
+        if (remainder > 0) {
+          weights[key] -= remainder;
+        }
+      } else if (diff < 0) {
+        diff = -diff;
+        let base = Math.floor(diff / others.length);
+        let remainder = diff % others.length;
+        others.forEach(k => {
+          const add = Math.min(base, 100 - weights[k]);
+          weights[k] += add;
+          remainder += base - add;
+        });
+        const order = addPriority.filter(k => k !== key);
+        for (const o of order) {
+          while (remainder > 0 && weights[o] < 100) {
+            weights[o]++;
+            remainder--;
+          }
+          if (remainder <= 0) break;
+        }
+        if (remainder > 0) {
+          weights[key] += remainder;
+        }
+      }
+
+      Object.keys(weightInputs).forEach(k => {
+        weightInputs[k].value = weights[k];
+        updateWeightDisplay(k);
+        prevWeights[k] = weights[k];
+      });
+      computeRatings();
+      sortAndRender(sortState.key, true);
     }
 
     const prevWeights = {};
@@ -477,6 +549,27 @@
       prevWeights[k] = parseInt(weightInputs[k].value, 10) || 0;
       weightInputs[k].addEventListener('input', () => handleWeightInput(k));
       updateWeightDisplay(k);
+    });
+
+    Object.keys(weightDisplays).forEach(k => {
+      const el = weightDisplays[k];
+      el.addEventListener('focus', () => {
+        el.textContent = weightInputs[k].value;
+      });
+      el.addEventListener('blur', () => {
+        const val = parseInt(el.textContent, 10);
+        if (!isNaN(val)) {
+          applyWeightEdit(k, val);
+        } else {
+          updateWeightDisplay(k);
+        }
+      });
+      el.addEventListener('keydown', e => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          el.blur();
+        }
+      });
     });
 
     const columns = [
