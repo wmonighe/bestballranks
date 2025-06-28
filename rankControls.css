@@ -102,3 +102,14 @@
 }
 .export-options.show{display:flex;}
 .export-options .export-option{justify-content:flex-start;}
+
+/* Editable weight value next to sliders */
+.weight-display{
+  min-width:2.5rem;
+  display:inline-block;
+  text-align:right;
+  cursor:text;
+}
+.weight-display:focus{
+  outline:1px solid #1e90ff;
+}
