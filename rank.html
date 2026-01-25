@@ -382,21 +382,9 @@
                 Export
               </button>
               <div id="exportOptions" class="export-options">
-                <button type="button" class="btn btn-secondary export-option" data-type="postdraft">
+                <button type="button" class="btn btn-secondary export-option" data-type="predraft">
                   <img class="icon" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRltuDZN3yIMK1sh9oDF7ykc7HYDeuCGoZ--g&s" alt="Download icon" />
-                  Post-Draft
-                </button>
-                <button type="button" class="btn btn-secondary export-option" data-type="eliminator">
-                  <img class="icon" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRltuDZN3yIMK1sh9oDF7ykc7HYDeuCGoZ--g&s" alt="Download icon" />
-                  Eliminator
-                </button>
-                <button type="button" class="btn btn-secondary export-option" data-type="marathon">
-                  <img class="icon" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRltuDZN3yIMK1sh9oDF7ykc7HYDeuCGoZ--g&s" alt="Download icon" />
-                  Marathon
-                </button>
-                <button type="button" class="btn btn-secondary export-option" data-type="sprint">
-                  <img class="icon" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRltuDZN3yIMK1sh9oDF7ykc7HYDeuCGoZ--g&s" alt="Download icon" />
-                  Sprint
+                  Pre-Draft
                 </button>
               </div>
             </div>
@@ -440,6 +428,7 @@
     const sheetId = '1MMmfHhZ13Kd-JyOR17LHvba5_gQ8Q13Ne-6HDtnfdvo';
     const rankingsUrl = `https://opensheet.elk.sh/${sheetId}/Rankings`;
     const sentimentUrl = `https://opensheet.elk.sh/${sheetId}/Sentiment`;
+    const adpUrl = `https://opensheet.elk.sh/${sheetId}/ADP`;
 
 
 
@@ -1226,6 +1215,28 @@
     const exportOptions = document.getElementById('exportOptions');
     const exportWrap = document.querySelector('.export-wrap');
     let draftIdMap = null;
+    let adpIdMap = null;
+
+    async function fetchAdpIds() {
+      if (adpIdMap) return adpIdMap;
+      try {
+        const response = await fetch(adpUrl);
+        const adpData = await response.json();
+        adpIdMap = {};
+        adpData.forEach(r => {
+          const canon = canonicalName(r.NAME || r.name);
+          if (canon && r.id) {
+            adpIdMap[canon] = r.id;
+            const altCanon = altCanonicalName(r.NAME || r.name);
+            adpIdMap[altCanon] = r.id;
+          }
+        });
+        return adpIdMap;
+      } catch (err) {
+        console.error('Error loading ADP ids', err);
+        return {};
+      }
+    }
 
     async function fetchDraftIds() {
       if (draftIdMap) return draftIdMap;
@@ -1275,20 +1286,28 @@
       const rows = displayRows
         .map(r => {
           const canon = canonicalName(r.player);
-          let rec = map[canon];
-          if (!rec) {
+          let id = map[canon];
+          if (!id) {
             const alt = altCanonicalName(r.player);
-            rec = map[alt];
+            id = map[alt];
           }
-          const id = (rec && rec[type]) || '';
-          return `${id},${r.player || ''}`;
+          // For old draft types, map structure is different
+          if (typeof id === 'object') {
+            id = (id && id[type]) || '';
+          }
+          return `${id || ''},${r.player || ''}`;
         })
         .join('\n');
       return header + rows;
     }
 
     async function handleExport(type) {
-      const map = await fetchDraftIds();
+      let map;
+      if (type === 'predraft') {
+        map = await fetchAdpIds();
+      } else {
+        map = await fetchDraftIds();
+      }
       const csv = buildCsv(type, map);
       const blob = new Blob([csv], { type: 'text/csv' });
       const url = URL.createObjectURL(blob);
