@@ -337,28 +337,28 @@
       <div id="weight-controls">
         <div>
           <label for="weight-wmonighe" id="rank-label">Rankings</label>
-          <input type="range" id="weight-wmonighe" min="0" max="100" value="35" />
-          <span id="weight-wmonighe-val" class="weight-display" contenteditable="true" tabindex="0">35%</span>
+          <input type="range" id="weight-wmonighe" min="0" max="100" value="50" />
+          <span id="weight-wmonighe-val" class="weight-display" contenteditable="true" tabindex="0">50%</span>
         </div>
         <div>
           <label for="weight-adp">ADP</label>
-          <input type="range" id="weight-adp" min="0" max="100" value="35" />
-          <span id="weight-adp-val" class="weight-display" contenteditable="true" tabindex="0">35%</span>
+          <input type="range" id="weight-adp" min="0" max="100" value="50" />
+          <span id="weight-adp-val" class="weight-display" contenteditable="true" tabindex="0">50%</span>
         </div>
         <div>
           <label for="weight-fp">Fantasy Points</label>
-          <input type="range" id="weight-fp" min="0" max="100" value="10" />
-          <span id="weight-fp-val" class="weight-display" contenteditable="true" tabindex="0">10%</span>
+          <input type="range" id="weight-fp" min="0" max="100" value="0" />
+          <span id="weight-fp-val" class="weight-display" contenteditable="true" tabindex="0">0%</span>
         </div>
         <div>
           <label for="weight-sentiment">Sentiment</label>
-          <input type="range" id="weight-sentiment" min="0" max="100" value="5" />
-          <span id="weight-sentiment-val" class="weight-display" contenteditable="true" tabindex="0">5%</span>
+          <input type="range" id="weight-sentiment" min="0" max="100" value="0" />
+          <span id="weight-sentiment-val" class="weight-display" contenteditable="true" tabindex="0">0%</span>
         </div>
         <div>
           <label for="weight-vorp">Futures Props</label>
-          <input type="range" id="weight-vorp" min="0" max="100" value="15" />
-          <span id="weight-vorp-val" class="weight-display" contenteditable="true" tabindex="0">15%</span>
+          <input type="range" id="weight-vorp" min="0" max="100" value="0" />
+          <span id="weight-vorp-val" class="weight-display" contenteditable="true" tabindex="0">0%</span>
         </div>
       </div>
         <aside class="rank-controls">
@@ -599,8 +599,11 @@
       },
       {
         header: '🏅 <span id="rankings-source">wmonighe</span> Rankings',
-        cell: r =>
-          `<td>${r.wmonigheRank}${r.wmonighePct ? ' (' + r.wmonighePct + ')' : ''}</td>`,
+        cell: r => {
+          const rank = (r.wmonigheRank === '' || r.wmonigheRank === 'N/A' || r.wmonigheRank === '#N/A') ? '0' : r.wmonigheRank;
+          const pct = r.wmonighePct ? ' (' + r.wmonighePct + ')' : '';
+          return `<td>${rank}${pct}</td>`;
+        },
         sortKey: 'wmonigheRank',
       },
       {
@@ -621,21 +624,28 @@
       {
         header: '🏆 Fantasy Points',
         cell: r => {
+          const pts = (r.fantasyPts === '' || r.fantasyPts === 'N/A' || r.fantasyPts === '#N/A') ? '0' : r.fantasyPts;
           const pctText = r.fpPctDisplay || r.fpPct;
-          return `<td>${r.fantasyPts}${pctText ? ' (' + pctText + ')' : ''}</td>`;
+          return `<td>${pts}${pctText ? ' (' + pctText + ')' : ''}</td>`;
         },
         sortKey: 'fantasyPts',
       },
       {
         header: '😊 Sentiment',
-        cell: r =>
-          `<td class="sentiment-cell" style="--width:${r.sentimentPercent}%"><span>${r.sentiment}${r.sentimentPct ? ' (' + r.sentimentPct + ')' : ''}</span></td>`,
+        cell: r => {
+          const sent = (r.sentiment === '' || r.sentiment === 'N/A' || r.sentiment === '#N/A') ? '0' : r.sentiment;
+          const pct = r.sentimentPct ? ' (' + r.sentimentPct + ')' : '';
+          return `<td class="sentiment-cell" style="--width:${r.sentimentPercent}%"><span>${sent}${pct}</span></td>`;
+        },
         sortKey: 'sentimentValue',
       },
       {
         header: '🎲 Futures Props',
-        cell: r =>
-          `<td>${r.vorp}${r.vorpPct ? ' (' + r.vorpPct + ')' : ''}</td>`,
+        cell: r => {
+          const vorp = (r.vorp === '' || r.vorp === 'N/A' || r.vorp === '#N/A') ? '0' : r.vorp;
+          const pct = r.vorpPct ? ' (' + r.vorpPct + ')' : '';
+          return `<td>${vorp}${pct}</td>`;
+        },
         sortKey: 'vorp',
       },
     ];
@@ -1036,8 +1046,12 @@
           const canonName = canonicalName(player);
           const rowSentiment =
             row.Sentiment || row['Sentiment Score'] || row.H || '';
-          const sentiment =
+          let sentiment =
             rowSentiment || sentimentMap[canonName] || '';
+          // Treat N/A as 0 for sentiment
+          if (sentiment === 'N/A' || sentiment === '#N/A' || sentiment === '') {
+            sentiment = '0';
+          }
           let adp = row.J || row.ADP || row['ADP'] || '';
           let adpPct = getColumn(row, 'L', 'adp percentile');
           const isUndrafted =
@@ -1065,19 +1079,25 @@
             ? `<img src="${teamLogo}" class="team-logo" onerror="this.style.display='none'" /> ${player} (${row.Position})`
             : `${player} (${row.Position})`;
 
+          let vorp = getColumn(row, 'Q', 'vorp score');
+          // Treat N/A as 0 for vorp
+          if (vorp === 'N/A' || vorp === '#N/A' || vorp === '') {
+            vorp = '0';
+          }
+
           return {
             player,
             position: row.Position,
             team: row.Team,
             playerHtml,
             sentiment,
-            sentimentValue: parseFloat(sentiment),
+            sentimentValue: parseFloat(sentiment) || 0,
             adp,
             adpPct,
             postDraftId: getColumn(row, 'P', 'post draft id'),
             wmonigheRank,
             wmonigheRankOrig: wmonigheRank,
-            vorp: getColumn(row, 'Q', 'vorp score'),
+            vorp,
             vorpPct: getColumn(row, 'R', 'vorp percentile'),
             fantasyPts,
             fantasyPtsOrig: fpRaw,
@@ -1152,7 +1172,7 @@
         // Sentiment rendering
         const numericSentiments = rowsData
           .map(r => r.sentimentValue)
-          .filter(v => !isNaN(v));
+          .filter(v => !isNaN(v) && v !== 0);
         const minSentiment =
           numericSentiments.length > 0 ? Math.min(...numericSentiments) : 0;
         const maxSentiment =
@@ -1160,13 +1180,13 @@
         const range = maxSentiment - minSentiment || 1;
 
         rowsData.forEach(r => {
-          if (!isNaN(r.sentimentValue)) {
+          if (!isNaN(r.sentimentValue) && r.sentimentValue !== 0) {
             const pctRaw = (r.sentimentValue - minSentiment) / range;
             r.sentimentPercent = pctRaw * 100;
             r.sentimentPct = pctRaw.toFixed(2);
           } else {
             r.sentimentPercent = 0;
-            r.sentimentPct = '';
+            r.sentimentPct = '0.00';
           }
         });
 
@@ -1340,11 +1360,11 @@
     });
 
     document.getElementById('resetBtn').addEventListener('click', () => {
-      weightInputs.wmonighe.value = 35;
-      weightInputs.adp.value = 35;
-      weightInputs.fp.value = 10;
-      weightInputs.sentiment.value = 5;
-      weightInputs.vorp.value = 15;
+      weightInputs.wmonighe.value = 50;
+      weightInputs.adp.value = 50;
+      weightInputs.fp.value = 0;
+      weightInputs.sentiment.value = 0;
+      weightInputs.vorp.value = 0;
       Object.keys(weightInputs).forEach(k => {
         updateWeightDisplay(k);
         prevWeights[k] = parseInt(weightInputs[k].value, 10) || 0;
