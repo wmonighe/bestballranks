@@ -658,6 +658,20 @@
       }
     }
 
+    function recalculateTeamRatings(){
+      allTeams.forEach(team=>{
+        const rosterSize=team.rosterSize||team.picks.length;
+        team.totalRating=team.picks.reduce((sum,p)=>{
+          const canon=canonicalName(`${p['First Name']} ${p['Last Name']}`);
+          const rating=parseFloat(ratingMap[canon]);
+          return sum+(isNaN(rating)?0:rating);
+        },0);
+        if(rosterSize===20){
+          team.totalRating=team.totalRating*(18/20);
+        }
+      });
+    }
+
     function filterAndRender(){
       const selected=[];
       if(document.getElementById('chk-pre').checked) selected.push('pre');
@@ -884,7 +898,11 @@
 
     loadUploads();
     updateFormatOptions();
-    ratingsPromise.then(filterAndRender);
+    ratingsPromise.then(()=>{
+      recalculateTeamRatings();
+      saveUploads();
+      filterAndRender();
+    });
 
     document.getElementById('chk-pre').addEventListener('change',filterAndRender);
     document.getElementById('chk-post').addEventListener('change',filterAndRender);
