@@ -337,18 +337,18 @@
       <div id="weight-controls">
         <div>
           <label for="weight-wmonighe" id="rank-label">Rankings</label>
-          <input type="range" id="weight-wmonighe" min="0" max="100" value="50" />
-          <span id="weight-wmonighe-val" class="weight-display" contenteditable="true" tabindex="0">50%</span>
+          <input type="range" id="weight-wmonighe" min="0" max="100" value="33" />
+          <span id="weight-wmonighe-val" class="weight-display" contenteditable="true" tabindex="0">33%</span>
         </div>
         <div>
           <label for="weight-adp">ADP</label>
-          <input type="range" id="weight-adp" min="0" max="100" value="50" />
-          <span id="weight-adp-val" class="weight-display" contenteditable="true" tabindex="0">50%</span>
+          <input type="range" id="weight-adp" min="0" max="100" value="33" />
+          <span id="weight-adp-val" class="weight-display" contenteditable="true" tabindex="0">33%</span>
         </div>
         <div>
           <label for="weight-fp">Fantasy Points</label>
-          <input type="range" id="weight-fp" min="0" max="100" value="0" />
-          <span id="weight-fp-val" class="weight-display" contenteditable="true" tabindex="0">0%</span>
+          <input type="range" id="weight-fp" min="0" max="100" value="34" />
+          <span id="weight-fp-val" class="weight-display" contenteditable="true" tabindex="0">34%</span>
         </div>
         <div>
           <label for="weight-sentiment">Sentiment</label>
@@ -1360,9 +1360,9 @@
     });
 
     document.getElementById('resetBtn').addEventListener('click', () => {
-      weightInputs.wmonighe.value = 50;
-      weightInputs.adp.value = 50;
-      weightInputs.fp.value = 0;
+      weightInputs.wmonighe.value = 33;
+      weightInputs.adp.value = 33;
+      weightInputs.fp.value = 34;
       weightInputs.sentiment.value = 0;
       weightInputs.vorp.value = 0;
       Object.keys(weightInputs).forEach(k => {
