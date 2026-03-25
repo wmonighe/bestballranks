@@ -1124,7 +1124,8 @@
         rowsData.forEach(r => {
           const val = parseFloat(r.fantasyPtsOrig);
           const pos = r.position || 'NA';
-          const arr = fpsByPos[pos];
+          // TEs are ranked against the WR pool to account for positional scoring differences
+          const arr = pos === 'TE' ? fpsByPos['WR'] : fpsByPos[pos];
           if (!r.hasFantasyPts || isNaN(val) || !arr || !arr.length) {
             r.fpPct = '0.00';
             r.fpPctValue = '0.00';
