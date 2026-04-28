@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clay Projections Admin</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: system-ui, -apple-system, sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; padding: 24px; }
+    a { color: #60a5fa; }
+
+    h1 { font-size: 1.4rem; font-weight: 700; margin-bottom: 4px; }
+    h2 { font-size: 1rem; font-weight: 600; margin: 0 0 12px; }
+    .subtitle { font-size: 0.8rem; color: #94a3b8; margin-bottom: 24px; }
+
+    .card { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+
+    .btn { display: inline-flex; align-items: center; gap: 6px; background: #3b82f6; color: #fff; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 0.875rem; font-weight: 500; transition: background .15s; }
+    .btn:hover { background: #2563eb; }
+    .btn:disabled { opacity: .45; cursor: not-allowed; }
+    .btn-big { padding: 12px 36px; font-size: 1rem; font-weight: 700; }
+    .btn-green { background: #16a34a; }
+    .btn-green:hover:not(:disabled) { background: #15803d; }
+    .btn-sm { padding: 4px 10px; font-size: 0.78rem; }
+    .btn-ghost { background: transparent; border: 1px solid #475569; color: #cbd5e1; }
+    .btn-ghost:hover { background: #1e293b; }
+
+    .row { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .row + .row { margin-top: 10px; }
+
+    label { font-size: 0.85rem; color: #94a3b8; }
+    input[type="text"], input[type="file"] { background: #0f172a; border: 1px solid #334155; border-radius: 5px; color: #e2e8f0; padding: 6px 10px; font-size: 0.85rem; outline: none; }
+    input[type="text"]:focus { border-color: #3b82f6; }
+    input[type="text"].wide { width: 360px; }
+
+    .badge { display: inline-block; border-radius: 4px; padding: 2px 8px; font-size: 0.75rem; font-weight: 600; }
+    .badge-green { background: #14532d; color: #86efac; }
+    .badge-red { background: #7f1d1d; color: #fca5a5; }
+    .badge-blue { background: #1e3a5f; color: #93c5fd; }
+
+    #status-bar { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin-bottom: 4px; }
+    .stat-chip { font-size: 0.85rem; }
+    .stat-chip strong { font-weight: 700; }
+
+    /* Auth */
+    #auth-status { font-size: 0.85rem; color: #94a3b8; }
+    #auth-status.signed-in { color: #86efac; }
+
+    /* Results table */
+    .table-wrap { overflow-x: auto; max-height: 420px; overflow-y: auto; border-radius: 6px; border: 1px solid #334155; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    th { background: #0f172a; color: #94a3b8; text-align: left; padding: 7px 10px; font-weight: 600; position: sticky; top: 0; z-index: 1; white-space: nowrap; }
+    td { padding: 6px 10px; border-top: 1px solid #1e293b; white-space: nowrap; }
+    tr:hover td { background: #253047; }
+    .pos-qb { color: #f59e0b; }
+    .pos-rb { color: #34d399; }
+    .pos-wr { color: #60a5fa; }
+    .pos-te { color: #a78bfa; }
+
+    /* Unmatched list */
+    .unmatched-item { background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 12px 14px; margin-bottom: 8px; }
+    .unmatched-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .unmatched-name { font-weight: 600; font-size: 0.9rem; }
+    .unmatched-meta { font-size: 0.78rem; color: #94a3b8; }
+    .map-row { display: flex; gap: 8px; align-items: center; }
+    .map-input { flex: 1; max-width: 280px; }
+    .suggestions { position: relative; }
+    .suggestion-list { position: absolute; top: 100%; left: 0; right: 0; background: #1e293b; border: 1px solid #3b82f6; border-radius: 0 0 6px 6px; z-index: 10; max-height: 180px; overflow-y: auto; }
+    .suggestion-item { padding: 6px 10px; cursor: pointer; font-size: 0.82rem; }
+    .suggestion-item:hover { background: #2d3e55; }
+    .mapped-badge { background: #14532d; color: #86efac; border-radius: 4px; padding: 2px 8px; font-size: 0.75rem; font-weight: 600; }
+
+    /* Settings */
+    #settings-panel { display: none; }
+    #settings-panel.open { display: block; }
+    .settings-note { font-size: 0.78rem; color: #64748b; margin-top: 6px; }
+
+    /* Progress */
+    #progress-wrap { display: none; }
+    #progress-bar-outer { background: #1e293b; border-radius: 4px; height: 8px; overflow: hidden; width: 300px; }
+    #progress-bar { background: #3b82f6; height: 100%; width: 0%; transition: width .1s; }
+    #progress-label { font-size: 0.8rem; color: #94a3b8; margin-top: 4px; }
+
+    /* Error */
+    .error-box { background: #450a0a; border: 1px solid #b91c1c; border-radius: 6px; padding: 10px 14px; font-size: 0.85rem; color: #fca5a5; margin-bottom: 12px; }
+
+    #results-section { display: none; }
+    #write-card { display: none; }
+
+    .divider { border: none; border-top: 1px solid #1e293b; margin: 20px 0; }
+  </style>
+</head>
+<body>
+
+<h1>Mike Clay 2026 Projections — Admin</h1>
+<p class="subtitle">Ingests projections from the ESPN PDF and writes Fantasy Points to the Rankings sheet.</p>
+
+<!-- Auth Card -->
+<div class="card" id="auth-card">
+  <div class="row">
+    <h2 style="margin:0">Google Auth</h2>
+    <span id="auth-status">Not signed in</span>
+    <button class="btn btn-sm" id="signin-btn" onclick="requestToken()">Sign in with Google</button>
+    <button class="btn btn-sm btn-ghost" id="signout-btn" onclick="signOut()" style="display:none">Sign out</button>
+  </div>
+  <div class="settings-note" style="margin-top:8px">
+    Needed to write to the sheet. Requires a Google Cloud OAuth Client ID —
+    <a href="#" onclick="toggleSettings()">configure →</a>
+  </div>
+</div>
+
+<!-- Settings Panel -->
+<div class="card" id="settings-panel">
+  <h2>Google OAuth Setup</h2>
+  <div class="row">
+    <label for="client-id-input">Client ID</label>
+    <input type="text" id="client-id-input" class="wide" placeholder="xxxxx.apps.googleusercontent.com" />
+    <button class="btn btn-sm" onclick="saveClientId()">Save</button>
+  </div>
+  <p class="settings-note" style="margin-top:8px">
+    1. Go to <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a> →
+    APIs &amp; Services → Credentials.<br>
+    2. Enable the <strong>Google Sheets API</strong> for your project.<br>
+    3. Create an <strong>OAuth 2.0 Client ID</strong> (Web application) and add
+    <code>https://www.bestballrankings.xyz</code> as an authorized JavaScript origin.<br>
+    4. Paste the client ID above and click Save.
+  </p>
+</div>
+
+<!-- PDF Source Card -->
+<div class="card">
+  <h2>PDF Source</h2>
+  <div class="row">
+    <span style="font-size:.85rem;color:#94a3b8">URL:</span>
+    <code style="font-size:.78rem;color:#60a5fa" id="pdf-url-display">https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf</code>
+  </div>
+  <div class="row" style="margin-top:10px">
+    <span style="font-size:.82rem;color:#64748b">CORS fallback — upload file manually if URL fetch fails:</span>
+    <input type="file" id="pdf-file-input" accept=".pdf" />
+  </div>
+</div>
+
+<!-- Error -->
+<div class="error-box" id="error-box" style="display:none"></div>
+
+<!-- Ingest Button -->
+<div class="row" style="margin-bottom:20px">
+  <button class="btn btn-big" id="ingest-btn" onclick="runIngest()">⚡ Ingest</button>
+</div>
+
+<!-- Progress -->
+<div id="progress-wrap">
+  <div id="progress-bar-outer"><div id="progress-bar"></div></div>
+  <div id="progress-label">Loading…</div>
+</div>
+
+<!-- Results -->
+<div id="results-section">
+
+  <div id="status-bar" class="card" style="margin-bottom:12px;">
+    <div class="stat-chip">PDF Players: <strong id="stat-pdf">0</strong></div>
+    <div class="stat-chip"><span class="badge badge-green" id="stat-matched">0 matched</span></div>
+    <div class="stat-chip"><span class="badge badge-red" id="stat-unmatched">0 unmatched</span></div>
+  </div>
+
+  <!-- Write to Sheet -->
+  <div class="card" id="write-card">
+    <div class="row">
+      <button class="btn btn-green btn-big" id="write-btn" onclick="writeToSheet()">✅ Write to Sheet</button>
+      <span style="font-size:.82rem;color:#94a3b8">Updates Fantasy Points (column I) in the Rankings tab for all matched players.</span>
+    </div>
+    <div id="write-status" style="margin-top:10px;font-size:.85rem;"></div>
+  </div>
+
+  <!-- Matched Table -->
+  <div class="card">
+    <h2>Matched Players (<span id="matched-count">0</span>)</h2>
+    <div class="table-wrap">
+      <table id="matched-table">
+        <thead>
+          <tr>
+            <th>PDF Name</th><th>Pos</th><th>Team</th><th>Rank</th>
+            <th>Proj Pts</th><th>Sheet Name</th><th>Sheet Row</th>
+          </tr>
+        </thead>
+        <tbody id="matched-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Unmatched Section -->
+  <div class="card" id="unmatched-card" style="display:none">
+    <h2>Unmatched Players (<span id="unmatched-count">0</span>)</h2>
+    <p style="font-size:.82rem;color:#94a3b8;margin-bottom:14px">
+      These players were found in the PDF but could not be matched to a sheet row.
+      Search for a player name from the sheet and click Map to link them.
+      Mappings are saved and re-used on future ingestions.
+    </p>
+    <div id="unmatched-list"></div>
+  </div>
+
+</div><!-- /results-section -->
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>
+// ─────────────────────────────────────────────
+// CONFIG
+// ─────────────────────────────────────────────
+const SHEET_ID   = '1MMmfHhZ13Kd-JyOR17LHvba5_gQ8Q13Ne-6HDtnfdvo';
+const SHEET_NAME = 'Rankings';
+const FP_COL     = 'I'; // Fantasy Points column
+
+const PDF_URL = 'https://g.espncdn.com/s/ffldraftkit/26/NFLDK2026_CS_ClayProjections2026.pdf';
+
+// 1-indexed PDF pages for each position
+const POSITION_PAGES = [
+  { pos: 'QB', pages: [35] },
+  { pos: 'RB', pages: [36, 37, 38] },
+  { pos: 'WR', pages: [39, 40, 41, 42, 43] },
+  { pos: 'TE', pages: [44, 45] },
+];
+
+// All team codes that appear in the PDF (includes non-standard abbreviations)
+const NFL_TEAMS = new Set([
+  'ARZ','ARI','ATL','BLT','BAL','BUF','CAR','CHI','CIN','CLV','CLE',
+  'DAL','DEN','DET','GB','HOU','HST','IND','JAC','JAX','KC','LAC',
+  'LAR','LV','LVR','MIA','MIN','NE','NO','NYG','NYJ','PHI','PIT','SF',
+  'SEA','TB','TEN','WAS','WSH',
+]);
+
+// Skip tokens that are all-caps but are NOT team codes
+const SKIP_CAPS = new Set(['QB','RB','WR','TE','FB','FF','NFL','PPR','IDP','KR','PR']);
+
+// ─────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────
+const state = {
+  sheetRows:   [],
+  matched:     [],
+  unmatched:   [],
+  accessToken: null,
+  tokenClient: null,
+};
+
+// Mappings: { canonicalPdfName → sheetPlayerName } persisted in localStorage
+function loadMappings() {
+  try { return JSON.parse(localStorage.getItem('clay_mappings') || '{}'); }
+  catch { return {}; }
+}
+function saveMappings(m) {
+  localStorage.setItem('clay_mappings', JSON.stringify(m));
+}
+
+// ─────────────────────────────────────────────
+// NAME NORMALIZATION (mirrors rank.html)
+// ─────────────────────────────────────────────
+function canonicalName(name) {
+  return (name || '')
+    .toString()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[.''']/g, '')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
+}
+function altCanonicalName(name) {
+  return canonicalName(name).replace(/\s+/g, '');
+}
+
+// ─────────────────────────────────────────────
+// PDF PARSING
+// ─────────────────────────────────────────────
+async function extractPageLines(page) {
+  const content = await page.getTextContent();
+  if (!content.items.length) return [];
+
+  // Group text items by y-coordinate (±2px tolerance)
+  const lineMap = new Map();
+  for (const item of content.items) {
+    if (!item.str.trim()) continue;
+    const y = Math.round(item.transform[5] / 2) * 2;
+    if (!lineMap.has(y)) lineMap.set(y, []);
+    lineMap.get(y).push({ x: item.transform[4], str: item.str });
+  }
+
+  // Sort lines top-to-bottom (y descending in PDF coords), items left-to-right
+  return [...lineMap.entries()]
+    .sort((a, b) => b[0] - a[0])
+    .map(([, items]) =>
+      items.sort((a, b) => a.x - b.x).map(i => i.str).join(' ').trim()
+    )
+    .filter(l => l.length > 0);
+}
+
+function parsePlayerLine(line, pos) {
+  const tokens = line.trim().split(/\s+/);
+  if (tokens.length < 4) return null;
+
+  // Walk tokens looking for a team abbreviation followed by posRk + ffPt
+  for (let i = 1; i < tokens.length - 2; i++) {
+    const t = tokens[i];
+    if (!NFL_TEAMS.has(t) || SKIP_CAPS.has(t)) continue;
+
+    const posRk = parseInt(tokens[i + 1], 10);
+    const ffPt  = parseInt(tokens[i + 2], 10);
+
+    if (posRk >= 1 && posRk <= 300 && ffPt >= 5 && ffPt <= 500) {
+      const name = tokens.slice(0, i).join(' ').trim();
+      if (name.length >= 3 && !/^\d/.test(name) && !/^(QB|RB|WR|TE|Pos|Wide|Running|Tight|Quarter)/.test(name)) {
+        return { name, team: t, posRk, ffPt, pos };
+      }
+    }
+  }
+  return null;
+}
+
+async function parsePDF(source) {
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+  const loadArg = typeof source === 'string'
+    ? { url: source, withCredentials: false }
+    : { data: source };
+
+  const pdf = await pdfjsLib.getDocument(loadArg).promise;
+  const allPlayers = [];
+
+  let done = 0;
+  const totalPages = POSITION_PAGES.reduce((s, g) => s + g.pages.length, 0);
+
+  for (const { pos, pages } of POSITION_PAGES) {
+    for (const pageNum of pages) {
+      setProgress(done / totalPages * 60, `Parsing page ${pageNum} (${pos})…`);
+      const page  = await pdf.getPage(pageNum);
+      const lines = await extractPageLines(page);
+      for (const line of lines) {
+        const p = parsePlayerLine(line, pos);
+        if (p) allPlayers.push(p);
+      }
+      done++;
+    }
+  }
+
+  // Deduplicate by canonical name (keep first occurrence = best rank)
+  const seen = new Set();
+  return allPlayers.filter(p => {
+    const key = canonicalName(p.name);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+// ─────────────────────────────────────────────
+// GOOGLE SHEET FETCH
+// ─────────────────────────────────────────────
+async function fetchSheetData() {
+  setProgress(65, 'Fetching sheet data…');
+  const url = `https://opensheet.elk.sh/${SHEET_ID}/${encodeURIComponent(SHEET_NAME)}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Sheet fetch failed: ${res.status}`);
+  return res.json();
+}
+
+// ─────────────────────────────────────────────
+// PLAYER MATCHING
+// ─────────────────────────────────────────────
+function matchPlayers(pdfPlayers, sheetRows) {
+  const mappings = loadMappings();
+
+  // Build lookup maps for sheet players (by canonical and alt canonical)
+  const byCanon = new Map();
+  const byAlt   = new Map();
+  sheetRows.forEach((row, idx) => {
+    const name = row.Player || row.player || '';
+    if (!name) return;
+    const canon = canonicalName(name);
+    const alt   = altCanonicalName(name);
+    const entry = { row, idx, name };
+    if (!byCanon.has(canon)) byCanon.set(canon, entry);
+    if (!byAlt.has(alt))     byAlt.set(alt, entry);
+  });
+
+  const matched   = [];
+  const unmatched = [];
+
+  for (const player of pdfPlayers) {
+    const canon = canonicalName(player.name);
+    const alt   = altCanonicalName(player.name);
+
+    let sheetEntry = null;
+
+    // 1. Check manual mappings first
+    if (mappings[canon]) {
+      const mappedCanon = canonicalName(mappings[canon]);
+      sheetEntry = byCanon.get(mappedCanon) || byAlt.get(mappedCanon.replace(/\s/g, ''));
+    }
+
+    // 2. Exact canonical match
+    if (!sheetEntry) sheetEntry = byCanon.get(canon);
+
+    // 3. Alt canonical (no spaces) match
+    if (!sheetEntry) sheetEntry = byAlt.get(alt);
+
+    if (sheetEntry) {
+      matched.push({
+        pdfPlayer:  player,
+        sheetRow:   sheetEntry.row,
+        sheetIdx:   sheetEntry.idx,
+        sheetName:  sheetEntry.name,
+      });
+    } else {
+      unmatched.push(player);
+    }
+  }
+
+  return { matched, unmatched };
+}
+
+// ─────────────────────────────────────────────
+// MAIN INGEST
+// ─────────────────────────────────────────────
+async function runIngest() {
+  showError('');
+  setProgress(0, 'Starting…');
+  document.getElementById('progress-wrap').style.display = 'block';
+  document.getElementById('results-section').style.display = 'none';
+  document.getElementById('ingest-btn').disabled = true;
+
+  try {
+    // Determine PDF source
+    let pdfSource = PDF_URL;
+    const fileInput = document.getElementById('pdf-file-input');
+    if (fileInput.files.length > 0) {
+      pdfSource = await fileInput.files[0].arrayBuffer();
+    }
+
+    setProgress(5, 'Loading PDF…');
+    const pdfPlayers = await parsePDF(pdfSource);
+
+    const sheetRows = await fetchSheetData();
+    state.sheetRows = sheetRows;
+
+    setProgress(80, 'Matching players…');
+    const { matched, unmatched } = matchPlayers(pdfPlayers, sheetRows);
+    state.matched   = matched;
+    state.unmatched = unmatched;
+
+    setProgress(100, 'Done');
+    renderResults(pdfPlayers.length);
+
+  } catch (err) {
+    showError(err.message);
+    console.error(err);
+  } finally {
+    document.getElementById('progress-wrap').style.display = 'none';
+    document.getElementById('ingest-btn').disabled = false;
+  }
+}
+
+// ─────────────────────────────────────────────
+// RENDER RESULTS
+// ─────────────────────────────────────────────
+function posClass(pos) {
+  return 'pos-' + (pos || '').toLowerCase();
+}
+
+function renderResults(totalPdfPlayers) {
+  const { matched, unmatched } = state;
+
+  document.getElementById('results-section').style.display = 'block';
+  document.getElementById('stat-pdf').textContent       = totalPdfPlayers;
+  document.getElementById('stat-matched').textContent   = matched.length + ' matched';
+  document.getElementById('stat-unmatched').textContent = unmatched.length + ' unmatched';
+  document.getElementById('matched-count').textContent  = matched.length;
+  document.getElementById('unmatched-count').textContent = unmatched.length;
+
+  // Matched table
+  const tbody = document.getElementById('matched-tbody');
+  tbody.innerHTML = '';
+  for (const m of matched) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${m.pdfPlayer.name}</td>
+      <td class="${posClass(m.pdfPlayer.pos)}">${m.pdfPlayer.pos}</td>
+      <td>${m.pdfPlayer.team}</td>
+      <td>${m.pdfPlayer.posRk}</td>
+      <td><strong>${m.pdfPlayer.ffPt}</strong></td>
+      <td>${m.sheetName}</td>
+      <td>${m.sheetIdx + 2}</td>
+    `;
+    tbody.appendChild(tr);
+  }
+
+  // Write button (show only when signed in or remind user to sign in)
+  document.getElementById('write-card').style.display = 'block';
+
+  // Unmatched
+  const unmatchedCard = document.getElementById('unmatched-card');
+  const list = document.getElementById('unmatched-list');
+  list.innerHTML = '';
+  if (unmatched.length > 0) {
+    unmatchedCard.style.display = 'block';
+    for (const player of unmatched) {
+      list.appendChild(buildUnmatchedItem(player));
+    }
+  } else {
+    unmatchedCard.style.display = 'none';
+  }
+}
+
+function buildUnmatchedItem(player) {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'unmatched-item';
+  wrapper.dataset.pdfName = player.name;
+
+  const mappings = loadMappings();
+  const canon    = canonicalName(player.name);
+  const alreadyMapped = mappings[canon];
+
+  wrapper.innerHTML = `
+    <div class="unmatched-header">
+      <span class="unmatched-name">${player.name}</span>
+      <span class="badge badge-blue">${player.pos}</span>
+      <span class="unmatched-meta">${player.team} · ${player.ffPt} pts · rank #${player.posRk}</span>
+      ${alreadyMapped ? `<span class="mapped-badge">✓ mapped → ${alreadyMapped}</span>` : ''}
+    </div>
+    <div class="map-row">
+      <div class="suggestions" style="position:relative;flex:1;max-width:320px">
+        <input type="text" class="map-input" style="width:100%"
+          placeholder="Search sheet players…"
+          value="${alreadyMapped || ''}"
+          oninput="handleMapSearch(this, '${escAttr(player.name)}')"
+          onfocus="handleMapSearch(this, '${escAttr(player.name)}')"
+        />
+        <div class="suggestion-list" style="display:none"></div>
+      </div>
+      <button class="btn btn-sm btn-green"
+        onclick="saveMapping('${escAttr(player.name)}', this)">Map</button>
+      ${alreadyMapped ? `<button class="btn btn-sm btn-ghost"
+        onclick="clearMapping('${escAttr(player.name)}', this)">Clear</button>` : ''}
+    </div>
+  `;
+
+  return wrapper;
+}
+
+function escAttr(s) {
+  return (s || '').replace(/'/g, "\\'");
+}
+
+function handleMapSearch(input, pdfName) {
+  const q = input.value.toLowerCase().trim();
+  const dropEl = input.nextElementSibling;
+  if (!state.sheetRows.length) return;
+
+  const filtered = state.sheetRows
+    .filter(r => r.Player && r.Player.toLowerCase().includes(q))
+    .slice(0, 12);
+
+  if (!filtered.length || q.length < 1) {
+    dropEl.style.display = 'none';
+    return;
+  }
+
+  dropEl.innerHTML = filtered.map(r =>
+    `<div class="suggestion-item" onclick="selectSuggestion(this, '${escAttr(pdfName)}')" data-player="${escAttr(r.Player)}">
+      ${r.Player} <span style="color:#64748b;font-size:.75rem">${r.Position || ''} ${r.Team || ''}</span>
+    </div>`
+  ).join('');
+  dropEl.style.display = 'block';
+}
+
+function selectSuggestion(el, pdfName) {
+  const sheetName = el.dataset.player;
+  const wrapper   = el.closest('.unmatched-item');
+  const input     = wrapper.querySelector('.map-input');
+  input.value     = sheetName;
+  el.closest('.suggestion-list').style.display = 'none';
+}
+
+function saveMapping(pdfName, btn) {
+  const wrapper   = btn.closest('.unmatched-item');
+  const input     = wrapper.querySelector('.map-input');
+  const sheetName = input.value.trim();
+  if (!sheetName) return;
+
+  const mappings  = loadMappings();
+  const canon     = canonicalName(pdfName);
+  mappings[canon] = sheetName;
+  saveMappings(mappings);
+
+  // Re-run matching and re-render
+  const { matched, unmatched } = matchPlayers(
+    [...state.matched.map(m => m.pdfPlayer), ...state.unmatched],
+    state.sheetRows
+  );
+  state.matched   = matched;
+  state.unmatched = unmatched;
+
+  const total = state.matched.length + state.unmatched.length;
+  renderResults(total);
+}
+
+function clearMapping(pdfName, btn) {
+  const mappings = loadMappings();
+  delete mappings[canonicalName(pdfName)];
+  saveMappings(mappings);
+
+  const total = state.matched.length + state.unmatched.length;
+  // Re-run matching without this mapping
+  const { matched, unmatched } = matchPlayers(
+    [...state.matched.map(m => m.pdfPlayer), ...state.unmatched],
+    state.sheetRows
+  );
+  state.matched   = matched;
+  state.unmatched = unmatched;
+  renderResults(total);
+}
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', e => {
+  if (!e.target.classList.contains('map-input')) {
+    document.querySelectorAll('.suggestion-list').forEach(el => {
+      el.style.display = 'none';
+    });
+  }
+});
+
+// ─────────────────────────────────────────────
+// WRITE TO SHEET
+// ─────────────────────────────────────────────
+async function writeToSheet() {
+  if (!state.accessToken) {
+    showError('Sign in with Google before writing to the sheet.');
+    return;
+  }
+  if (!state.matched.length) {
+    showError('No matched players to write.');
+    return;
+  }
+
+  const btn = document.getElementById('write-btn');
+  btn.disabled = true;
+  btn.textContent = 'Writing…';
+  document.getElementById('write-status').textContent = '';
+
+  const batchData = state.matched.map(({ sheetIdx, pdfPlayer }) => ({
+    range:  `${SHEET_NAME}!${FP_COL}${sheetIdx + 2}`,
+    values: [[pdfPlayer.ffPt.toString()]],
+  }));
+
+  try {
+    const res = await fetch(
+      `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values:batchUpdate`,
+      {
+        method:  'POST',
+        headers: {
+          'Authorization': `Bearer ${state.accessToken}`,
+          'Content-Type':  'application/json',
+        },
+        body: JSON.stringify({
+          valueInputOption: 'RAW',
+          data: batchData,
+        }),
+      }
+    );
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error?.message || `HTTP ${res.status}`);
+    }
+
+    const json = await res.json();
+    const updated = json.totalUpdatedCells || state.matched.length;
+    document.getElementById('write-status').innerHTML =
+      `<span style="color:#86efac">✓ Updated ${updated} cells in the Rankings sheet.</span>`;
+
+  } catch (err) {
+    showError('Write failed: ' + err.message);
+    console.error(err);
+  } finally {
+    btn.disabled  = false;
+    btn.textContent = '✅ Write to Sheet';
+  }
+}
+
+// ─────────────────────────────────────────────
+// GOOGLE AUTH
+// ─────────────────────────────────────────────
+function getClientId() {
+  return localStorage.getItem('googleClientId') || '';
+}
+
+function initTokenClient() {
+  const clientId = getClientId();
+  if (!clientId || !window.google) return;
+  state.tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: clientId,
+    scope: 'https://www.googleapis.com/auth/spreadsheets',
+    callback: resp => {
+      if (resp.error) { showError('Auth error: ' + resp.error); return; }
+      state.accessToken = resp.access_token;
+      document.getElementById('auth-status').textContent = 'Signed in ✓';
+      document.getElementById('auth-status').className   = 'signed-in';
+      document.getElementById('signin-btn').style.display  = 'none';
+      document.getElementById('signout-btn').style.display = 'inline-flex';
+    }
+  });
+}
+
+function requestToken() {
+  if (!state.tokenClient) {
+    initTokenClient();
+    if (!state.tokenClient) {
+      showError('No Google Client ID configured. Click "configure →" above.');
+      return;
+    }
+  }
+  state.tokenClient.requestAccessToken({ prompt: 'consent' });
+}
+
+function signOut() {
+  if (state.accessToken) {
+    google.accounts.oauth2.revoke(state.accessToken, () => {});
+  }
+  state.accessToken = null;
+  document.getElementById('auth-status').textContent = 'Not signed in';
+  document.getElementById('auth-status').className   = '';
+  document.getElementById('signin-btn').style.display  = 'inline-flex';
+  document.getElementById('signout-btn').style.display = 'none';
+}
+
+// ─────────────────────────────────────────────
+// SETTINGS
+// ─────────────────────────────────────────────
+function toggleSettings() {
+  const panel = document.getElementById('settings-panel');
+  panel.classList.toggle('open');
+  if (panel.classList.contains('open')) {
+    document.getElementById('client-id-input').value = getClientId();
+  }
+}
+
+function saveClientId() {
+  const val = document.getElementById('client-id-input').value.trim();
+  localStorage.setItem('googleClientId', val);
+  initTokenClient();
+  document.getElementById('settings-panel').classList.remove('open');
+}
+
+// ─────────────────────────────────────────────
+// UI HELPERS
+// ─────────────────────────────────────────────
+function setProgress(pct, label) {
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('progress-label').textContent = label;
+}
+
+function showError(msg) {
+  const el = document.getElementById('error-box');
+  el.textContent = msg;
+  el.style.display = msg ? 'block' : 'none';
+}
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+window.addEventListener('load', () => {
+  // Init token client after GIS library loads
+  const waitForGIS = setInterval(() => {
+    if (window.google?.accounts?.oauth2) {
+      clearInterval(waitForGIS);
+      initTokenClient();
+    }
+  }, 200);
+});
+</script>
+</body>
+</html>
